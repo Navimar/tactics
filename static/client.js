@@ -68,7 +68,6 @@ let data = {
 
 let leftclickcn = 0;
 let nextunit = 0;
-// let selected = false
 
 window.onload = function () {
   // step(new Date().getTime());
@@ -145,7 +144,6 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
-  // selected = false;
   console.log(val);
   data = val;
   local.unit = false;
@@ -214,7 +212,6 @@ let onMouseDown = () => {
 let onMouseDownRight = () => {
   nextunit = 0;
   if (local.unit && local.unit.akt && data.turn && local.unit.color == 1) {
-    // local.order = false;
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
       send();

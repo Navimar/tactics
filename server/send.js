@@ -94,8 +94,10 @@ exports.data = (game) => {
     game.players[0].socket.emit('update', getData(game, game.turn));
   }
   else {
-    game.players[0].socket.emit('update', getData(game, 1));
-    game.players[1].socket.emit('update', getData(game, 2));
+    if (game.players[0].socket)
+      game.players[0].socket.emit('update', getData(game, 1));
+    if (game.players[1].socket)
+      game.players[1].socket.emit('update', getData(game, 2));
   }
 }
 
