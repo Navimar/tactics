@@ -9,9 +9,9 @@ if (os.platform() == 'darwin' || os.platform() == 'win32') {
   }
 } else {
   module.exports = {
-    ip: "46.101.23.21",
+    ip: "165.22.49.60",
     port: "80",
-    botkey: '',
+    botkey: '1000504506:AAGsQTgD-paoUrMwoldGeQMwWdmjN3pcbJ4',
     speed: 1,
   }
 }
