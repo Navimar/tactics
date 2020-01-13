@@ -68,6 +68,7 @@ let data = {
 
 let leftclickcn = 0;
 let nextunit = 0;
+// let selected = false
 
 window.onload = function () {
   // step(new Date().getTime());
@@ -144,9 +145,12 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
+  // selected = false;
   console.log(val);
   data = val;
-  local.unit = getUnit(mouseCell.x, mouseCell.y);
+  local.unit = false;
+  let unit = getUnit(mouseCell.x, mouseCell.y);
+  if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
   if (data.win) {
     alert(data.win);
   }
@@ -166,26 +170,29 @@ let getAkt = (x, y) => {
 }
 
 let onMouseDown = () => {
-  if (mouseCell.x < 0 && mouseCell.y <= 2) {
+  if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2) {
     endturn();
   } else {
-    local.unit = getUnit(mouseCell.x, mouseCell.y);
-    if (!local.unit) {
-      let arr = [];
-      data.unit.forEach((u) => {
-        if (u.color == 1 && u.isReady) {
-          arr.push(u);
+    if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
+      local.unit = getUnit(mouseCell.x, mouseCell.y);
+      if (!local.unit) {
+        let arr = [];
+        data.unit.forEach((u) => {
+          if (u.color == 1 && u.isReady) {
+            arr.push(u);
+          }
+        });
+        if (arr[nextunit] && local.unit != arr[nextunit]) {
+          local.unit = arr[nextunit];
+          nextunit++;
+        } else {
+          nextunit = 0;
+          local.unit = arr[nextunit];
+          nextunit++;
         }
-      });
-      if (arr[nextunit] && local.unit != arr[nextunit]) {
-        local.unit = arr[nextunit];
-        nextunit++;
-      } else {
-        nextunit = 0;
-        local.unit = arr[nextunit];
-        nextunit++;
-
       }
+    } else {
+      local.unit = false;
     }
   }
   // local.focus = false;
@@ -207,7 +214,7 @@ let onMouseDown = () => {
 let onMouseDownRight = () => {
   nextunit = 0;
   if (local.unit && local.unit.akt && data.turn && local.unit.color == 1) {
-    local.order = false;
+    // local.order = false;
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
       send();
