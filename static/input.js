@@ -1,13 +1,16 @@
 const socket = io();
 function inputServer() {
     socket.on('connect', function () {
-      console.log('connected');
-    //   socket.emit('login', login);
+        console.log('connected');
+        //   socket.emit('login', login);
     });
     socket.on('update', function (val) {
-      onUpdate(val);
+        onUpdate(val);
     });
     socket.on('login', (val) => {
-      onLogin(val);
+        onLogin(val);
     });
-  }
+    socket.on('logic', (val) => {
+        alert(val);
+    });
+}

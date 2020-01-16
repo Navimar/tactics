@@ -1,8 +1,10 @@
 let local = {
   akt: [],
   focus: false,
+  fisher: [999, 120],
 };
 let data = {
+  fisher: ['???', '!!!'],
   leftturns: 'нет подключения к серверу',
   field:
     [['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],
@@ -70,12 +72,25 @@ let leftclickcn = 0;
 let nextunit = 0;
 
 window.onload = function () {
-  // step(new Date().getTime());
   render();
   inputMouse();
   inputServer();
+  step(new Date().getTime());
   socket.emit("login", { id: findGetParameter("id"), pass: findGetParameter("key") });
 };
+
+
+function step(lastTime) {
+  let time = new Date().getTime();
+  let timeDiff = time - lastTime;
+  lastTime = time;
+
+  onStep(timeDiff);
+  setTimeout(function () { step(lastTime) }, 1000);
+  // requestAnimFrame(function () {
+  // step(lastTime);
+  // });
+}
 
 
 let render = () => {
@@ -112,29 +127,44 @@ let render = () => {
     }
   }
 
-  let renderpanel = () => {
-    // console.log(data.leftturns)
-    if (data.turn) {
-      drawSize('turn', -2, 0, 2, 2)
-    } else {
-      drawSize('turnEnemy', -2, 0, 2, 2)
-    }
-    drawTxt(data.leftturns + '', -2, 0, '#f00')
 
+  if (data.turn == 1) {
+    drawBackground('edgeTurn');
+  } else {
+    drawBackground('edgeWait');
   }
-  drawBackground('edgeTurn');
-  renderpanel();
   renderfield()
   renderunit();
+
+  renderpanel();
+
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
   }
 
 }
-
-let onStep = () => {
-  render();
+let renderpanel = () => {
+  // console.log(data.leftturns)
+  if (data.turn) {
+    drawSize('turn', -2, 0, 2, 2)
+  } else {
+    drawSize('turnEnemy', -2, 0, 2, 2)
+  }
+  drawTxt(data.leftturns + '', -2, 0, '#222')
+  renderFisher();
 }
+let renderFisher = () => {
+  drawTxt(local.fisher[0] + '', -2, 0.5, '#090')
+  drawTxt(local.fisher[1] + '', -1, 0.5, '#f00')
+}
+
+let onStep = (diff) => {
+  console.log('step');
+  if (data.turn)
+    local.fisher[0]--;
+  renderpanel();
+}
+
 let onLogin = (val) => {
   if (val !== 'success') {
     alert(val);
@@ -144,9 +174,15 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
-  console.log(val);
+  // console.log(val);
   data = val;
   local.unit = false;
+
+  if (local.fisher[0] > data.fisher[0]) {
+    local.fisher[0] = data.fisher[0];
+  }
+  local.fisher[1] = data.fisher[1];
+
   let unit = getUnit(mouseCell.x, mouseCell.y);
   if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
   if (data.win) {
@@ -243,5 +279,6 @@ let send = () => {
   socket.emit("order", { unit: local.unit, akt: local.order });
 }
 let endturn = () => {
+  local.fisher[0] += 120;
   socket.emit("endturn");
 }

@@ -70,7 +70,6 @@ exports.bot = (msg, bot) => {
   else if (text == '/sandbox') {
     game.new(p, p)
     p.game.sandbox = true;
-    console.log(p.game);
     send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p), bot);
   }
   else if (text == '/cancel') {

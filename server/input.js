@@ -1,5 +1,7 @@
 // // const _ = require('underscore');
 const bot = require('./bot');
+const time = require('./time');
+
 const config = require('./config');
 const handle = require('./handle');
 
@@ -38,7 +40,7 @@ input.tick = () => {
         previousTick = now;
 
         // update(delta);
-        // event.tick();
+        time.tick();
 
         // console.log('delta', delta, '(target: ' + tickLengthMs +' ms)', 'node ticks', actualTicks);
         actualTicks = 0;

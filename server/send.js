@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
+const time = require('./time');
+
 
 exports.web = (p, game) => {
   msg = game.data;
@@ -42,11 +44,11 @@ exports.data = (game) => {
         for (let x = 0; x < 9; x++) {
           arr[x] = [];
           for (let y = 0; y < 9; y++) {
-            arr[x][y] = game.data.field[x][y];
+            arr[x][y] = game.field[x][y];
             if (player == 2) {
-              if (game.data.field[x][y] == 'team1')
+              if (game.field[x][y] == 'team1')
                 arr[x][y] = 'team2';
-              if (game.data.field[x][y] == 'team2')
+              if (game.field[x][y] == 'team2')
                 arr[x][y] = 'team1';
             }
           }
@@ -54,13 +56,17 @@ exports.data = (game) => {
         return arr
       })(),
       unit: [],
+      fisher: (() => {
+        if (player == 1) return game.fisher;
+        if (player == 2) return game.fisher.slice().reverse();
+      })(),
       turn: (() => {
         if (game.turn == player) {
           return true;
         }
       })(),
     };
-    game.data.unit.forEach(u => {
+    game.unit.forEach(u => {
       let img = _.isFunction(meta[u.tp].img) ? meta[u.tp].img(u.data) : meta[u.tp].img;
       let akt = [];
       if (u.isReady) {
@@ -87,18 +93,20 @@ exports.data = (game) => {
     });
     return send;
   }
-  console.log('insend')
-
-  console.log(game)
   if (game.sandbox) {
     game.players[0].socket.emit('update', getData(game, game.turn));
   }
   else {
-    if (game.players[0].socket)
+    if (game.players[0].socket && players[0].game == game.players[0])
       game.players[0].socket.emit('update', getData(game, 1));
-    if (game.players[1].socket)
+    if (game.players[1].socket && players[1].game == game.players[1])
       game.players[1].socket.emit('update', getData(game, 2));
   }
+}
+
+exports.logicerror = (game, error) => {
+  game.players[0].socket.emit('logic', error);
+  game.players[1].socket.emit('logic', error);
 }
 
 // let send = (socket, event, msg, ctx) => {

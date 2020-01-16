@@ -1,19 +1,53 @@
-const akt = require('./akt');
+const en = require('./engine');
 
-exports.bear = {
+exports.warrior = {
     life: 3,
     img: 'bear',
     akt: (akt) => {
         // return [{ x: 5, y: 5, img: 'move' }]
         return akt.move().concat(akt.hand())
     },
-    move: (wd, target) => {
-        wd.walk(target);
+    move: (wd) => {
+        wd.walk();
     },
-    bear: (wd, target) => {
-        wd.damage(target);
+    warrior: (wd) => {
+        wd.damage();
         wd.tire();
         // wd.moveTo(target, wd.me.pt, 2);
+    }
+}
+
+exports.bear = {
+    life: 3,
+    img: 'bear',
+    akt: (akt) => {
+        let akts = akt.move()
+        let points = en.near(akt.me.x, akt.me.y);
+        points = points.filter(pt => {
+            let x = (2*akt.me.x - pt.x)
+            let y = (2*akt.me.y - pt.y)
+            return en.isOccupied(akt.game, pt.x, pt.y) && !en.isOccupied(akt.game, x, y)
+        });
+        points.forEach((pt) => {
+            akts.push({
+                x: pt.x,
+                y: pt.y,
+                img: 'bear',
+            })
+        });
+        // return [{ x: 5, y: 5, img: 'move' }]
+        return akts
+
+    },
+    move: (wd) => {
+        wd.walk();
+    },
+    bear: (wd) => {
+        wd.tire();
+        let x = (wd.me.x - wd.target.x)
+        let y = (wd.me.y - wd.target.y)
+        wd.move(x + wd.me.x, y + wd.me.y);
+        wd.damage(x + wd.me.x, y + wd.me.y);
     }
 }
 

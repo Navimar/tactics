@@ -1,17 +1,23 @@
 const meta = require('./meta');
+const time = require('./time');
 const wrapper = require('./wrapper');
 const send = require('./send');
 const en = require('./engine');
 const generator = require('./generator');
 
 exports.new = (p1, p2) => {
+  let data = generator.new();
   let game = {
     // key: newKey(),
     players: [p1, p2],
-    data: generator.new(),
+    fisher: [120, 120],
+    lastturntime: [],
+    unit: data.unit,
+    field: data.field,
     turn: 1,
     winner: 0,
     leftturns: 14,
+    started: time.clock(),
   }
   p1.game = game;
   p2.game = game;
@@ -25,7 +31,7 @@ exports.order = (p, u, akt) => {
   // console.log(u.x, akt)
 
   let unit = en.unitInPoint(game, u.x, u.y);
-  game.data.unit.forEach(u => {
+  game.unit.forEach(u => {
     // console.log(u.energy,u.isReady)
     u.isActive = false;
     if (u.energy < 3 && u != unit) u.isReady = false;
@@ -42,21 +48,20 @@ exports.order = (p, u, akt) => {
 
 exports.endturn = (p) => {
   let game = p.game;
-  game.data.unit.forEach(u => {
+  game.unit.forEach(u => {
     u.energy = 3;
     u.isReady = true;
   });
 
-  game.turn = game.turn == 1 ? 2 : 1;
   game.leftturns--;
   if (game.leftturns == 0) {
     let flag1 = 0
     let flag2 = 0;
     for (let x = 0; x < 9; x++) {
       for (let y = 0; y < 9; y++) {
-        if (game.data.field[x][y] == 'team1')
+        if (game.field[x][y] == 'team1')
           flag1++;
-        if (game.data.field[x][y] == 'team2')
+        if (game.field[x][y] == 'team2')
           flag2++
       }
     }
@@ -65,6 +70,20 @@ exports.endturn = (p) => {
     } else {
       game.winner = 2
     }
+  } else {
+    if (!game.lastturntime[game.turn-1]) game.lastturntime[game.turn-1] = time.clock();
+    game.fisher[game.turn-1] -= game.lastturntime[game.turn-1] - game.started;
+    game.lastturntime[game.turn-1] = time.clock();
+    if (game.fisher[game.turn-1] < 0) {
+      game.winner = game.turn == 1 ? 2 : 1;
+    } else {
+      game.fisher[game.turn-1] += 120;
+    }
   }
+  game.turn = game.turn == 1 ? 2 : 1;
   send.data(game);
+}
+
+function updatefisher(game) {
+
 }
