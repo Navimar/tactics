@@ -5,6 +5,9 @@ const send = require('./send');
 const en = require('./engine');
 const generator = require('./generator');
 
+const _ = require('lodash');
+
+
 exports.new = (p1, p2) => {
   let data = generator.new();
   let game = {
@@ -34,7 +37,13 @@ exports.order = (p, u, akt) => {
   game.unit.forEach(u => {
     // console.log(u.energy,u.isReady)
     u.isActive = false;
-    if (u.energy < 3 && u != unit) u.isReady = false;
+    if (u.energy < 3 && u != unit) {
+      if (_.isFunction(meta[u.tp].onTire)) {
+        // console.log('isFunction');
+        meta[u.tp].onTire(wrapper(game, u));
+      }
+      wrapper(game, u).tire();
+    }
   });
   unit.isActive = true;
   if (unit.x - akt.x > 0) {
@@ -49,6 +58,10 @@ exports.order = (p, u, akt) => {
 exports.endturn = (p) => {
   let game = p.game;
   game.unit.forEach(u => {
+    if (_.isFunction(meta[u.tp].onEndturn)) {
+      // console.log('isFunction');
+      meta[u.tp].onEndturn(wrapper(game, u));
+    }
     u.energy = 3;
     u.isReady = true;
   });

@@ -29,7 +29,7 @@ module.exports = (game, me) => {
             });
             return akts;
         },
-        hand: () => {
+        hand: (img) => {
             let akts = []
             let points = en.near(me.x, me.y);
             points = points.filter(pt =>
@@ -39,7 +39,7 @@ module.exports = (game, me) => {
                 akts.push({
                     x: pt.x,
                     y: pt.y,
-                    img: 'bear',
+                    img,
                 })
             });
             return akts

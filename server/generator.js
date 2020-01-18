@@ -1,4 +1,16 @@
 const meta = require('./meta');
+// const barraks = require('./barraks');
+const _ = require('lodash');
+
+let barraks = {};
+Object.keys(meta).forEach(function (key) {
+  let val = meta[key];
+  if (barraks[val.class]) {
+    barraks[val.class].push(key);
+  } else {
+    barraks[val.class] = [key];
+  }
+});
 
 exports.new = () => {
   let data = {
@@ -17,21 +29,21 @@ exports.new = () => {
   data.field[7][7] = 'team2';
   data.field[7][1] = 'team1';
   data.unit.push(...[
-    makeUnit('bear', 0, 0, 1),
-    makeUnit('bear', 1, 1, 1),
-    makeUnit('bear', 2, 2, 1),
-    makeUnit('bear', 3, 1, 1),
-    makeUnit('bear', 1, 3, 1),
-    makeUnit('bear', 3, 0, 1),
-    makeUnit('bear', 0, 3, 1),
+    makeUnit(rndUnit(), 0, 0, 1),
+    makeUnit(rndUnit(), 1, 1, 1),
+    makeUnit(rndUnit(), 2, 2, 1),
+    makeUnit(rndUnit(), 3, 1, 1),
+    makeUnit(rndUnit(), 1, 3, 1),
+    makeUnit(rndUnit(), 3, 0, 1),
+    makeUnit(rndUnit(), 0, 3, 1),
 
-    makeUnit('bear', 8, 8, 2),
-    makeUnit('bear', 7, 7, 2),
-    makeUnit('bear', 5, 7, 2),
-    makeUnit('bear', 7, 5, 2),
-    makeUnit('bear', 6, 6, 2),
-    makeUnit('bear', 8, 5, 2),
-    makeUnit('bear', 5, 8, 2),
+    makeUnit(rndUnit(), 8, 8, 2),
+    makeUnit(rndUnit(), 7, 7, 2),
+    makeUnit(rndUnit(), 5, 7, 2),
+    makeUnit(rndUnit(), 7, 5, 2),
+    makeUnit(rndUnit(), 6, 6, 2),
+    makeUnit(rndUnit(), 8, 5, 2),
+    makeUnit(rndUnit(), 5, 8, 2),
   ]
   );
 
@@ -51,4 +63,8 @@ let makeUnit = (tp, x, y, team, ) => {
     team,
     life: meta[tp].life,
   }
+}
+
+let rndUnit = () => {
+  return _.sample(barraks.champion);
 }

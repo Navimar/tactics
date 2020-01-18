@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
+const wrapper = require('./wrapper');
+
 const time = require('./time');
 
 
@@ -72,10 +74,9 @@ exports.data = (game) => {
       if (u.isReady) {
         akt = meta[u.tp].akt(akter(game, u));
       }
-      if (akt.length == 0) {
-        u.isActive = false;
-        u.isReady = false;
-      }
+      // if (akt.length == 0 && u.isReady) {
+      //   wrapper(game, u).tire();
+      // }
       send.unit.push({
         img,
         isActive: u.isActive,

@@ -1,4 +1,6 @@
 const en = require('./engine');
+// const en = require('./engine');
+const _ = require('lodash');
 
 module.exports = (game, me, target) => {
   return {
@@ -19,12 +21,19 @@ module.exports = (game, me, target) => {
         en.damage(game, en.unitInPoint(game, target.x, target.y));
       }
     },
+    noenergy: () => {
+      me.energy = 0;
+    },
     tire: () => {
       me.isReady = false;
       me.isActive = false;
+      // console.log(me,'tire wrapper');
     },
     move: (xto, yto) => {
       en.move(game, en.unitInPoint(game, target.x, target.y), xto, yto);
+    },
+    go: (xto, yto) => {
+      en.move(game, me, xto, yto);
     }
   }
 }

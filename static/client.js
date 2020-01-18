@@ -183,8 +183,15 @@ let onUpdate = (val) => {
   }
   local.fisher[1] = data.fisher[1];
 
-  let unit = getUnit(mouseCell.x, mouseCell.y);
-  if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
+  data.unit.forEach((u) => {
+    if (u.isActive && u.akt.length > 0) {
+      local.unit = u
+    }
+  });
+  // let unit = getUnit(mouseCell.x, mouseCell.y);
+  // if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
+
+
   if (data.win) {
     alert(data.win);
   }
