@@ -32,30 +32,34 @@ exports.new = (p1, p2) => {
 exports.order = (p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
   let game = p.game;
-  game.trail = [];
-  let unit = en.unitInPoint(game, u.x, u.y);
+  if (game) {
+    game.trail = [];
+    let unit = en.unitInPoint(game, u.x, u.y);
+    if (unit) {
 
-  addbonus(game, unit)
+      addbonus(game, unit)
 
-  game.unit.forEach(u => {
-    // console.log(u.energy,u.isReady)
-    u.isActive = false;
-    if (u.energy < 3 && u != unit) {
-      if (_.isFunction(meta[u.tp].onTire)) {
-        // console.log('isFunction');
-        meta[u.tp].onTire(wrapper(game, u));
+      game.unit.forEach(u => {
+        // console.log(u.energy,u.isReady)
+        u.isActive = false;
+        if (u.energy < 3 && u != unit) {
+          if (_.isFunction(meta[u.tp].onTire)) {
+            // console.log('isFunction');
+            meta[u.tp].onTire(wrapper(game, u));
+          }
+          wrapper(game, u).tire();
+        }
+      });
+      unit.isActive = true;
+      if (unit.x - akt.x > 0) {
+        unit.m = true;
+      } else if (unit.x - akt.x < 0) {
+        unit.m = false;
       }
-      wrapper(game, u).tire();
+      meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y }));
+      send.data(game);
     }
-  });
-  unit.isActive = true;
-  if (unit.x - akt.x > 0) {
-    unit.m = true;
-  } else if (unit.x - akt.x < 0) {
-    unit.m = false;
   }
-  meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y }));
-  send.data(game);
 }
 
 exports.endturn = (p) => {
