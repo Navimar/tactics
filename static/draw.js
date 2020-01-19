@@ -215,6 +215,11 @@ function drawImg(name, x, y) {
     ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
     // ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
 }
+
+function drawTrail(name, x, y) {
+    let img = getImg(name + '.trl', x, y);
+    ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
+}
 function drawAkt(name, x, y) {
     let p = 0;
     let img = getImg(name + '.akt', x, y);
@@ -235,7 +240,7 @@ function drawLife(quantity, x, y) {
 
     // let img = getImg('life' + quantity, x, y);
     // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
-    drawTxt(quantity + '', x - 0.1, y - 0.1, '#328094','25pt monospace');
+    drawTxt(quantity + '', x - 0.1, y - 0.1, '#328094', '25pt monospace');
     // ctx.drawImage(img, x * dh - p*0.5  + shiftX, y * dh- p*0.5, dh/4 + 2 * p, dh/4 + 2 * p);
     // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }

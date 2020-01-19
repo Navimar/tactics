@@ -6,6 +6,7 @@ let local = {
 let data = {
   fisher: ['???', '!!!'],
   leftturns: 'нет подключения к серверу',
+  trail: [],
   field:
     [['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],
     ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],
@@ -126,7 +127,16 @@ let render = () => {
       drawImg('focus', local.unit.x, local.unit.y)
     }
   }
-
+  let rendertrail = () => {
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < 9; x++) {
+        let u = data.trail.filter(u => u.x == x && u.y == y)[0];
+        if (u) {
+          drawTrail(u.img, u.x, u.y);
+        }
+      }
+    }
+  }
 
   if (data.turn == 1) {
     drawBackground('edgeTurn');
@@ -135,8 +145,8 @@ let render = () => {
   }
   renderfield()
   renderunit();
-
   renderpanel();
+  rendertrail();
 
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
@@ -149,6 +159,12 @@ let renderpanel = () => {
     drawSize('turn', -2, 0, 2, 2)
   } else {
     drawSize('turnEnemy', -2, 0, 2, 2)
+  }
+  if (data.win=='win') {
+    drawSize('win', -2, 2, 2, 2)
+  }
+  if (data.win == 'defeat') {
+    drawSize('defeat', -2, 2, 2, 2)
   }
   drawTxt(data.leftturns + '', -2, 0, '#222')
   renderFisher();
@@ -190,11 +206,6 @@ let onUpdate = (val) => {
   });
   // let unit = getUnit(mouseCell.x, mouseCell.y);
   // if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
-
-
-  if (data.win) {
-    alert(data.win);
-  }
   render();
   if (allakts() == 0) {
     endturn();

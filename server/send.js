@@ -32,12 +32,14 @@ exports.success = (socket) => {
 }
 
 exports.data = (game) => {
+  console.log(game.trail);
   let getData = (game, player) => {
     let send = {
       leftturns: game.leftturns,
+      trail: game.trail,
       win: (() => {
         if (game.winner != 0) {
-          if (player == game.winner) { return 'win' } else { return 'lose' }
+          if (player == game.winner) { return 'win' } else { return 'defeat' }
         }
         return false
       })(),

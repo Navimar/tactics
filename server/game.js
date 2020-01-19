@@ -14,6 +14,7 @@ exports.new = (p1, p2) => {
     // key: newKey(),
     players: [p1, p2],
     fisher: [120, 120],
+    trail:[],
     lastturntime: [],
     unit: data.unit,
     field: data.field,
@@ -32,7 +33,7 @@ exports.order = (p, u, akt) => {
   let game = p.game;
   // console.log('order');
   // console.log(u.x, akt)
-
+  game.trail = [];
   let unit = en.unitInPoint(game, u.x, u.y);
   game.unit.forEach(u => {
     // console.log(u.energy,u.isReady)

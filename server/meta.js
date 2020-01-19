@@ -37,20 +37,21 @@ exports.electric = {
         while (nw) {
             nw = false;
             wd.game.unit.forEach((u) => {
-                let npt = en.near(u.x, u.y)
-                npt.forEach((n) => {
-                    if (marks.get(n.x + '_' + n.y)) {
-                        if (!marks.get(u.x + '_' + u.y)) {
-                            marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
-                            nw = true;
+                if (u != wd.me) {
+                    let npt = en.near(u.x, u.y)
+                    npt.forEach((n) => {
+                        if (marks.get(n.x + '_' + n.y)) {
+                            if (!marks.get(u.x + '_' + u.y)) {
+                                marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
+                                nw = true;
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
         }
         marks.forEach((v, k, m) => {
-            if (!(v.x == wd.me.x && v.y == wd.me.y))
-                wd.damage(v.x, v.y);
+            wd.damage(v.x, v.y);
         });
         wd.tire();
     }

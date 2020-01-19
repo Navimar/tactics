@@ -27,6 +27,7 @@ en.damage = (game, unit) => {
   if (unit) {
     unit.life--;
     if (unit.life <= 0) en.death(game, unit);
+    game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
   } else {
     // require('./send').logicerror(game, 'damage cant find the unit')
   }
@@ -34,6 +35,7 @@ en.damage = (game, unit) => {
 
 en.move = (game, unit, x, y) => {
   if (unit) {
+    game.trail.push({ img: 'move', x: unit.x, y: unit.y });
     if (x >= 0 && x < 9 && y < 9 && y >= 0) {
       if (!en.unitInPoint(game, x, y)) {
         unit.x = x
