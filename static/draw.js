@@ -276,10 +276,15 @@ function drawLife(quantity, x, y) {
 
 function drawProp(name, x, y, m, team, isReady, isActive) {
   let color = false;
-  if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
-  if (team == 2 && !isReady) color = 'rgba(190,0,190,1)';
-  if (team == 1 && isReady) color = 'rgba(255,255,255,1)';
-  if (team == 1 && !isReady) color = 'rgba(30,190,40,1)';
+  if (!data.chooseteam && !data.bonus) {
+    if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
+    if (team == 2 && !isReady) color = 'rgba(190,0,190,1)';
+    if (team == 1 && isReady) color = 'rgba(255,255,255,1)';
+    if (team == 1 && !isReady) color = 'rgba(30,190,40,1)';
+  } else {
+    if (team == 2 && isReady) color = 'rgba(138, 120, 62,1)';
+    if (team == 1 && isReady) color = 'rgba(64, 117, 163,1)';
+  }
   if (isActive) color = 'rgba(0,255,0,1)';
   let p = dh / 10;
   let img = getImg(name, x, y);

@@ -41,6 +41,12 @@ exports.socket = (socket, e, msg) => {
       game.order(p, msg.unit, msg.akt);
     }
   }
+  if (e == 'bonus') {
+    let p = player.bySocket(socket);
+    if (p) {
+      game.setbonus(p, msg);
+    }
+  }
   if (e == 'endturn') {
     let p = player.bySocket(socket);
     if (p) {

@@ -35,7 +35,11 @@ exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
       leftturns: game.leftturns,
+      chooseteam: game.chooseteam,
       trail: game.trail,
+      bonus: (() => {
+        if (game.bonus[0] === null || game.bonus[1] === null) { return true }
+      })(),
       win: (() => {
         if (game.winner != 0) {
           if (player == game.winner) { return 'win' } else { return 'defeat' }

@@ -2,6 +2,7 @@ let local = {
   akt: [],
   focus: false,
   fisher: [999, 120],
+  sandclock: { x: 0, y: 0 }
 };
 let data = {
   fisher: ['???', '!!!'],
@@ -69,7 +70,7 @@ let data = {
   }]
 };
 let fieldmask = (() => {
-  let arr=[]
+  let arr = []
   for (let y = 0; y < 9; y++) {
     arr[y] = [];
     for (let x = 0; x < 9; x++) {
@@ -155,9 +156,11 @@ let render = () => {
   }
   renderfield()
   renderunit();
+  if (local.sandclock) {
+    drawImg('sandclock', local.sandclock.x, local.sandclock.y)
+  }
   renderpanel();
   rendertrail();
-
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
   }
@@ -170,11 +173,21 @@ let renderpanel = () => {
   } else {
     drawSize('turnEnemy', -2, 0, 2, 2)
   }
-  if (data.win=='win') {
+  if (data.win == 'win') {
     drawSize('win', -2, 2, 2, 2)
   }
   if (data.win == 'defeat') {
     drawSize('defeat', -2, 2, 2, 2)
+  }
+  if (data.bonus) {
+    let i = 0;
+    for (let x = 9; x < 11; x++) {
+      for (let y = 0; y < 9; y++) {
+        drawImgNormal('bonus', x, y)
+        drawTxt(("0" + i).slice(-2), x + 0.08, y + 0.11, '#000', "3vw monospace")
+        i++
+      }
+    }
   }
   drawTxt(data.leftturns + '', -2, 0, '#222')
   renderFisher();
@@ -200,9 +213,11 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
+
   // console.log(val);
   data = val;
   local.unit = false;
+  local.sandclock = false;
 
   if (local.fisher[0] > data.fisher[0]) {
     local.fisher[0] = data.fisher[0];
@@ -232,50 +247,60 @@ let getAkt = (x, y) => {
 }
 
 let onMouseDown = () => {
-  if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2) {
-    endturn();
-  } else {
-    if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
-      local.unit = getUnit(mouseCell.x, mouseCell.y);
-      if (!local.unit) {
-        let arr = [];
-        data.unit.forEach((u) => {
-          if (u.color == 1 && u.isReady) {
-            arr.push(u);
-          }
-        });
-        if (arr[nextunit] && local.unit != arr[nextunit]) {
-          local.unit = arr[nextunit];
-          nextunit++;
-        } else {
-          nextunit = 0;
-          local.unit = arr[nextunit];
-          nextunit++;
-        }
-      }
+  if (!data.bonus) {
+    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2) {
+      endturn();
     } else {
-      local.unit = false;
+      if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
+        local.unit = getUnit(mouseCell.x, mouseCell.y);
+        if (!local.unit) {
+          let arr = [];
+          data.unit.forEach((u) => {
+            if (u.color == 1 && u.isReady) {
+              arr.push(u);
+            }
+          });
+          if (arr[nextunit] && local.unit != arr[nextunit]) {
+            local.unit = arr[nextunit];
+            nextunit++;
+          } else {
+            nextunit = 0;
+            local.unit = arr[nextunit];
+            nextunit++;
+          }
+        }
+      } else {
+        local.unit = false;
+      }
     }
-  }
-  // local.focus = false;
-  // local.akt = [];
+    // local.focus = false;
+    // local.akt = [];
 
-  render();
-  if (local.unit && !local.unit.isReady) {
-    drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
-    //     local.akt = local.unit.akt;
-    //     local.focus = { x: unit.x, y: unit.y };
-  }
-  leftclickcn++
-  if (leftclickcn == 5) {
-    drawTxt('Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!', mouseCell.x, mouseCell.y, '#550000')
-    leftclickcn = 2;
+    render();
+    if (local.unit && !local.unit.isReady) {
+      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
+      //     local.akt = local.unit.akt;
+      //     local.focus = { x: unit.x, y: unit.y };
+    }
+    leftclickcn++
+    if (leftclickcn == 5) {
+      drawTxt('Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!', mouseCell.x, mouseCell.y, '#550000')
+      leftclickcn = 2;
+    }
+  } else {
+    if (mouseCell.x > 8 && mouseCell.x < 11) {
+      let b = (mouseCell.x - 9) * 9 + mouseCell.y;
+      sendbonus(b);
+    } else {
+      render();
+      drawTxt('Нажмите на одну из красных кнопок с числом справа! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+    }
   }
 }
 
 let onMouseDownRight = () => {
   nextunit = 0;
-  if (local.unit && local.unit.akt && data.turn && local.unit.color == 1) {
+  if (local.unit && local.unit.akt && data.turn && (local.unit.color == 1 || data.chooseteam)) {
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
       send();
@@ -305,6 +330,9 @@ let allakts = () => {
 
 let send = () => {
   socket.emit("order", { unit: local.unit, akt: local.order });
+}
+let sendbonus = (b) => {
+  socket.emit("bonus", b);
 }
 let endturn = () => {
   local.fisher[0] += 120;

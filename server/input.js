@@ -68,6 +68,10 @@ input.socket = (io) => {
         socket.on('endturn', function (msg) {
             handle.socket(socket, 'endturn', msg);
         });
+        socket.on('bonus', function (msg) {
+            handle.socket(socket, 'bonus', msg);
+        });
+
 
         socket.on('login', function (msg) {
             handle.socket(socket, 'login', msg);

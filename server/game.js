@@ -14,8 +14,9 @@ exports.new = (p1, p2) => {
     // key: newKey(),
     players: [p1, p2],
     fisher: [120, 120],
-    trail:[],
+    trail: [],
     lastturntime: [],
+    bonus: [null, null],
     unit: data.unit,
     field: data.field,
     turn: 1,
@@ -31,10 +32,11 @@ exports.new = (p1, p2) => {
 exports.order = (p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
   let game = p.game;
-  // console.log('order');
-  // console.log(u.x, akt)
   game.trail = [];
   let unit = en.unitInPoint(game, u.x, u.y);
+
+  addbonus(game, unit)
+
   game.unit.forEach(u => {
     // console.log(u.energy,u.isReady)
     u.isActive = false;
@@ -85,19 +87,44 @@ exports.endturn = (p) => {
       game.winner = 2
     }
   } else {
-    if (!game.lastturntime[game.turn-1]) game.lastturntime[game.turn-1] = time.clock();
-    game.fisher[game.turn-1] -= game.lastturntime[game.turn-1] - game.started;
-    game.lastturntime[game.turn-1] = time.clock();
-    if (game.fisher[game.turn-1] < 0) {
+    if (!game.lastturntime[game.turn - 1]) game.lastturntime[game.turn - 1] = time.clock();
+    game.fisher[game.turn - 1] -= game.lastturntime[game.turn - 1] - game.started;
+    game.lastturntime[game.turn - 1] = time.clock();
+    if (game.fisher[game.turn - 1] < 0) {
       game.winner = game.turn == 1 ? 2 : 1;
     } else {
-      game.fisher[game.turn-1] += 120;
+      game.fisher[game.turn - 1] += 120;
     }
   }
   game.turn = game.turn == 1 ? 2 : 1;
   send.data(game);
 }
 
-function updatefisher(game) {
-
+exports.setbonus = (p, bonus) => {
+  let game = p.game;
+  game.bonus[game.turn - 1] = bonus;
+  if (game.bonus[0] !== null && game.bonus[1] !== null) {
+    if (game.bonus[0] < game.bonus[1]) {
+      game.bonus[0] = 0;
+      game.turn = game.turn == 1 ? 2 : 1;
+    } else {
+      game.bonus[1] = 0;
+    }
+    game.chooseteam = true;
+  }
+  game.turn = game.turn == 1 ? 2 : 1;
+  send.data(game);
+}
+function addbonus(game, unit) {
+  let turn = game.turn == 1 ? 1 : 0;
+  if (game.bonus[turn]) {
+    unit.life += game.bonus[turn];
+    game.bonus[turn] = 0;
+  }
+  if (unit.team !== game.turn) {
+    game.unit.forEach(u => {
+      u.team = u.team == 1 ? 2 : 1;
+    });
+  }
+  game.chooseteam = false;
 }
