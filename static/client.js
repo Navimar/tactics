@@ -179,7 +179,7 @@ let renderpanel = () => {
   if (data.win == 'defeat') {
     drawSize('defeat', -2, 2, 2, 2)
   }
-  if (data.bonus) {
+  if (data.bonus && data.turn) {
     let i = 0;
     for (let x = 9; x < 11; x++) {
       for (let y = 0; y < 9; y++) {
@@ -288,12 +288,16 @@ let onMouseDown = () => {
       leftclickcn = 2;
     }
   } else {
-    if (mouseCell.x > 8 && mouseCell.x < 11) {
+    if (mouseCell.x > 8 && mouseCell.x < 11 && data.turn) {
       let b = (mouseCell.x - 9) * 9 + mouseCell.y;
       sendbonus(b);
     } else {
       render();
-      drawTxt('Нажмите на одну из красных кнопок с числом справа! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+      if (data.turn) {
+        drawTxt('Нажмите на одну из красных кнопок с числом справа! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+      } else {
+        drawTxt('Соперник выбирает бонус', mouseCell.x, mouseCell.y, '#222')
+      }
     }
   }
 }
@@ -310,11 +314,11 @@ let onMouseDownRight = () => {
   }
   // console.log(data.turn)
   render();
-  if (local.unit && local.unit.color == 2) {
-    drawTxt('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
-  }
   if (!data.turn) {
     drawTxt('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
+  }
+  else if (local.unit && local.unit.color == 2) {
+    drawTxt('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
   }
 }
 
