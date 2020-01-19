@@ -32,7 +32,6 @@ exports.success = (socket) => {
 }
 
 exports.data = (game) => {
-  console.log(game.trail);
   let getData = (game, player) => {
     let send = {
       leftturns: game.leftturns,

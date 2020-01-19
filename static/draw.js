@@ -365,14 +365,16 @@ function message(string) {
 
 function initGrafio() {
   let imgs = new Map();
-  return (url, onLoad) => {
+  return (url) => {
     let img = imgs.get(url);
 
     if (img) {
       return img.complete && img.naturalWidth !== 0 ? img : null;
     } else {
       img = new Image();
-      img.onload = onLoad;
+      img.onload = () => {
+        render();
+      };
       img.src = url + ".png";
       imgs.set(url, img);
       return null;

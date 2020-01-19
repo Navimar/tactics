@@ -58,7 +58,7 @@ exports.electric = {
 }
 
 exports.bear = {
-    class: 'champion',
+    class: 'never',
     life: 3,
     img: 'bear',
     akt: (akt) => {
