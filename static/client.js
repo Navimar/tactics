@@ -248,7 +248,7 @@ let getAkt = (x, y) => {
 
 let onMouseDown = () => {
   if (!data.bonus) {
-    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2) {
+    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2&& data.turn) {
       endturn();
     } else {
       if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
