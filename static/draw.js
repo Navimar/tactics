@@ -49,9 +49,9 @@ function drawBoard() {
     ctx.restore();
 }
 
-function drawTxt(txt, x, y, color) {
+function drawTxt(txt, x, y, color, font) {
     color = color || '#222';
-    ctx.font = '13pt Verdana';
+    ctx.font = font || '13pt Verdana';
     ctx.fillStyle = 'white';
     ctx.textBaseline = "top";
     //console.log(txt);
@@ -72,7 +72,7 @@ function drawTxt(txt, x, y, color) {
                     context.fillText(line, marginLeft - blx, marginTop + bly);
                 }
             }
-            ctx.font = '13pt Verdana';
+            ctx.font = font || '13pt Verdana';
             ctx.fillStyle = 'white';
             context.fillText(line, marginLeft, marginTop);
         }
@@ -233,9 +233,9 @@ function drawAkt(name, x, y) {
 function drawLife(quantity, x, y) {
     let p = dh / 10;
 
-    let img = getImg('life' + quantity, x, y);
-    ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
-    // drawTxt(quantity + '', x,y);
+    // let img = getImg('life' + quantity, x, y);
+    // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
+    drawTxt(quantity + '', x - 0.1, y - 0.1, '#328094','25pt monospace');
     // ctx.drawImage(img, x * dh - p*0.5  + shiftX, y * dh- p*0.5, dh/4 + 2 * p, dh/4 + 2 * p);
     // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
