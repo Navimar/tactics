@@ -16,6 +16,7 @@ let answer;
 let bot = {
     sendMessage: (id, text) => {
         answer = { id, text };
+        // console.log('answer', answer);
     }
 }
 module.exports = () => {
@@ -29,6 +30,16 @@ module.exports = () => {
     // console.log(en.unitInPoint(game.new({},{}),0,0))
     // handle.socket(socket, 'order', answer[0],)
     let g = game.new({},{}).sanbox=true
-    console.log()
-
+    msg = {
+        from: { id: 1 },
+        text: '/find',
+    }
+    handle.bot(msg, bot);
+    msg = {
+        from: { id: 2 },
+        text: '/find',
+    }
+    handle.bot(msg, bot);
+    pass = answer.text.split('=')[2];
+    handle.socket(socket, 'login', { id: 1, pass})
 }

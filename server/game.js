@@ -11,7 +11,6 @@ const _ = require('lodash');
 exports.new = (p1, p2) => {
   let data = generator.new();
   let game = {
-    // key: newKey(),
     players: [p1, p2],
     fisher: [120, 120],
     trail: [],

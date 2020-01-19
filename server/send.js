@@ -103,9 +103,9 @@ exports.data = (game) => {
     game.players[0].socket.emit('update', getData(game, game.turn));
   }
   else {
-    if (game.players[0].socket && players[0].game == game.players[0])
+    if (game.players[0].socket && game.players[0].game == game.players[0])
       game.players[0].socket.emit('update', getData(game, 1));
-    if (game.players[1].socket && players[1].game == game.players[1])
+    if (game.players[1].socket && game.players[1].game == game.players[1])
       game.players[1].socket.emit('update', getData(game, 2));
   }
 }

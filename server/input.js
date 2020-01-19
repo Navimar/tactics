@@ -61,7 +61,6 @@ input.socket = (io) => {
         socket.on('disconnect', function () {
             handle.socket(socket, 'disconnect');
         });
-
         socket.on('order', function (msg) {
             handle.socket(socket, 'order', msg);
         });
@@ -71,8 +70,6 @@ input.socket = (io) => {
         socket.on('bonus', function (msg) {
             handle.socket(socket, 'bonus', msg);
         });
-
-
         socket.on('login', function (msg) {
             handle.socket(socket, 'login', msg);
         });
