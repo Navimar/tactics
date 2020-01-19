@@ -68,6 +68,16 @@ let data = {
     ]
   }]
 };
+let fieldmask = (() => {
+  let arr=[]
+  for (let y = 0; y < 9; y++) {
+    arr[y] = [];
+    for (let x = 0; x < 9; x++) {
+      arr[y][x] = [Math.random(), Math.random()];
+    }
+  }
+  return arr
+})();
 
 let leftclickcn = 0;
 let nextunit = 0;
@@ -99,7 +109,7 @@ let render = () => {
   let renderfield = () => {
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        drawImg(data.field[x][y], x, y);
+        drawField(data.field[x][y], x, y, fieldmask[x][y]);
         // drawImg("grass", x, y);
       }
     }
