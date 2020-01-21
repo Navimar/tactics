@@ -5,10 +5,10 @@ var io = require('socket.io')(http);
 var run = require('./server/run.js');
 let config = require('./server/config.js');
 
-
 app.use(express.static(__dirname + '/static'));
 app.use(express.static(__dirname + '/script'));
 app.use(express.static(__dirname + '/img'));
+app.use(express.static(__dirname + '/sound'));
 
 app.get('*', function (req, res) {
     res.status(404).send("nothing there");

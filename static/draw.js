@@ -57,7 +57,7 @@ function drawTxt(txt, x, y, color, font) {
   //console.log(txt);
   // ctx.fillText(txt, x * dh + shiftX, y * dh);
   // ctx.strokeText(txt,  x * dh + shiftX, y * dh);
-  wrapText(ctx, txt, x * dh + shiftX + 10, y * dh + 10, dh * 3, 25);
+  wrapText(ctx, txt, x * dh + shiftX, y * dh, dh * 3, 25);
 
   // drawBubble(x, y, px, py);
 
@@ -269,7 +269,7 @@ function drawLife(quantity, x, y) {
 
   // let img = getImg('life' + quantity, x, y);
   // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
-  drawTxt(quantity + '', x - 0.1, y - 0.1, '#328094', '25pt monospace');
+  drawTxt(quantity + '', x, y, '#328094', '2.3vw monospace');
   // ctx.drawImage(img, x * dh - p*0.5  + shiftX, y * dh- p*0.5, dh/4 + 2 * p, dh/4 + 2 * p);
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
@@ -279,13 +279,14 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
   if (!data.chooseteam && !data.bonus) {
     if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
     if (team == 2 && !isReady) color = 'rgba(190,0,190,1)';
-    if (team == 1 && isReady) color = 'rgba(255,255,255,1)';
+    if (team == 1 && isReady && data.turn) color = 'rgba(255,255,255,1)';
+    if (team == 1 && isReady && !data.turn) color = 'rgba(30,190,40,1)';
     if (team == 1 && !isReady) color = 'rgba(30,190,40,1)';
   } else {
     if (team == 2 && isReady) color = 'rgba(138, 120, 62,1)';
     if (team == 1 && isReady) color = 'rgba(64, 117, 163,1)';
   }
-  if (isActive) color = 'rgba(0,255,0,1)';
+  if (isActive && team == 1) color = 'rgba(0,255,0,1)';
   let p = dh / 10;
   let img = getImg(name, x, y);
   let h = dh + 2 * p;

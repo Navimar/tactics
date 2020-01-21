@@ -34,7 +34,6 @@ exports.kicker = {
         wd.tire();
         let x = (wd.target.unit.x - wd.me.x)
         let y = (wd.target.unit.y - wd.me.y)
-        console.log(wd.isOccupied(wd.target.unit.x+x, wd.target.unit.y + y));
         while (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == 0) {
             wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
         }

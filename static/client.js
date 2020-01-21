@@ -184,7 +184,7 @@ let renderpanel = () => {
     for (let x = 9; x < 11; x++) {
       for (let y = 0; y < 9; y++) {
         drawImgNormal('bonus', x, y)
-        drawTxt(("0" + i).slice(-2), x + 0.08, y + 0.11, '#000', "3vw monospace")
+        drawTxt(("0" + i).slice(-2), x + 0.20, y + 0.20, '#000', "3vw monospace")
         i++
       }
     }
@@ -213,7 +213,7 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
-
+  updateAudio.play();
   // console.log(val);
   data = val;
   local.unit = false;
@@ -243,12 +243,11 @@ let getUnit = (x, y) => {
 }
 let getAkt = (x, y) => {
   return local.unit.akt.find(a => (x == a.x && y == a.y));
-
 }
 
 let onMouseDown = () => {
   if (!data.bonus) {
-    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 2&& data.turn) {
+    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1&& data.turn) {
       endturn();
     } else {
       if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
