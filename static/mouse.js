@@ -16,12 +16,13 @@ function inputMouse() {
 
     }, false);
     canvas.addEventListener("touchend", e => {
-        etMousePos(canvas, e);
-        mouseCell = {
-            x: Math.floor((mousePos.x - shiftX) / dh),
-            y: Math.floor((mousePos.y) / dh)
-        }
-        onMouseDown();
+        alert('извините. порка работает только десктоп');
+        // mousePos = getMousePos(canvas, e);
+        // mouseCell = {
+        //     x: Math.floor((mousePos.x - shiftX) / dh),
+        //     y: Math.floor((mousePos.y) / dh)
+        // }
+        // onMouseDownRight();
     }, false);
     canvas.addEventListener("touchcancel", e => {
 
