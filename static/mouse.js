@@ -8,11 +8,28 @@ function getMousePos(canvas, evt) {
         y: evt.clientY - rect.top
     }
 }
-
 function inputMouse() {
     document.oncontextmenu = function (e) {
         return false;
     }
+    canvas.addEventListener("touchstart", e => {
+
+    }, false);
+    canvas.addEventListener("touchend", e => {
+        etMousePos(canvas, e);
+        mouseCell = {
+            x: Math.floor((mousePos.x - shiftX) / dh),
+            y: Math.floor((mousePos.y) / dh)
+        }
+        onMouseDown();
+    }, false);
+    canvas.addEventListener("touchcancel", e => {
+
+    }, false);
+    canvas.addEventListener("touchmove", e => {
+
+    }, false);
+
     canvas.addEventListener("mousedown", e => {
         switch (e.which) {
             case 1:
