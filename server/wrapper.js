@@ -17,6 +17,8 @@ module.exports = (game, me, target) => {
     damage: (x, y) => {
       if (x != undefined && y != undefined) {
         en.damage(game, en.unitInPoint(game, x, y));
+      } else if (x != undefined && y == undefined) {
+        en.damage(game, en.unitInPoint(game, x.x, x.y));
       } else {
         en.damage(game, en.unitInPoint(game, target.x, target.y));
       }
@@ -24,13 +26,19 @@ module.exports = (game, me, target) => {
     noenergy: () => {
       me.energy = 0;
     },
+    isOccupied: (x, y) => {
+      return en.isOccupied(game, x, y);
+    },
+    unitInPoint: (x, y) => {
+      return en.unitInPoint(game, x, y);
+    },
     tire: () => {
       me.isReady = false;
       me.isActive = false;
       // console.log(me,'tire wrapper');
     },
     move: (xto, yto) => {
-      en.move(game, en.unitInPoint(game, target.x, target.y), xto, yto);
+      en.move(game, target.unit, xto, yto);
     },
     go: (xto, yto) => {
       en.move(game, me, xto, yto);

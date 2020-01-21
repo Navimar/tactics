@@ -19,6 +19,29 @@ exports.warrior = {
     }
 }
 
+exports.kicker = {
+    class: 'champion',
+    life: 3,
+    img: 'kicker',
+    akt: (akt) => {
+        // return [{ x: 5, y: 5, img: 'move' }]
+        return akt.move().concat(akt.hand('kicker'))
+    },
+    move: (wd) => {
+        wd.walk();
+    },
+    kicker: (wd) => {
+        wd.tire();
+        let x = (wd.target.unit.x - wd.me.x)
+        let y = (wd.target.unit.y - wd.me.y)
+        console.log(wd.isOccupied(wd.target.unit.x+x, wd.target.unit.y + y));
+        while (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == 0) {
+            wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
+        }
+        wd.damage(wd.target.unit);
+    }
+}
+
 exports.electric = {
     class: 'champion',
     life: 3,
@@ -58,7 +81,7 @@ exports.electric = {
 }
 
 exports.bear = {
-    class: 'never',
+    class: 'champion',
     life: 3,
     img: 'bear',
     akt: (akt) => {

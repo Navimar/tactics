@@ -44,9 +44,9 @@ exports.order = (p, u, akt) => {
         if (u.energy < 3 && u != unit) {
           if (_.isFunction(meta[u.tp].onTire)) {
             // console.log('isFunction');
-            meta[u.tp].onTire(wrapper(game, u));
+            meta[u.tp].onTire(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
           }
-          wrapper(game, u).tire();
+          wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
         }
       });
       unit.isActive = true;
@@ -55,7 +55,7 @@ exports.order = (p, u, akt) => {
       } else if (unit.x - akt.x < 0) {
         unit.m = false;
       }
-      meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y }));
+      meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
       send.data(game);
     }
   }
@@ -66,7 +66,7 @@ exports.endturn = (p) => {
   game.unit.forEach(u => {
     if (_.isFunction(meta[u.tp].onEndturn)) {
       // console.log('isFunction');
-      meta[u.tp].onEndturn(wrapper(game, u));
+      meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
     }
     u.energy = 3;
     u.isReady = true;
