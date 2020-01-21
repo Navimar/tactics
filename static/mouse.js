@@ -25,7 +25,7 @@ function inputMouse() {
     document.oncontextmenu = function (e) {
         return false;
     }
-    document.onselectstart = function (e) {
+    document.onselect = function (e) {
         return false;
     }
     canvas.addEventListener("touchstart", e => {
