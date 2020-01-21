@@ -16,7 +16,7 @@ function resize() {
     dh = (canvas.height / 9) * 0.98;
     shiftX = (canvas.width - dh * 9) / 2;
   } else {
-    dh = canvas.width / (9 + 4);
+    dh = canvas.width / (9);
   }
 
   ctx.fillStyle = "rgb(0,0,0)";

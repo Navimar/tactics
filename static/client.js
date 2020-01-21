@@ -1,4 +1,6 @@
 let local = {
+  time: 0,
+  seconds: 0,
   akt: [],
   focus: false,
   fisher: [999, 120],
@@ -98,7 +100,7 @@ function step(lastTime) {
   lastTime = time;
 
   onStep(timeDiff);
-  setTimeout(function () { step(lastTime) }, 1000);
+  setTimeout(function () { step(lastTime) }, 10);
   // requestAnimFrame(function () {
   // step(lastTime);
   // });
@@ -198,10 +200,21 @@ let renderFisher = () => {
 }
 
 let onStep = (diff) => {
-  console.log('step');
-  if (data.turn)
-    local.fisher[0]--;
+  // console.log('step');
+  local.time += diff;
+  if (Math.floor(local.time / 1000) > local.seconds) {
+    local.seconds=Math.floor(local.time / 1000) 
+    if (data.turn) {
+      local.fisher[0]--;
+    } else {
+      local.fisher[1]--;
+    }
   renderpanel();
+  }
+  if (tapDown && local.time - tapTime > interval) {
+    onMouseDownRight();
+    tapDown = false;
+  }
 }
 
 let onLogin = (val) => {
@@ -247,7 +260,7 @@ let getAkt = (x, y) => {
 
 let onMouseDown = () => {
   if (!data.bonus) {
-    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1&& data.turn) {
+    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1 && data.turn) {
       endturn();
     } else {
       if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
