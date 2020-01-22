@@ -176,7 +176,7 @@ let renderpanel = () => {
   let xp = 0
   let yp = 2
   console.log(window.orientation)
-  if (window.orientation == 0&& mobile) {
+  if (window.orientation == 0 && mobile) {
     x = 0
     y = -2
     xp = 2
@@ -203,12 +203,12 @@ let renderpanel = () => {
     for (let fx = 9; fx < 11; fx++) {
       for (let fy = 0; fy < 9; fy++) {
         if (window.orientation == 0 && mobile) {
-        drawImgNormal('bonus', fy, fx)
+          drawImgNormal('bonus', fy, fx)
 
           drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vmax monospace")
 
         } else {
-        drawImgNormal('bonus', fx, fy)
+          drawImgNormal('bonus', fx, fy)
 
           drawTxt(("0" + i).slice(-2), fx + 0.20, fy + 0.20, '#000', "3vmax monospace")
 
@@ -281,7 +281,7 @@ let getAkt = (x, y) => {
 
 let onMouseDown = () => {
   if (!data.bonus) {
-    if (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1 && data.turn) {
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
       endturn();
     } else {
       if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
@@ -311,7 +311,7 @@ let onMouseDown = () => {
 
     render();
     if (local.unit && !local.unit.isReady) {
-      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050',)
+      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
       //     local.akt = local.unit.akt;
       //     local.focus = { x: unit.x, y: unit.y };
     }
@@ -327,9 +327,9 @@ let onMouseDown = () => {
     if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11)) && data.turn) {
       let b
       if (mouseCell.x > 8)
-         b = (mouseCell.x - 9) * 9 + mouseCell.y;
+        b = (mouseCell.x - 9) * 9 + mouseCell.y;
       if (mouseCell.y > 8)
-         b = (mouseCell.y - 9) * 9 + mouseCell.x;
+        b = (mouseCell.y - 9) * 9 + mouseCell.x;
       sendbonus(b);
     } else {
       render();
