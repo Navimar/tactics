@@ -205,12 +205,12 @@ let renderpanel = () => {
         if (window.orientation == 0 && mobile) {
         drawImgNormal('bonus', fy, fx)
 
-          drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vw monospace")
+          drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vmax monospace")
 
         } else {
         drawImgNormal('bonus', fx, fy)
 
-          drawTxt(("0" + i).slice(-2), fx + 0.20, fy + 0.20, '#000', "3vw monospace")
+          drawTxt(("0" + i).slice(-2), fx + 0.20, fy + 0.20, '#000', "3vmax monospace")
 
         }
         i++
@@ -311,13 +311,16 @@ let onMouseDown = () => {
 
     render();
     if (local.unit && !local.unit.isReady) {
-      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
+      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050',)
       //     local.akt = local.unit.akt;
       //     local.focus = { x: unit.x, y: unit.y };
     }
     leftclickcn++
     if (leftclickcn == 5) {
-      drawTxt('Приказывайте юнитам ПРАВОЙ кнопкной мыши!!! На телефоне ДОЛГИМ нажатием!!', mouseCell.x, mouseCell.y, '#550000')
+      let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
+      if (mobile)
+        txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
+      drawTxt(txt, mouseCell.x, mouseCell.y, '#550000')
       leftclickcn = 2;
     }
   } else {

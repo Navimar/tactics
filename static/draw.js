@@ -57,7 +57,8 @@ function drawBoard() {
 
 function drawTxt(txt, x, y, color, font) {
   color = color || '#222';
-  ctx.font = font || '13pt Verdana';
+  font = font || '1.5vmax/1.2 Verdana'
+  ctx.font = font;
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
   wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 3, 25);
@@ -75,7 +76,7 @@ function drawTxt(txt, x, y, color, font) {
           context.fillText(line, marginLeft - blx, marginTop + bly);
         }
       }
-      ctx.font = font || '13pt Verdana';
+      ctx.font = font;
       ctx.fillStyle = 'white';
       context.fillText(line, marginLeft, marginTop);
     }
@@ -272,7 +273,7 @@ function drawLife(quantity, x, y) {
 
   // let img = getImg('life' + quantity, x, y);
   // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
-  drawTxt(quantity + '', x, y, '#328094', '2.3vw monospace');
+  drawTxt(quantity + '', x, y, '#328094', '2.3vmax monospace');
   // ctx.drawImage(img, x * dh - p*0.5  + shiftX, y * dh- p*0.5, dh/4 + 2 * p, dh/4 + 2 * p);
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
