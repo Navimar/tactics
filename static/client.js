@@ -1,3 +1,5 @@
+const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 let local = {
   time: 0,
   seconds: 0,
@@ -169,47 +171,66 @@ let render = () => {
 
 }
 let renderpanel = () => {
-  // console.log(data.leftturns)
-  if (data.turn) {
-    drawSize('turn', -2, 0, 2, 2)
-  } else {
-    drawSize('turnEnemy', -2, 0, 2, 2)
+  let x = -2
+  let y = 0
+  let xp = 0
+  let yp = 2
+  console.log(window.orientation)
+  if (window.orientation == 0&& mobile) {
+    x = 0
+    y = -2
+    xp = 2
+    yp = 0
   }
+  if (data.turn) {
+    drawSize('turn', x, y, 2, 2)
+  } else {
+    drawSize('turnEnemy', x, y, 2, 2)
+  }
+  drawTxt(data.leftturns + '', x + 0.15, y + 0.15, '#222')
+  drawTxt(local.fisher[0] + '', x + 0.15, y + 0.5 + 0.15, '#090')
+  drawTxt(local.fisher[1] + '', x + 1 + 0.15, y + 0.5 + 0.15, '#f00')
+  x += xp
+  y += yp
   if (data.win == 'win') {
-    drawSize('win', -2, 2, 2, 2)
+    drawSize('win', x, y, 2, 2)
   }
   if (data.win == 'defeat') {
-    drawSize('defeat', -2, 2, 2, 2)
+    drawSize('defeat', x, y, 2, 2)
   }
   if (data.bonus && data.turn) {
     let i = 0;
-    for (let x = 9; x < 11; x++) {
-      for (let y = 0; y < 9; y++) {
-        drawImgNormal('bonus', x, y)
-        drawTxt(("0" + i).slice(-2), x + 0.20, y + 0.20, '#000', "3vw monospace")
+    for (let fx = 9; fx < 11; fx++) {
+      for (let fy = 0; fy < 9; fy++) {
+        if (window.orientation == 0 && mobile) {
+        drawImgNormal('bonus', fy, fx)
+
+          drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vw monospace")
+
+        } else {
+        drawImgNormal('bonus', fx, fy)
+
+          drawTxt(("0" + i).slice(-2), fx + 0.20, fy + 0.20, '#000', "3vw monospace")
+
+        }
         i++
       }
     }
   }
-  drawTxt(data.leftturns + '', -2, 0, '#222')
-  renderFisher();
-}
-let renderFisher = () => {
-  drawTxt(local.fisher[0] + '', -2, 0.5, '#090')
-  drawTxt(local.fisher[1] + '', -1, 0.5, '#f00')
+
 }
 
 let onStep = (diff) => {
   // console.log('step');
   local.time += diff;
   if (Math.floor(local.time / 1000) > local.seconds) {
-    local.seconds=Math.floor(local.time / 1000) 
+    local.seconds = Math.floor(local.time / 1000)
     if (data.turn) {
       local.fisher[0]--;
     } else {
       local.fisher[1]--;
     }
-  renderpanel();
+    renderpanel();
   }
   if (tapDown && local.time - tapTime > interval) {
     onMouseDownRight();
@@ -296,12 +317,16 @@ let onMouseDown = () => {
     }
     leftclickcn++
     if (leftclickcn == 5) {
-      drawTxt('Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!', mouseCell.x, mouseCell.y, '#550000')
+      drawTxt('Приказывайте юнитам ПРАВОЙ кнопкной мыши!!! На телефоне ДОЛГИМ нажатием!!', mouseCell.x, mouseCell.y, '#550000')
       leftclickcn = 2;
     }
   } else {
-    if (mouseCell.x > 8 && mouseCell.x < 11 && data.turn) {
-      let b = (mouseCell.x - 9) * 9 + mouseCell.y;
+    if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11)) && data.turn) {
+      let b
+      if (mouseCell.x > 8)
+         b = (mouseCell.x - 9) * 9 + mouseCell.y;
+      if (mouseCell.y > 8)
+         b = (mouseCell.y - 9) * 9 + mouseCell.x;
       sendbonus(b);
     } else {
       render();

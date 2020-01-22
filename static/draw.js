@@ -12,13 +12,19 @@ let shiftX = 0;
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  // canvas.width = window.visualViewport.width;
+  // canvas.height = window.visualViewport.height;
   if (canvas.width > canvas.height) {
-    dh = (canvas.height / 9) * 0.98;
+    dh = (canvas.height / 9);
     shiftX = (canvas.width - dh * 9) / 2;
+    shiftY =0
+
   } else {
     dh = canvas.width / (9);
-  }
+    shiftX = 0;
+    shiftY = (canvas.height - dh * 9) / 2;
 
+  }
   ctx.fillStyle = "rgb(0,0,0)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
@@ -34,7 +40,7 @@ function drawBoard() {
   ctx.save();
 
   for (x = shiftX; x <= canvas.width; x += dh) {
-    for (y = 0; y <= canvas.height; y += dh) {
+    for (y = shiftY; y <= canvas.height; y += dh) {
       ctx.strokeStyle = 'rgba(0,0,0,0.1)';
       // ctx.fillStyle = 'rgba(0,0,0,0.1)';
       ctx.globalAlpha = 0.2;
@@ -54,10 +60,7 @@ function drawTxt(txt, x, y, color, font) {
   ctx.font = font || '13pt Verdana';
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
-  //console.log(txt);
-  // ctx.fillText(txt, x * dh + shiftX, y * dh);
-  // ctx.strokeText(txt,  x * dh + shiftX, y * dh);
-  wrapText(ctx, txt, x * dh + shiftX, y * dh, dh * 3, 25);
+  wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 3, 25);
 
   // drawBubble(x, y, px, py);
 
@@ -102,9 +105,9 @@ function drawTxt(txt, x, y, color, font) {
 
   function drawBubble(x, y, px, py) {
     x = x * dh + shiftX;
-    y = y * dh;
+    y = y * dh + shiftY;
     px = px * dh + shiftX + dh / 2;
-    py = py * dh + dh / 2;
+    py = py * dh + shiftY+ dh / 2;
     let w = dh * 3;
     let h = 100;
     let radius = 20;
@@ -226,8 +229,8 @@ function getImg(name, x, y, mask) {
 function drawImg(name, x, y) {
   let p = dh / 10;
   let img = getImg(name, x, y);
-  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
-  // ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
+  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
+  // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
 }
 function drawField(name, x, y, mask) {
   let p = dh / 10;
@@ -237,17 +240,17 @@ function drawField(name, x, y, mask) {
   if (mask[1] > 0.5) {
     ctx.save();
     ctx.scale(-1, 1);
-    ctx.drawImage(img, (x * dh - p + shiftX) * -1 - w, y * dh - p, w, h);
+    ctx.drawImage(img, (x * dh - p + shiftX) * -1 - w, y * dh - p + shiftY, w, h);
     // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
     ctx.restore();
   } else {
-    ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, w, h);
-    // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
+    ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, w, h);
+    // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p+shiftY, dh + 2 * p);
   }
 }
 function drawTrail(name, x, y) {
   let img = getImg(name + '.trl', x, y);
-  ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
+  ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
 }
 function drawAkt(name, x, y) {
   let p = 0;
@@ -258,7 +261,7 @@ function drawAkt(name, x, y) {
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
   ctx.shadowBlur = 0;
-  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p, dh + 2 * p);
+  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
   ctx.restore();
 
   // ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
@@ -294,7 +297,7 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
 
   if (m) {
     let df = () => {
-      ctx.drawImage(img, (x * dh - p + shiftX) * -1 - w, y * dh - p, w, h);
+      ctx.drawImage(img, (x * dh - p + shiftX) * -1 - w, y * dh - p + shiftY, w, h);
     }
     ctx.save();
     ctx.scale(-1, 1);
@@ -306,7 +309,7 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
 
   } else {
     let df = () => {
-      ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, w, h);
+      ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, w, h);
     }
     ctx.save();
     if (color) {
@@ -324,7 +327,7 @@ function drawImgNormal(name, x, y) {
   let p = dh / 10;
   let img = getImg(name);
   // ctx.drawImage(img, x * dh-p + shiftX, y * dh-p, dh +2*p, dh+2*p);
-  ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
+  ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
 }
 
 
@@ -342,7 +345,7 @@ function drawSize(name, x, y, w, h) {
     img = questionmark;
   }
   // console.log(img);
-  ctx.drawImage(img, x * dh + shiftX, y * dh, dh * w, dh * h);
+  ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h);
 }
 
 // function drawWeb(name, x, y, w, h) {
