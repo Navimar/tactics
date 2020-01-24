@@ -12,7 +12,7 @@ exports.new = (p1, p2) => {
   let data = generator.new();
   let game = {
     players: [p1, p2],
-    fisher: [120, 120],
+    fisher: ['', ''],
     trail: [],
     lastturntime: [],
     bonus: [null, null],
@@ -32,6 +32,7 @@ exports.order = (p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
   let game = p.game;
   if (game) {
+    fisher(game);
     game.trail = [];
     let unit = en.unitInPoint(game, u.x, u.y);
     if (unit) {
@@ -90,9 +91,6 @@ exports.endturn = (p) => {
       game.winner = 2
     }
   } else {
-    if (!game.lastturntime[game.turn - 1]) game.lastturntime[game.turn - 1] = time.clock();
-    game.fisher[game.turn - 1] -= game.lastturntime[game.turn - 1] - game.started;
-    game.lastturntime[game.turn - 1] = time.clock();
     if (game.fisher[game.turn - 1] < 0) {
       game.winner = game.turn == 1 ? 2 : 1;
     } else {
@@ -100,6 +98,7 @@ exports.endturn = (p) => {
     }
   }
   game.turn = game.turn == 1 ? 2 : 1;
+  fisher(game)
   send.data(game);
 }
 
@@ -130,4 +129,16 @@ function addbonus(game, unit) {
     });
   }
   game.chooseteam = false;
+}
+
+let fisher = (game) => {
+  if (!game.lastturntime[game.turn - 1]) {
+    game.lastturntime[game.turn - 1] = time.clock();
+    game.fisher[game.turn - 1] = 120;
+  }
+  game.fisher[game.turn - 1] -= time.clock() - game.lastturntime[game.turn - 1];
+  game.lastturntime[game.turn - 1] = time.clock();
+
+  console.log(game.fisher)
+
 }

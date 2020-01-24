@@ -17,13 +17,13 @@ function resize() {
   if (canvas.width > canvas.height) {
     dh = (canvas.height / 9);
     shiftX = (canvas.width - dh * 9) / 2;
-    shiftY =0
-
+    shiftY = 0
+    orientation = 'w'
   } else {
     dh = canvas.width / (9);
     shiftX = 0;
     shiftY = (canvas.height - dh * 9) / 2;
-
+    orientation = 'h'
   }
   ctx.fillStyle = "rgb(0,0,0)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -108,7 +108,7 @@ function drawTxt(txt, x, y, color, font) {
     x = x * dh + shiftX;
     y = y * dh + shiftY;
     px = px * dh + shiftX + dh / 2;
-    py = py * dh + shiftY+ dh / 2;
+    py = py * dh + shiftY + dh / 2;
     let w = dh * 3;
     let h = 100;
     let radius = 20;
@@ -234,6 +234,11 @@ function drawImg(name, x, y) {
   // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
 }
 function drawField(name, x, y, mask) {
+  // if (name == 'team1') {
+  //   drawProp('team', x, y, false, '1', false, false);
+  // } else if (name == 'team2') {
+  //   drawProp('team', x, y, false, '2', true, false);
+  // }else{
   let p = dh / 10;
   let img = getImg(name, x, y, mask[0]);
   let h = dh + 2 * p;
@@ -249,6 +254,7 @@ function drawField(name, x, y, mask) {
     // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh + 2 * p+shiftY, dh + 2 * p);
   }
 }
+// }
 function drawTrail(name, x, y) {
   let img = getImg(name + '.trl', x, y);
   ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);

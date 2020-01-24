@@ -5,7 +5,7 @@ let local = {
   seconds: 0,
   akt: [],
   focus: false,
-  fisher: [999, 120],
+  fisher: ['xxx', 'xxx'],
   sandclock: { x: 0, y: 0 }
 };
 let data = {
@@ -86,6 +86,8 @@ let fieldmask = (() => {
 
 let leftclickcn = 0;
 let nextunit = 0;
+let orientation = 'h'
+let fisherStart = false
 
 window.onload = function () {
   render();
@@ -175,8 +177,7 @@ let renderpanel = () => {
   let y = 0
   let xp = 0
   let yp = 2
-  console.log(window.orientation)
-  if (window.orientation == 0 && mobile) {
+  if (orientation == 'h') {
     x = 0
     y = -2
     xp = 2
@@ -202,7 +203,7 @@ let renderpanel = () => {
     let i = 0;
     for (let fx = 9; fx < 11; fx++) {
       for (let fy = 0; fy < 9; fy++) {
-        if (window.orientation == 0 && mobile) {
+        if (orientation == 'h') {
           drawImgNormal('bonus', fy, fx)
 
           drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vmax monospace")
@@ -226,9 +227,17 @@ let onStep = (diff) => {
   if (Math.floor(local.time / 1000) > local.seconds) {
     local.seconds = Math.floor(local.time / 1000)
     if (data.turn) {
-      local.fisher[0]--;
+      if (local.fisher[0]) {
+        local.fisher[0]--;
+      } else {
+        local.fisher[0] = ''
+      }
     } else {
-      local.fisher[1]--;
+      if (local.fisher[1]) {
+        local.fisher[1]--;
+      } else {
+        local.fisher[1] = ''
+      }
     }
     renderpanel();
   }
@@ -252,10 +261,7 @@ let onUpdate = (val) => {
   data = val;
   local.unit = false;
   local.sandclock = false;
-
-  if (local.fisher[0] > data.fisher[0]) {
-    local.fisher[0] = data.fisher[0];
-  }
+  local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
 
   data.unit.forEach((u) => {
@@ -379,6 +385,6 @@ let sendbonus = (b) => {
   socket.emit("bonus", b);
 }
 let endturn = () => {
-  local.fisher[0] += 120;
+  // local.fisher[0] += 120;
   socket.emit("endturn");
 }
