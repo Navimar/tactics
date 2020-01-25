@@ -1,7 +1,5 @@
 const en = require('./engine');
 
-
-
 exports.warrior = {
   class: 'never',
   life: 3,
@@ -36,7 +34,7 @@ exports.mashroom = {
 }
 
 exports.bird = {
-  class: 'champion',
+  class: 'support',
   life: 3,
   img: 'bird',
   akt: (akt) => {
@@ -71,7 +69,7 @@ exports.bird = {
     wd.damage(wd.me.x, wd.me.y + 1, 3);
     wd.damage(wd.me.x + 1, wd.me.y + 1, 3);
     wd.damage(undefined, undefined, 3);
-    // wd.tire();
+    wd.tire();
   }
 }
 

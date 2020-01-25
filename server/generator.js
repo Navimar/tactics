@@ -133,7 +133,10 @@ let makeUnit = (tp, x, y, team, ) => {
 }
 
 let rndUnit = () => {
-  return _.sample(barraks.champion);
+  let chance = [];
+  _.times(10, () => chance.push(barraks.champion));
+  _.times(1, () => chance.push(barraks.support));
+  return _.sample(_.sample(chance));
 }
 
 let rndTeam = () => {

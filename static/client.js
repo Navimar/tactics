@@ -133,10 +133,8 @@ let render = () => {
         }
       }
     }
-    // data.unit.forEach(u => {
-    //     drawProp(u.img, u.x, u.y, u.m, u.color);
-    //     drawLife(u.life, u.x, u.y);
-    // });
+  }
+  let renderakt= () => {
     if (local.unit && local.unit.akt) {
       local.unit.akt.forEach(a => {
         drawAkt(a.img, a.x, a.y);
@@ -167,6 +165,7 @@ let render = () => {
   }
   renderpanel();
   rendertrail();
+  renderakt();
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
   }
