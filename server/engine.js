@@ -3,6 +3,16 @@ en.near = (x, y) => {
   return [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }].filter(pt => pt.x <= 8 && pt.x >= 0 && pt.y >= 0 && pt.y <= 8)
 }
 
+en.allPoints = () => {
+  let points = []
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      points.push({ x, y });
+    }
+  }
+  return points;
+}
+
 en.inField = (x, y) => {
   if (x >= 0 && x < 9 && y < 9 && y >= 0) return true
 }
@@ -23,9 +33,11 @@ en.death = (game, unit) => {
   game.unit.splice(game.unit.indexOf(unit), 1);
 }
 
-en.damage = (game, unit) => {
+en.damage = (game, unit, d) => {
   if (unit) {
-    unit.life--;
+    if (d) { unit.life -= d } else {
+      unit.life--;
+    }
     if (unit.life <= 0) en.death(game, unit);
     game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
   } else {

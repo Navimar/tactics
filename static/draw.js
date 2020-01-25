@@ -293,8 +293,8 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
     if (team == 1 && isReady && !data.turn) color = 'rgba(30,190,40,1)';
     if (team == 1 && !isReady) color = 'rgba(30,190,40,1)';
   } else {
-    if (team == 2 && isReady) color = 'rgba(138, 120, 62,1)';
-    if (team == 1 && isReady) color = 'rgba(64, 117, 163,1)';
+    if (team == 2 && isReady) color = 'rgba(47, 0, 255,1)';
+    if (team == 1 && isReady) color = 'rgba(255, 149, 0,1)';
   }
   if (isActive && team == 1) color = 'rgba(0,255,0,1)';
   let p = dh / 10;

@@ -13,6 +13,7 @@ Object.keys(meta).forEach(function (key) {
 });
 
 exports.new = () => {
+  // console.log('new')
   let data = {
     unit: [],
     field: [],
@@ -23,29 +24,70 @@ exports.new = () => {
       data.field[x][y] = 'grass';
     }
   }
-  data.field[1][1] = 'team1';
-  data.field[1][7] = 'team2';
-  data.field[4][4] = 'team1';
-  data.field[7][7] = 'team2';
-  data.field[7][1] = 'team1';
-  data.unit.push(...[
-    makeUnit(rndUnit(), 0, 0, 1),
-    makeUnit(rndUnit(), 1, 1, 1),
-    makeUnit(rndUnit(), 2, 2, 1),
-    makeUnit(rndUnit(), 3, 1, 1),
-    makeUnit(rndUnit(), 1, 3, 1),
-    makeUnit(rndUnit(), 3, 0, 1),
-    makeUnit(rndUnit(), 0, 3, 1),
+  data.field[1][1] = 'team' + rndTeam();
+  data.field[1][7] = 'team' + rndTeam();
+  data.field[4][4] = 'team' + rndTeam();
+  data.field[7][7] = 'team' + rndTeam();
+  data.field[7][1] = 'team' + rndTeam();
 
-    makeUnit(rndUnit(), 8, 8, 2),
-    makeUnit(rndUnit(), 7, 7, 2),
-    makeUnit(rndUnit(), 5, 7, 2),
-    makeUnit(rndUnit(), 7, 5, 2),
-    makeUnit(rndUnit(), 6, 6, 2),
-    makeUnit(rndUnit(), 8, 5, 2),
-    makeUnit(rndUnit(), 5, 8, 2),
-  ]
-  );
+  let points = []
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      points.push({ x, y });
+    }
+  }
+  let t1p;
+  do {
+    t1p = _.sample(points)
+  } while (!(t1p.x == 0 || t1p.x == 8 || t1p.y == 0 || t1p.y == 8));
+  data.unit.push(makeUnit(rndUnit(), t1p.x, t1p.y, 1));
+
+
+  do {
+    t2p = _.sample(points)
+  } while (!(t2p.x == 0 || t2p.x == 8 || t2p.y == 0 || t2p.y == 8) || Math.abs(t2p.x + t2p.y - (t1p.x + t1p.y)) < 4);
+  data.unit.push(makeUnit(rndUnit(), t2p.x, t2p.y, 2));
+
+  t1p = [t1p]
+  t2p = [t2p]
+  _.times(6, (n) => {
+    let np = _.sample(points)
+    let near
+    do {
+      np = _.sample(points)
+      near = false
+      t1p.forEach(e => {
+        // console.log(e.x, e.y, np.x, np.y)
+        if (Math.abs(e.x + e.y - (np.x + np.y)) < 4) {
+          near = true
+        }
+      });
+      t2p.forEach(e => {
+        if (e.x == np.x && e.y == np.y) near = true;
+      });
+
+    } while (near)
+    data.unit.push(makeUnit(rndUnit(), np.x, np.y, 2));
+    t2p.push({ x: np.x, y: np.y });
+
+    np = _.sample(points)
+    near
+    do {
+      np = _.sample(points)
+      near = false
+      t2p.forEach(e => {
+        // console.log(e.x, e.y, np.x, np.y)
+        if (Math.abs(e.x + e.y - (np.x + np.y)) < 4) {
+          near = true
+        }
+      });
+      t1p.forEach(e => {
+        if (e.x == np.x && e.y == np.y) near = true;
+      });
+    } while (near)
+    data.unit.push(makeUnit(rndUnit(), np.x, np.y, 1));
+    t1p.push({ x: np.x, y: np.y });
+  });
 
   return data
 }
@@ -67,4 +109,8 @@ let makeUnit = (tp, x, y, team, ) => {
 
 let rndUnit = () => {
   return _.sample(barraks.champion);
+}
+
+let rndTeam = () => {
+  return (Math.random() >= 0.5) ? 1 : 2;
 }

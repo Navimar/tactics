@@ -14,13 +14,13 @@ module.exports = (game, me, target) => {
       if (game.field[me.x][me.y] == 'team1' && me.team == 2) game.field[me.x][me.y] = 'team2';
       if (game.field[me.x][me.y] == 'team2' && me.team == 1) game.field[me.x][me.y] = 'team1';
     },
-    damage: (x, y) => {
+    damage: (x, y, d) => {
       if (x != undefined && y != undefined) {
-        en.damage(game, en.unitInPoint(game, x, y));
+        en.damage(game, en.unitInPoint(game, x, y), d);
       } else if (x != undefined && y == undefined) {
-        en.damage(game, en.unitInPoint(game, x.x, x.y));
+        en.damage(game, en.unitInPoint(game, x.x, x.y), d);
       } else {
-        en.damage(game, en.unitInPoint(game, target.x, target.y));
+        en.damage(game, en.unitInPoint(game, target.x, target.y), d);
       }
     },
     noenergy: () => {
