@@ -297,6 +297,7 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
     if (team == 1 && isReady) color = 'rgba(255, 149, 0,1)';
   }
   if (isActive && team == 1) color = 'rgba(0,255,0,1)';
+  if (team == 3) color = 'rgba(255, 255, 0,1)';
   let p = dh / 10;
   let img = getImg(name, x, y);
   let h = dh + 2 * p;

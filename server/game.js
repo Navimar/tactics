@@ -125,7 +125,8 @@ function addbonus(game, unit) {
   }
   if (unit.team !== game.turn) {
     game.unit.forEach(u => {
-      u.team = u.team == 1 ? 2 : 1;
+      if (u.team == 1) { u.team = 2; } else
+        if (u.team == 2) u.team = 1;
     });
   }
   game.chooseteam = false;
@@ -139,6 +140,6 @@ let fisher = (game) => {
   game.fisher[game.turn - 1] -= time.clock() - game.lastturntime[game.turn - 1];
   game.lastturntime[game.turn - 1] = time.clock();
 
-  console.log(game.fisher)
+  // console.log(game.fisher)
 
 }

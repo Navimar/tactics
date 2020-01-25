@@ -13,7 +13,7 @@ Object.keys(meta).forEach(function (key) {
 });
 
 exports.new = () => {
-  // console.log('new')
+  let c = 0;
   let data = {
     unit: [],
     field: [],
@@ -39,13 +39,17 @@ exports.new = () => {
   let t1p;
   do {
     t1p = _.sample(points)
-  } while (!(t1p.x == 0 || t1p.x == 8 || t1p.y == 0 || t1p.y == 8));
+    c++;
+
+  } while (!(t1p.x == 0 || t1p.x == 8 || t1p.y == 0 || t1p.y == 8) && c < 1000);
   data.unit.push(makeUnit(rndUnit(), t1p.x, t1p.y, 1));
 
 
   do {
     t2p = _.sample(points)
-  } while (!(t2p.x == 0 || t2p.x == 8 || t2p.y == 0 || t2p.y == 8) || Math.abs(t2p.x + t2p.y - (t1p.x + t1p.y)) < 4);
+    c++;
+
+  } while (!(t2p.x == 0 || t2p.x == 8 || t2p.y == 0 || t2p.y == 8) || Math.abs(t2p.x + t2p.y - (t1p.x + t1p.y)) < 4 && c < 1000);
   data.unit.push(makeUnit(rndUnit(), t2p.x, t2p.y, 2));
 
   t1p = [t1p]
@@ -65,8 +69,9 @@ exports.new = () => {
       t2p.forEach(e => {
         if (e.x == np.x && e.y == np.y) near = true;
       });
+      c++;
 
-    } while (near)
+    } while (near && c < 1000)
     data.unit.push(makeUnit(rndUnit(), np.x, np.y, 2));
     t2p.push({ x: np.x, y: np.y });
 
@@ -84,11 +89,31 @@ exports.new = () => {
       t1p.forEach(e => {
         if (e.x == np.x && e.y == np.y) near = true;
       });
-    } while (near)
+      c++;
+
+    } while (near && c < 1000)
     data.unit.push(makeUnit(rndUnit(), np.x, np.y, 1));
     t1p.push({ x: np.x, y: np.y });
   });
-
+  let tnp = [];
+  _.times(_.random(7), (n) => {
+    do {
+      np = _.sample(points)
+      near = false
+      t1p.forEach(e => {
+        if (e.x == np.x && e.y == np.y) near = true;
+      });
+      t2p.forEach(e => {
+        if (e.x == np.x && e.y == np.y) near = true;
+      });
+      tnp.forEach(e => {
+        if (e.x == np.x && e.y == np.y) near = true;
+      });
+      c++;
+    } while (near && c < 1000)
+    data.unit.push(makeUnit('mashroom', np.x, np.y, 3));
+    tnp.push({ x: np.x, y: np.y });
+  });
   return data
 }
 

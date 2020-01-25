@@ -286,6 +286,7 @@ let getAkt = (x, y) => {
 }
 
 let onMouseDown = () => {
+  let grib = false;
   if (!data.bonus) {
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
       endturn();
@@ -308,6 +309,10 @@ let onMouseDown = () => {
             nextunit++;
           }
         }
+        else if (local.unit.color == 3 ) {
+          local.unit = false;
+          grib = true;
+        }
       } else {
         local.unit = false;
       }
@@ -316,6 +321,9 @@ let onMouseDown = () => {
     // local.akt = [];
 
     render();
+    if (grib) {
+      drawTxt('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
+    }
     if (local.unit && !local.unit.isReady) {
       drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
       //     local.akt = local.unit.akt;
@@ -350,7 +358,7 @@ let onMouseDown = () => {
 
 let onMouseDownRight = () => {
   nextunit = 0;
-  if (local.unit && local.unit.akt && data.turn && (local.unit.color == 1 || data.chooseteam)) {
+  if (local.unit && local.unit.akt && data.turn && (local.unit.color == 1 || (data.chooseteam && local.unit.color != 3))) {
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
       send();
@@ -363,8 +371,14 @@ let onMouseDownRight = () => {
   if (!data.turn) {
     drawTxt('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
   }
-  else if (local.unit && local.unit.color == 2) {
-    drawTxt('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
+  else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
+    drawTxt('Я гриб!', mouseCell.x, mouseCell.y, '#333')
+  }
+  else if (local.unit && local.unit.color != 1) {
+    if (data.chooseteam) {
+      drawTxt('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
+    } else
+      drawTxt('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
   }
 }
 

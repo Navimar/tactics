@@ -18,6 +18,22 @@ exports.warrior = {
     wd.tire();
   }
 }
+exports.mashroom = {
+  class: 'never',
+  life: 3,
+  img: 'mashroom',
+  akt: (akt) => {
+    // return [{ x: 5, y: 5, img: 'move' }]
+    return akt.move().concat(akt.hand('mashroom'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  mashroom: (wd) => {
+    wd.damage();
+    wd.tire();
+  }
+}
 
 exports.bird = {
   class: 'champion',

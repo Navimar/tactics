@@ -93,7 +93,11 @@ exports.data = (game) => {
         akt,
         color: (() => {
           if (player == 1) return u.team;
-          if (player == 2) return (u.team == 1 ? 2 : 1);
+          if (player == 2) return (() => {
+            if (u.team == 1) { return 2 } else
+              if (u.team == 2) { return 1 } else
+                return u.team;
+          })();
         })(),
       });
     });
