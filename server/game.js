@@ -20,9 +20,9 @@ exports.new = (p1, p2) => {
     field: data.field,
     turn: 1,
     winner: 0,
-    leftturns: 16,
+    leftturns: 17,
     started: time.clock(),
-    destraction: 0,
+    destraction: -1,
     finshed:false,
   }
   p1.game = game;
