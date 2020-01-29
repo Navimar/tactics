@@ -31,7 +31,7 @@ exports.mashroom = {
   }
 }
 exports.telepath = {
-  class: 'hero',
+  class: 'champion',
   life: 3,
   img: 'telepath',
   akt: (akt) => {

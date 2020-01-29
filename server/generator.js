@@ -126,7 +126,7 @@ let makeUnit = (tp, x, y, team) => {
 
 let rndUnit = () => {
   let chance = [];
-  _.times(7, () => chance.push(barraks.hero));
+  // _.times(7, () => chance.push(barraks.hero));
   _.times(7, () => chance.push(barraks.champion));
   _.times(1, () => chance.push(barraks.support));
   return _.sample(_.sample(chance));
