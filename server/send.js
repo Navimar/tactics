@@ -2,6 +2,8 @@ const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
 const wrapper = require('./wrapper');
+const status = require('./status');
+
 
 const time = require('./time');
 
@@ -78,12 +80,13 @@ exports.data = (game) => {
       let akt = [];
       if (u.isReady) {
         akt = meta[u.tp].akt(akter(game, u));
+        game.unit.forEach(stu => {
+          akt = stu.status && _.isFunction(status[stu.status].onAkt) ? status[stu.status].onAkt(akter(game, stu), akt) : akt;
+        });
       }
-      // if (akt.length == 0 && u.isReady) {
-      //   wrapper(game, u).tire();
-      // }
       send.unit.push({
         img,
+        status: u.status,
         isActive: u.isActive,
         isReady: u.isReady,
         life: u.life,
@@ -98,6 +101,11 @@ exports.data = (game) => {
               if (u.team == 2) { return 1 } else
                 return u.team;
           })();
+        })(),
+        canMove: (() => {
+          if ((game.chooseteam && u.team != 3) || u.team == player || u.status == 'telepath')
+            return true;
+          return false;
         })(),
       });
     });

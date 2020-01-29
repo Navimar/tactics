@@ -42,6 +42,12 @@ module.exports = (game, me, target) => {
     },
     go: (xto, yto) => {
       en.move(game, me, xto, yto);
-    }
+    },
+    addStatus: (st) => {
+      en.addStatus( en.unitInPoint(game,target.x, target.y), st);
+    },
+    addUnit: (tp, life) => {
+      return en.addUnit(game, tp, target.x, target.y, me.team, life)
+    },
   }
 }

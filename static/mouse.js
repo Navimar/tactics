@@ -41,6 +41,7 @@ function inputMouse() {
 
 
   canvas.addEventListener("touchstart", e => {
+    mobile = true;
     mousePos = getTouchPos(canvas, e);
     mouseCell = {
       x: Math.floor((mousePos.x - shiftX) / dh),

@@ -61,7 +61,7 @@ function drawTxt(txt, x, y, color, font) {
   ctx.font = font;
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
-  wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 3, 25);
+  wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 4, 25);
 
   // drawBubble(x, y, px, py);
 
@@ -77,6 +77,8 @@ function drawTxt(txt, x, y, color, font) {
         }
       }
       ctx.font = font;
+      lineHeight = ctx.font.substring(0, 2)*1.1;
+      // lineHeight=100
       ctx.fillStyle = 'white';
       context.fillText(line, marginLeft, marginTop);
     }
@@ -230,6 +232,12 @@ function getImg(name, x, y, mask) {
 function drawImg(name, x, y) {
   let p = dh / 10;
   let img = getImg(name, x, y);
+  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
+  // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
+}
+function drawStatus(name, x, y) {
+  let p = dh / 10;
+  let img = getImg(name + '.stt', x, y);
   ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
   // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
 }
@@ -398,4 +406,7 @@ function initGrafio() {
     }
   }
 }
+
+
+
 

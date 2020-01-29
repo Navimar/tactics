@@ -5,7 +5,6 @@ exports.warrior = {
   life: 3,
   img: 'warrior',
   akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
     return akt.move().concat(akt.hand('warrior'))
   },
   move: (wd) => {
@@ -21,7 +20,6 @@ exports.mashroom = {
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
     return akt.move().concat(akt.hand('mashroom'))
   },
   move: (wd) => {
@@ -32,7 +30,42 @@ exports.mashroom = {
     wd.tire();
   }
 }
+exports.telepath = {
+  class: 'hero',
+  life: 3,
+  img: 'telepath',
+  akt: (akt) => {
+    let akts = akt.move().concat(akt.hand('telepath', 'enemy'))
+    // akts.forEach(e => e.img = 'hatchery');
+    return akts;
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  telepath: (wd) => {
+    wd.addStatus('telepath');
+    wd.tire();
+  }
+}
+exports.hatchery = {
+  class: 'support',
+  life: 3,
+  img: 'hatchery',
+  akt: (akt) => {
+    let akts = akt.move()
+    akts.forEach(e => e.img = 'hatchery');
+    return akts;
+  },
+  hatchery: (wd) => {
+    let u = wd.addUnit('warrior', 2)
+    // console.log(u)
+    wd.tire()
+    // console.log('zerg',u)
+    // u.isReady = false;
+    u.energy = 0
 
+  }
+}
 exports.bird = {
   class: 'support',
   life: 3,

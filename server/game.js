@@ -4,6 +4,7 @@ const wrapper = require('./wrapper');
 const send = require('./send');
 const en = require('./engine');
 const generator = require('./generator');
+const status = require('./status');
 
 const _ = require('lodash');
 
@@ -12,7 +13,7 @@ exports.new = (p1, p2) => {
   let data = generator.new();
   let game = {
     players: [p1, p2],
-    fisher: ['', ''],
+    fisher: [120, 120],
     trail: [],
     lastturntime: [],
     bonus: [null, null],
@@ -20,10 +21,10 @@ exports.new = (p1, p2) => {
     field: data.field,
     turn: 1,
     winner: 0,
-    leftturns: 17,
+    leftturns: 14,
     started: time.clock(),
-    destraction: -1,
-    finshed:false,
+    destraction: 0,
+    finshed: false,
   }
   p1.game = game;
   p2.game = game;
@@ -33,13 +34,13 @@ exports.new = (p1, p2) => {
 exports.order = (p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
   let game = p.game;
-  if (game &&!game.finshed) {
+  if (game && !game.finshed) {
     fisher(game);
     game.trail = [];
     let unit = en.unitInPoint(game, u.x, u.y);
     if (unit) {
 
-      addbonus(game, unit)
+      if(game.chooseteam)addbonus(game, unit)
 
       game.unit.forEach(u => {
         // console.log(u.energy,u.isReady)
@@ -67,11 +68,13 @@ exports.order = (p, u, akt) => {
 exports.endturn = (p) => {
   let game = p.game;
   if (game && !game.finshed) {
-    destraction(game);
     game.unit.forEach(u => {
       if (_.isFunction(meta[u.tp].onEndturn)) {
         // console.log('isFunction');
         meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
+      }
+      if (u.status && _.isFunction(status[u.status].onEndturn)) {
+        status[u.status].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
       }
       u.energy = 3;
       u.isReady = true;
@@ -96,7 +99,8 @@ exports.endturn = (p) => {
       }
     } else {
       if (game.fisher[game.turn - 1] < 0) {
-        game.winner = game.turn == 1 ? 2 : 1;
+        // game.winner = game.turn == 1 ? 2 : 1;
+        game.fisher[game.turn - 1] += 120;
       } else {
         game.fisher[game.turn - 1] += 120;
       }
@@ -150,47 +154,39 @@ let fisher = (game) => {
 }
 
 let destraction = (game) => {
+  let land = 'water'
   let des = game.destraction % 4
-  console.log('des', des)
+  // console.log('des', des)
   let d = 0
   if (game.destraction)
     d = (game.destraction - des) / 4;
-  console.log('d', d)
+  // console.log('d', d)
 
   if (des == 0) {
     for (let x = 0; x < 9; x++) {
       for (let y = 0 + d; y < 1 + d; y++) {
-        game.field[x][y] = 'outland';
+        game.field[x][y] = land;
       }
     }
   }
   else if (des == 1) {
     for (let x = 8 - d; x < 9 - d; x++) {
       for (let y = 0; y < 9; y++) {
-        game.field[x][y] = 'outland';
+        game.field[x][y] = land;
       }
     }
   }
   else if (des == 2) {
     for (let x = 0; x < 9; x++) {
       for (let y = 8 - d; y < 9 - d; y++) {
-        game.field[x][y] = 'outland';
+        game.field[x][y] = land;
       }
     }
   }
   else if (des == 3) {
     for (let x = 0 + d; x < 1 + d; x++) {
       for (let y = 0; y < 9; y++) {
-        game.field[x][y] = 'outland';
-      }
-    }
-  }
-  for (let x = 0; x < 9; x++) {
-    for (let y = 0; y < 9; y++) {
-      if (game.field[x][y] == 'outland') {
-        let u = en.unitInPoint(game, x, y)
-        if (u)
-          en.death(game, u);
+        game.field[x][y] = land;
       }
     }
   }

@@ -33,6 +33,27 @@ en.death = (game, unit) => {
   game.unit.splice(game.unit.indexOf(unit), 1);
 }
 
+en.addUnit = (game, tp, x, y, team, life) => {
+  let u = en.makeUnit(tp, x, y, team, life)
+  game.unit.push(u); return u;
+}
+
+
+en.makeUnit = (tp, x, y, team, life) => {
+  let m = x < 5 ? false : true;
+  return {
+    status: false,
+    isReady: true,
+    energy: 3,
+    tp,
+    m,
+    x,
+    y,
+    data: {},
+    team,
+    life,
+  }
+}
 en.damage = (game, unit, d) => {
   if (unit) {
     if (d) { unit.life -= d } else {
@@ -61,6 +82,9 @@ en.move = (game, unit, x, y) => {
   } else {
     require('./send').logicerror(game, 'move cant find the unit')
   }
+}
+en.addStatus = (unit, st) => {
+  unit.status = st;
 }
 
 module.exports = en;

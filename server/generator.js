@@ -1,4 +1,6 @@
 const meta = require('./meta');
+const en = require('./engine');
+
 // const barraks = require('./barraks');
 const _ = require('lodash');
 
@@ -117,24 +119,15 @@ exports.new = () => {
   return data
 }
 
-let makeUnit = (tp, x, y, team, ) => {
-  let m = x < 5 ? false : true;
-  return {
-    isReady: true,
-    energy: 3,
-    tp,
-    m,
-    x,
-    y,
-    data: {},
-    team,
-    life: meta[tp].life,
-  }
+let makeUnit = (tp, x, y, team) => {
+  let life = meta[tp].life;
+  return en.makeUnit(tp, x, y, team, life)
 }
 
 let rndUnit = () => {
   let chance = [];
-  _.times(10, () => chance.push(barraks.champion));
+  _.times(7, () => chance.push(barraks.hero));
+  _.times(7, () => chance.push(barraks.champion));
   _.times(1, () => chance.push(barraks.support));
   return _.sample(_.sample(chance));
 }

@@ -1,12 +1,14 @@
-const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+let mobile = false;
 
 let local = {
   time: 0,
   seconds: 0,
   akt: [],
   focus: false,
-  fisher: ['xxx', 'xxx'],
-  sandclock: { x: 0, y: 0 }
+  fisher: [999, 999],
+  sandclock: { x: 0, y: 0 },
+  tip: { text: 'Подключение к серверу...', x: 3, y: 3, color: '#F00', font: "3vmax verdana", dur: 30 },
+  turn: 1,
 };
 let data = {
   fisher: ['???', '!!!'],
@@ -84,6 +86,15 @@ let fieldmask = (() => {
   return arr
 })();
 
+let tip = (text, x, y, color, dur, font) => {
+  if (!font) {
+    font = "1.5vmax/1.2 Verdana"
+  }
+  if (!dur)
+    dur = 5;
+  local.tip = { text, x, y, color, font, dur }
+}
+
 let leftclickcn = 0;
 let nextunit = 0;
 let orientation = 'h'
@@ -130,11 +141,13 @@ let render = () => {
         if (u) {
           drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
           drawLife(u.life, u.x, u.y);
+          if (u.status)
+            drawStatus(u.status, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
         }
       }
     }
   }
-  let renderakt= () => {
+  let renderakt = () => {
     if (local.unit && local.unit.akt) {
       local.unit.akt.forEach(a => {
         drawAkt(a.img, a.x, a.y);
@@ -152,7 +165,11 @@ let render = () => {
       }
     }
   }
+  let rendertip = () => {
 
+    if (local.tip && local.tip.dur > 0)
+      drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
+  }
   if (data.turn == 1) {
     drawBackground('edgeTurn');
   } else {
@@ -166,6 +183,7 @@ let render = () => {
   renderpanel();
   rendertrail();
   renderakt();
+  rendertip();
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
   }
@@ -223,21 +241,29 @@ let renderpanel = () => {
 let onStep = (diff) => {
   // console.log('step');
   local.time += diff;
+  // console.log(local.tip.dur);
   if (Math.floor(local.time / 1000) > local.seconds) {
     local.seconds = Math.floor(local.time / 1000)
+    local.tip.dur--;
     if (data.turn) {
-      if (local.fisher[0]) {
-        local.fisher[0]--;
-      } else {
-        local.fisher[0] = ''
-      }
+      // console.log(''-1)
+      // if (local.fisher[0]) {
+      local.fisher[0]--;
+      // } else {
+      // local.fisher[0] = ''
+      // }
     } else {
-      if (local.fisher[1]) {
-        local.fisher[1]--;
-      } else {
-        local.fisher[1] = ''
-      }
+      // if (local.fisher[1]) {
+      local.fisher[1]--;
+      // } else {
+      // local.fisher[1] = ''
+      // }
     }
+    if (!data.bonus && local.fisher[0] != '' && local.fisher[0] == 5) {
+      tip('Вы не успеваете закончить ход. Ход будет передан сопернику! В следующий раз уложитесь в 2 минуты!', 3, 3, '#F00', 5, '2vmax verdana');
+      render();
+    };
+    if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
     renderpanel();
   }
   if (tapDown && local.time - tapTime > interval) {
@@ -258,11 +284,16 @@ let onUpdate = (val) => {
   updateAudio.play();
   // console.log(val);
   data = val;
+  local.tip = false;
   local.unit = false;
   local.sandclock = false;
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
-
+  console.log(data.turn)
+  if (local.turn == false && data.turn == true) {
+    tip('ВАШ ХОД!!!', 3, 3, "#0F0", 10, '4vmax verdana');
+    local.turn = data.turn;
+  }
   data.unit.forEach((u) => {
     if (u.isActive && u.akt.length > 0) {
       local.unit = u
@@ -285,7 +316,7 @@ let getAkt = (x, y) => {
 }
 
 let onMouseDown = () => {
-  let grib = false;
+  local.tip = false;
   if (!data.bonus) {
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
       endturn();
@@ -308,9 +339,9 @@ let onMouseDown = () => {
             nextunit++;
           }
         }
-        else if (local.unit.color == 3 ) {
+        else if (local.unit.color == 3 && !local.unit.canMove) {
           local.unit = false;
-          grib = true;
+          tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
         }
       } else {
         local.unit = false;
@@ -319,12 +350,9 @@ let onMouseDown = () => {
     // local.focus = false;
     // local.akt = [];
 
-    render();
-    if (grib) {
-      drawTxt('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
-    }
     if (local.unit && !local.unit.isReady) {
-      drawTxt('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
+      tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
+
       //     local.akt = local.unit.akt;
       //     local.focus = { x: unit.x, y: unit.y };
     }
@@ -333,7 +361,8 @@ let onMouseDown = () => {
       let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
       if (mobile)
         txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
-      drawTxt(txt, mouseCell.x, mouseCell.y, '#550000')
+      tip(txt, mouseCell.x, mouseCell.y, '#550000')
+
       leftclickcn = 2;
     }
   } else {
@@ -345,19 +374,20 @@ let onMouseDown = () => {
         b = (mouseCell.y - 9) * 9 + mouseCell.x;
       sendbonus(b);
     } else {
-      render();
       if (data.turn) {
-        drawTxt('Нажмите на одну из красных кнопок с числом справа! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+        tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
       } else {
-        drawTxt('Соперник выбирает бонус', mouseCell.x, mouseCell.y, '#222')
+        tip('Соперник выбирает бонус', mouseCell.x, mouseCell.y, '#222')
       }
     }
   }
+  render();
 }
 
 let onMouseDownRight = () => {
+  local.tip = false;
   nextunit = 0;
-  if (local.unit && local.unit.akt && data.turn && (local.unit.color == 1 || (data.chooseteam && local.unit.color != 3))) {
+  if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
       send();
@@ -368,16 +398,16 @@ let onMouseDownRight = () => {
   // console.log(data.turn)
   render();
   if (!data.turn) {
-    drawTxt('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
+    tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
   }
   else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
-    drawTxt('Я гриб!', mouseCell.x, mouseCell.y, '#333')
+    tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
   }
   else if (local.unit && local.unit.color != 1) {
     if (data.chooseteam) {
-      drawTxt('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
+      tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
     } else
-      drawTxt('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
+      tip('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
   }
 }
 
