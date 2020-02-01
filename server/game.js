@@ -10,13 +10,19 @@ const _ = require('lodash');
 
 
 exports.new = (p1, p2) => {
+  let game = creategame(p1, p2)
+  p1.game = game;
+  p2.game = game;
+  return game;
+}
+let creategame = (p1, p2) => {
   let data = generator.new();
   let game = {
     players: [p1, p2],
     fisher: [120, 120],
     trail: [],
     lastturntime: [],
-    bonus: [null, null],
+    bonus: [null, null, null],
     unit: data.unit,
     field: data.field,
     turn: 1,
@@ -24,23 +30,20 @@ exports.new = (p1, p2) => {
     leftturns: 14,
     started: time.clock(),
     destraction: 0,
-    finshed: false,
+    finished: false,
   }
-  p1.game = game;
-  p2.game = game;
   return game;
 }
-
 exports.order = (p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
   let game = p.game;
-  if (game && !game.finshed) {
+  if (game && !game.finished) {
     fisher(game);
     game.trail = [];
     let unit = en.unitInPoint(game, u.x, u.y);
     if (unit) {
 
-      if(game.chooseteam)addbonus(game, unit)
+      if (game.chooseteam) addbonus(game, unit)
 
       game.unit.forEach(u => {
         // console.log(u.energy,u.isReady)
@@ -64,10 +67,32 @@ exports.order = (p, u, akt) => {
     }
   }
 }
+exports.surrender = (p) => {
+  let game = p.game;
+  if (game && !game.finished) {
+    game.finished = true
+    game.winner = game.turn == 1 ? 2 : 1;
+    send.data(game);
+  }
+}
+
+exports.rematch = (p) => {
+  // console.log('rematch')
+  let sandbox = p.game.sandbox;
+  let p1 = p.game.players[0];
+  let p2 = p.game.players[1];
+  let game = creategame(p1, p2)
+  game.sandbox = sandbox;
+  p1.game = game;
+  p2.game = game;
+  send.data(game);
+
+}
+
 
 exports.endturn = (p) => {
   let game = p.game;
-  if (game && !game.finshed) {
+  if (game && !game.finished) {
     game.unit.forEach(u => {
       if (_.isFunction(meta[u.tp].onEndturn)) {
         // console.log('isFunction');
@@ -113,24 +138,22 @@ exports.endturn = (p) => {
 
 exports.setbonus = (p, bonus) => {
   let game = p.game;
-  game.bonus[game.turn - 1] = bonus;
-  if (game.bonus[0] !== null && game.bonus[1] !== null) {
-    if (game.bonus[0] < game.bonus[1]) {
-      game.bonus[0] = 0;
-      game.turn = game.turn == 1 ? 2 : 1;
-    } else {
+  game.bonus[game.turn] = bonus;
+  if (game.bonus[1] !== null && game.bonus[2] !== null) {
+    if (game.bonus[1] < game.bonus[2]) {
       game.bonus[1] = 0;
+    } else {
+      game.bonus[2] = 0;
     }
     game.chooseteam = true;
+    send.data(game);
   }
   game.turn = game.turn == 1 ? 2 : 1;
-  send.data(game);
 }
 function addbonus(game, unit) {
-  let turn = game.turn == 1 ? 1 : 0;
-  if (game.bonus[turn]) {
-    unit.life += game.bonus[turn];
-    game.bonus[turn] = 0;
+  if (game.bonus[game.turn]) {
+    unit.life += game.bonus[game.turn];
+    game.bonus[game.turn] = 0;
   }
   if (unit.team !== game.turn) {
     game.unit.forEach(u => {
@@ -191,5 +214,5 @@ let destraction = (game) => {
     }
   }
   game.destraction++
-  if (game.destraction > 15) game.finshed = true;
+  if (game.destraction > 15) game.finished = true;
 }

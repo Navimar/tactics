@@ -70,6 +70,12 @@ input.socket = (io) => {
         socket.on('bonus', function (msg) {
             handle.socket(socket, 'bonus', msg);
         });
+        socket.on('surrender', function (msg) {
+            handle.socket(socket, 'surrender', msg);
+        });
+        socket.on('rematch', function (msg) {
+            handle.socket(socket, 'rematch', msg);
+        });
         socket.on('login', function (msg) {
             handle.socket(socket, 'login', msg);
         });

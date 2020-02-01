@@ -77,7 +77,7 @@ function drawTxt(txt, x, y, color, font) {
         }
       }
       ctx.font = font;
-      lineHeight = ctx.font.substring(0, 2)*1.1;
+      lineHeight = ctx.font.substring(0, 2) * 1.1;
       // lineHeight=100
       ctx.fillStyle = 'white';
       context.fillText(line, marginLeft, marginTop);
@@ -294,7 +294,7 @@ function drawLife(quantity, x, y) {
 
 function drawProp(name, x, y, m, team, isReady, isActive) {
   let color = false;
-  if (!data.chooseteam && !data.bonus) {
+  if (!data.chooseteam && data.bonus == 'ready') {
     if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
     if (team == 2 && !isReady) color = 'rgba(190,0,190,1)';
     if (team == 1 && isReady && data.turn) color = 'rgba(255,255,255,1)';

@@ -190,33 +190,32 @@ let render = () => {
 
 }
 let renderpanel = () => {
-  let x = -2
-  let y = 0
-  let xp = 0
-  let yp = 2
+  let c = [
+    [-2, 0],
+    [-2, 2],
+    [-2, 7],
+  ]
   if (orientation == 'h') {
-    x = 0
-    y = -2
-    xp = 2
-    yp = 0
+    c.forEach(e => e.reverse());
   }
   if (data.turn) {
-    drawSize('turn', x, y, 2, 2)
+    drawSize('turn', c[0][0], c[0][1], 2, 2)
+    drawSize('surrender', c[2][0], c[2][1], 2, 2)
   } else {
-    drawSize('turnEnemy', x, y, 2, 2)
+    drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
   }
-  drawTxt(data.leftturns + '', x + 0.15, y + 0.15, '#222')
-  drawTxt(local.fisher[0] + '', x + 0.15, y + 0.5 + 0.15, '#090')
-  drawTxt(local.fisher[1] + '', x + 1 + 0.15, y + 0.5 + 0.15, '#f00')
-  x += xp
-  y += yp
+  drawTxt(data.leftturns + '', c[0][0] + 0.15, c[0][1] + 0.15, '#222')
+  drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.5 + 0.15, '#090')
+  drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.5 + 0.15, '#f00')
   if (data.win == 'win') {
-    drawSize('win', x, y, 2, 2)
+    drawSize('win', c[1][0], c[1][1], 2, 2)
   }
   if (data.win == 'defeat') {
-    drawSize('defeat', x, y, 2, 2)
+    drawSize('defeat', c[1][0], c[1][1], 2, 2)
   }
-  if (data.bonus && data.turn) {
+
+
+  if (data.bonus == 'choose') {
     let i = 0;
     for (let fx = 9; fx < 11; fx++) {
       for (let fy = 0; fy < 9; fy++) {
@@ -246,25 +245,16 @@ let onStep = (diff) => {
     local.seconds = Math.floor(local.time / 1000)
     local.tip.dur--;
     if (data.turn) {
-      // console.log(''-1)
-      // if (local.fisher[0]) {
       local.fisher[0]--;
-      // } else {
-      // local.fisher[0] = ''
-      // }
     } else {
-      // if (local.fisher[1]) {
       local.fisher[1]--;
-      // } else {
-      // local.fisher[1] = ''
-      // }
     }
-    if (!data.bonus && local.fisher[0] != '' && local.fisher[0] == 5) {
-      tip('Вы не успеваете закончить ход. Ход будет передан сопернику! В следующий раз уложитесь в 2 минуты!', 3, 3, '#F00', 5, '2vmax verdana');
+    if (!data.bonus && local.fisher[0] != '' && local.fisher[0] == 30) {
+      tip('Вы не успеваете закончить ход. Ход будет передан сопернику через 30 секунд!', 3, 3, '#F00', 5, '2vmax verdana');
       render();
     };
-    if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
-    renderpanel();
+    // if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
+    // renderpanel();
   }
   if (tapDown && local.time - tapTime > interval) {
     onMouseDownRight();
@@ -289,9 +279,9 @@ let onUpdate = (val) => {
   local.sandclock = false;
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
-  console.log(data.turn)
+  console.log('dataturn',data.turn)
   if (local.turn == false && data.turn == true) {
-    tip('ВАШ ХОД!!!', 3, 3, "#0F0", 10, '4vmax verdana');
+    tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, '4vmax verdana');
     local.turn = data.turn;
   }
   data.unit.forEach((u) => {
@@ -317,36 +307,44 @@ let getAkt = (x, y) => {
 
 let onMouseDown = () => {
   local.tip = false;
-  if (!data.bonus) {
+  if (data.bonus == 'ready') {
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
       endturn();
-    } else {
-      if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
-        local.unit = getUnit(mouseCell.x, mouseCell.y);
-        if (!local.unit) {
-          let arr = [];
-          data.unit.forEach((u) => {
-            if (u.color == 1 && u.isReady) {
-              arr.push(u);
-            }
-          });
-          if (arr[nextunit] && local.unit != arr[nextunit]) {
-            local.unit = arr[nextunit];
-            nextunit++;
-          } else {
-            nextunit = 0;
-            local.unit = arr[nextunit];
-            nextunit++;
-          }
+    } else
+      if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7)) && data.turn) {
+        if (data.finished) {
+          rematch();
+        } else {
+          surrender();
         }
-        else if (local.unit.color == 3 && !local.unit.canMove) {
-          local.unit = false;
-          tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
-        }
-      } else {
-        local.unit = false;
       }
-    }
+      else {
+        if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
+          local.unit = getUnit(mouseCell.x, mouseCell.y);
+          if (!local.unit) {
+            let arr = [];
+            data.unit.forEach((u) => {
+              if (u.color == 1 && u.isReady) {
+                arr.push(u);
+              }
+            });
+            if (arr[nextunit] && local.unit != arr[nextunit]) {
+              local.unit = arr[nextunit];
+              nextunit++;
+            } else {
+              nextunit = 0;
+              local.unit = arr[nextunit];
+              nextunit++;
+            }
+          }
+          else if (local.unit.color == 3 && !local.unit.canMove) {
+            local.unit = false;
+            tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
+          }
+        } else {
+          local.unit = false;
+        }
+      }
     // local.focus = false;
     // local.akt = [];
 
@@ -365,8 +363,9 @@ let onMouseDown = () => {
 
       leftclickcn = 2;
     }
-  } else {
-    if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11)) && data.turn) {
+  } else if (data.bonus == 'choose') {
+    console.log('chosse', mouseCell)
+    if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11))) {
       let b
       if (mouseCell.x > 8)
         b = (mouseCell.x - 9) * 9 + mouseCell.y;
@@ -374,12 +373,10 @@ let onMouseDown = () => {
         b = (mouseCell.y - 9) * 9 + mouseCell.x;
       sendbonus(b);
     } else {
-      if (data.turn) {
-        tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
-      } else {
-        tip('Соперник выбирает бонус', mouseCell.x, mouseCell.y, '#222')
-      }
+      tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
     }
+  } else if (data.bonus == 'wait') {
+    tip('Соперник еще выбирает бонус. Подождите', mouseCell.x, mouseCell.y, '#222')
   }
   render();
 }
@@ -427,7 +424,14 @@ let send = () => {
 let sendbonus = (b) => {
   socket.emit("bonus", b);
 }
+let surrender = () => {
+  socket.emit("surrender");
+}
+let rematch = () => {
+  socket.emit("rematch");
+}
 let endturn = () => {
+  local.turn = false;
   // local.fisher[0] += 120;
   socket.emit("endturn");
 }

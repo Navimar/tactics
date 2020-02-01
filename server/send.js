@@ -36,11 +36,14 @@ exports.success = (socket) => {
 exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
+      finished: game.finished,
       leftturns: game.leftturns,
       chooseteam: game.chooseteam,
       trail: game.trail,
       bonus: (() => {
-        if (game.bonus[0] === null || game.bonus[1] === null) { return true }
+        if (game.bonus[player] === null) return 'choose'
+        if (game.bonus[1] !== null && game.bonus[2] !== null) return 'ready'
+        if (game.bonus[3 - player] === null && game.bonus[player] !== null) return 'wait'
       })(),
       win: (() => {
         if (game.winner != 0) {
@@ -70,9 +73,10 @@ exports.data = (game) => {
         if (player == 2) return game.fisher.slice().reverse();
       })(),
       turn: (() => {
-        if (game.turn == player) {
+        if (game.turn == player)
           return true;
-        }
+        else
+          return false
       })(),
     };
     game.unit.forEach(u => {

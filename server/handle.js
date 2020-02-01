@@ -47,6 +47,18 @@ exports.socket = (socket, e, msg) => {
       game.setbonus(p, msg);
     }
   }
+  if (e == 'surrender') {
+    let p = player.bySocket(socket);
+    if (p) {
+      game.surrender(p, msg);
+    }
+  }
+  if (e == 'rematch') {
+    let p = player.bySocket(socket);
+    if (p) {
+      game.rematch(p, msg);
+    }
+  }
   if (e == 'endturn') {
     let p = player.bySocket(socket);
     if (p) {
@@ -71,7 +83,7 @@ exports.bot = (msg, bot) => {
     }
   }
   else if (text == '/find') {
-     queue.find(p,bot)
+    queue.find(p, bot)
   }
   else if (text == '/sandbox') {
     game.new(p, p)
