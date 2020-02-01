@@ -146,9 +146,9 @@ exports.setbonus = (p, bonus) => {
       game.bonus[2] = 0;
     }
     game.chooseteam = true;
-    send.data(game);
   }
   game.turn = game.turn == 1 ? 2 : 1;
+  send.data(game);
 }
 function addbonus(game, unit) {
   if (game.bonus[game.turn]) {
