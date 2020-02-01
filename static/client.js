@@ -279,7 +279,7 @@ let onUpdate = (val) => {
   local.sandclock = false;
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
-  console.log('dataturn',data.turn)
+  // console.log('dataturn',data.turn)
   if (local.turn == false && data.turn == true) {
     tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, '4vmax verdana');
     local.turn = data.turn;
@@ -364,7 +364,6 @@ let onMouseDown = () => {
       leftclickcn = 2;
     }
   } else if (data.bonus == 'choose') {
-    console.log('chosse', mouseCell)
     if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11))) {
       let b
       if (mouseCell.x > 8)
