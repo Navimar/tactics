@@ -198,9 +198,15 @@ let renderpanel = () => {
   if (orientation == 'h') {
     c.forEach(e => e.reverse());
   }
+  if (data.finished) {
+    drawSize('rematch', c[2][0], c[2][1], 2, 2)
+
+  } else {
+    drawSize('surrender', c[2][0], c[2][1], 2, 2)
+
+  }
   if (data.turn) {
     drawSize('turn', c[0][0], c[0][1], 2, 2)
-    drawSize('surrender', c[2][0], c[2][1], 2, 2)
   } else {
     drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
   }
@@ -410,7 +416,7 @@ let onMouseDownRight = () => {
 let allakts = () => {
   let arr = []
   data.unit.forEach(u => {
-    if (u.color == 1)
+    if (u.canMove)
       arr = arr.concat(u.akt);
   });
   return arr.length;

@@ -142,24 +142,37 @@ exports.setbonus = (p, bonus) => {
   if (game.bonus[1] !== null && game.bonus[2] !== null) {
     if (game.bonus[1] < game.bonus[2]) {
       game.bonus[1] = 0;
+      game.turn = 1;
     } else {
       game.bonus[2] = 0;
+      game.turn = 2;
     }
     game.chooseteam = true;
+  } else {
+    game.turn = game.turn == 1 ? 2 : 1;
   }
-  game.turn = game.turn == 1 ? 2 : 1;
   send.data(game);
 }
 function addbonus(game, unit) {
-  if (game.bonus[game.turn]) {
-    unit.life += game.bonus[game.turn];
-    game.bonus[game.turn] = 0;
-  }
+  console.log(game.bonus[game.turn])
   if (unit.team !== game.turn) {
     game.unit.forEach(u => {
       if (u.team == 1) { u.team = 2; } else
         if (u.team == 2) u.team = 1;
     });
+  }
+  if (game.bonus[3 - game.turn]) {
+    while (game.bonus[3 - game.turn] > 0) {
+      for (let x = 0; x < 9; x++) {
+        for (let y = 0; y < 9; y++) {
+          let u = en.unitInPoint(game, x, y);
+          if (u && game.bonus[3 - game.turn] > 0 && u.team != 3 && u.team != game.turn) {
+            u.life++ , game.bonus[3 - game.turn]--
+          }
+        }
+      }
+    }
+    game.bonus[game.turn] = 0;
   }
   game.chooseteam = false;
 }
