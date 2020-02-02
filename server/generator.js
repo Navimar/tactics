@@ -49,47 +49,64 @@ exports.new = () => {
   let orangearr = []
   let bluearr = []
   let nq = _.random(7)
+  let maxunit = 91;
+  let maxpop = 4;
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      points.push({ x, y, type:[0, 1, 2, 3], });
+      points.push({ x, y, type: [0, 1, 2, 3], });
     }
   }
   points = _.sampleSize(points, 81);
   points.forEach(p => {
     let notblue, notorange, notneutral = false;
+    let pop = 0;
 
     bluearr.forEach(e => {
-      if ((e.x == p.x && e.y == p.y)
+      if (
+        (e.x == p.x && e.y == p.y)
         || (Math.abs(e.x + e.y - (p.x + p.y)) > 8)
-        || bluearr.length == 7 || bluearr.length > orangearr.length) notblue = true;
+        || bluearr.length == maxunit
+        || bluearr.length > orangearr.length
+      )
+        notblue = true;
       if (Math.abs(e.x + e.y - (p.x + p.y)) < 5)
         notorange = true
+      if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
+        pop++
+      }
     });
+    if (pop > maxpop)
+    notblue = true;
+
+    pop = 0;
     orangearr.forEach(e => {
       if ((e.x == p.x && e.y == p.y) ||
         (Math.abs(e.x + e.y - (p.x + p.y)) > 8) ||
-        orangearr.length == 7 || bluearr.length < orangearr.length) notorange = true;
+        orangearr.length == maxunit || bluearr.length < orangearr.length) notorange = true;
       if (Math.abs(e.x + e.y - (p.x + p.y)) < 5)
         notblue = true
-
+      if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
+        pop++
+      }
     });
+    if (pop > maxpop)
+      notorange = true;
     let arr = []
-    if (neutralarr.length<nq)
+    if (neutralarr.length < nq)
       neutralarr.forEach(e => {
         if ((e.x == p.x && e.y == p.y)) {
           notneutral = true;
         }
       }); else
       notneutral = true;
-      
+
     if (notblue) p.type.remove(1);
     if (notorange) p.type.remove(2);
     if (notneutral) p.type.remove(3);
 
     if (p.type.length > 1) p.type.remove(0);
     p.type = _.sample(p.type);
-    console.log(p.type)
     if (p.type == 3) {
       data.unit.push(makeUnit('mashroom', p.x, p.y, p.type));
       neutralarr.push({ x: p.x, y: p.y })
