@@ -398,7 +398,6 @@ let onMouseDownRight = () => {
     }
   }
   // console.log(data.turn)
-  render();
   if (!data.turn) {
     tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
   }
@@ -411,6 +410,8 @@ let onMouseDownRight = () => {
     } else
       tip('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
   }
+  render();
+
 }
 
 let allakts = () => {
