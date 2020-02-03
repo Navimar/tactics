@@ -34,23 +34,58 @@ exports.new = () => {
   for (let x = 0; x < 9; x++) {
     data.field[x] = [];
     for (let y = 0; y < 9; y++) {
-      data.field[x][y] = 'grass';
+      data.field[x][y] = 'none';
     }
   }
-  data.field[1][1] = 'team' + rndTeam();
-  data.field[1][7] = 'team' + rndTeam();
-  data.field[4][4] = 'team' + rndTeam();
-  data.field[7][7] = 'team' + rndTeam();
-  data.field[7][1] = 'team' + rndTeam();
-
   let points = []
+
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      points.push({ x, y, type: [0, 1, 2, 3], });
+    }
+  }
+  points = _.sampleSize(points, 81);
+
+  points.forEach(p => {
+    let ground = 1
+    let grass = 1
+    let n = 3
+    if (data.field[p.x + 1]&&data.field[p.x + 1][p.y] == 'ground') ground += n;
+    if (data.field[p.x][p.y + 1]&&data.field[p.x][p.y + 1] == 'ground') ground += n;
+    if (data.field[p.x][p.y - 1]&&data.field[p.x][p.y - 1] == 'ground') ground += n;
+    if (data.field[p.x - 1]&&data.field[p.x - 1][p.y] == 'ground') ground += n;
+
+    if (data.field[p.x + 1]&&data.field[p.x + 1][p.y] == 'grass') grass += n;
+    if (data.field[p.x][p.y + 1]&&data.field[p.x][p.y + 1] == 'grass') grass += n;
+    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'grass') grass += n;
+    if (data.field[p.x - 1]&&data.field[p.x - 1][p.y] == 'grass') grass += n;
+
+    if (_.random(ground + grass-1) < ground)
+      data.field[p.x][p.y] = 'ground'
+    else
+      data.field[p.x][p.y] = 'grass'
+  });
+
+
+  // data.field[1][1] = 'team' + rndTeam();
+  // data.field[1][7] = 'team' + rndTeam();
+  // data.field[4][4] = 'team' + rndTeam();
+  // data.field[7][7] = 'team' + rndTeam();
+  // data.field[7][1] = 'team' + rndTeam();
+  data.field[2][2] = 'team' + rndTeam();
+  data.field[2][6] = 'team' + rndTeam();
+  data.field[4][4] = 'team' + rndTeam();
+  data.field[6][6] = 'team' + rndTeam();
+  data.field[6][2] = 'team' + rndTeam();
+
+  points = []
 
   let neutralarr = []
   let orangearr = []
   let bluearr = []
   let nq = _.random(7)
   let maxunit = 91;
-  let maxpop = 2;
+  let maxpop = 3;
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
@@ -62,8 +97,12 @@ exports.new = () => {
     let notblue, notorange, notneutral = false;
     let pop = 0;
 
-    if (p.x > 1) notorange = true
-    if (p.x < 7) notblue = true
+    if (p.x < 1 || p.x>2) notorange = true
+    if (p.x < 6 || p.x > 7) notblue = true
+    if (p.y == 0 || p.y == 8) {
+      notorange = true
+      notblue = true
+    }
     bluearr.forEach(e => {
       if (
         // (e.x == p.x && e.y == p.y)

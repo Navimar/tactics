@@ -28,7 +28,9 @@ en.isOccupied = (game, x, y) => {
 en.unitInPoint = (game, x, y) => {
   return game.unit.filter(u => u.x == x && u.y == y)[0];
 }
-
+en.fieldInPoint = (game, x, y) => {
+  return game.field[x][y]
+}
 en.death = (game, unit) => {
   game.unit.splice(game.unit.indexOf(unit), 1);
 }

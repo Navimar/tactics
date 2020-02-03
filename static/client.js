@@ -125,8 +125,8 @@ function step(lastTime) {
 let render = () => {
   resize();
   let renderfield = () => {
-    for (let y = 0; y < 9; y++) {
-      for (let x = 0; x < 9; x++) {
+    for (let y = 8; y >= 0; y-- ){
+      for (let x = 8; x >= 0; x--) {
         drawField(data.field[x][y], x, y, fieldmask[x][y]);
         // drawImg("grass", x, y);
       }

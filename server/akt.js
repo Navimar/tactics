@@ -11,11 +11,21 @@ module.exports = (game, me) => {
 
       _.times(me.energy, () => {
         points.forEach((pt) => {
-          points = points.concat(en.near(pt.x, pt.y))
+          let near = en.near(pt.x, pt.y)
+          near = near.filter(np => {
+            let nf = en.fieldInPoint(game, np.x, np.y)
+            let pf = en.fieldInPoint(game, pt.x, pt.y)
+            return !en.isOccupied(game, np.x, np.y) && (nf == pf || nf.slice(0, -1) == 'team' || pf.slice(0, -1) == 'team')
+          });
+          points = points.concat(near)
         });
-        points = points.filter(pt =>
-          !en.isOccupied(game, pt.x, pt.y)
-        )
+        // points = points.filter(pt =>
+          
+        // )
+        // points = points.filter(pt => {
+        //   let f = en.fieldInPoint(game, pt.x, pt.y)
+        //   // return (f == en.fieldInPoint(game, me.x, me.y) || f.slice(0, -1) == 'team');
+        // })
       })
       points = removeDuplicates(points);
       points = points.filter(pt => !en.isOccupied(game, pt.x, pt.y))
