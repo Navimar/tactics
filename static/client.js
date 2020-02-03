@@ -125,7 +125,7 @@ function step(lastTime) {
 let render = () => {
   resize();
   let renderfield = () => {
-    for (let y = 8; y >= 0; y-- ){
+    for (let y = 8; y >= 0; y--) {
       for (let x = 8; x >= 0; x--) {
         drawField(data.field[x][y], x, y, fieldmask[x][y]);
         // drawImg("grass", x, y);
@@ -277,6 +277,7 @@ let onLogin = (val) => {
   render();
 }
 let onUpdate = (val) => {
+  blocked = false
   updateAudio.play();
   // console.log(val);
   data = val;
@@ -425,19 +426,32 @@ let allakts = () => {
 
 
 let send = () => {
-  socket.emit("order", { unit: local.unit, akt: local.order });
+  if (!blocked)
+    socket.emit("order", { unit: local.unit, akt: local.order });
+  blocked = true;
 }
 let sendbonus = (b) => {
-  socket.emit("bonus", b);
+  if (!blocked)
+    socket.emit("bonus", b);
+  blocked = true;
+
 }
 let surrender = () => {
-  socket.emit("surrender");
+  if (!blocked)
+    socket.emit("surrender");
+  blocked = true;
+
 }
 let rematch = () => {
-  socket.emit("rematch");
+  if (!blocked)
+    socket.emit("rematch");
+  blocked = true;
 }
 let endturn = () => {
   local.turn = false;
   // local.fisher[0] += 120;
-  socket.emit("endturn");
+  if (!blocked)
+    socket.emit("endturn");
+  blocked = true;
+
 }
