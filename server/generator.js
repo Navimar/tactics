@@ -50,7 +50,7 @@ exports.new = () => {
   let bluearr = []
   let nq = _.random(7)
   let maxunit = 91;
-  let maxpop = 4;
+  let maxpop = 2;
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
@@ -62,37 +62,44 @@ exports.new = () => {
     let notblue, notorange, notneutral = false;
     let pop = 0;
 
+    if (p.x > 1) notorange = true
+    if (p.x < 7) notblue = true
     bluearr.forEach(e => {
       if (
-        (e.x == p.x && e.y == p.y)
-        || (Math.abs(e.x + e.y - (p.x + p.y)) > 8)
-        || bluearr.length == maxunit
-        || bluearr.length > orangearr.length
+        // (e.x == p.x && e.y == p.y)
+        // || (Math.abs(e.x + e.y - (p.x + p.y)) > 15)
+        // || bluearr.length == maxunit
+        // ||
+        bluearr.length > orangearr.length
       )
         notblue = true;
-      if (Math.abs(e.x + e.y - (p.x + p.y)) < 5)
-        notorange = true
+      // if (Math.abs(e.x + e.y - (p.x + p.y)) < 4)
+      //   // notorange = true
       if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
         pop++
       }
     });
     if (pop > maxpop)
-    notblue = true;
+      notblue = true;
 
     pop = 0;
     orangearr.forEach(e => {
-      if ((e.x == p.x && e.y == p.y) ||
-        (Math.abs(e.x + e.y - (p.x + p.y)) > 8) ||
-        orangearr.length == maxunit || bluearr.length < orangearr.length) notorange = true;
-      if (Math.abs(e.x + e.y - (p.x + p.y)) < 5)
-        notblue = true
+      if (
+        // (e.x == p.x && e.y == p.y) ||
+        //     (Math.abs(e.x + e.y - (p.x + p.y)) > 15) ||
+        //     orangearr.length == maxunit
+        //  ||
+        bluearr.length < orangearr.length
+      ) notorange = true;
+      //   if (Math.abs(e.x + e.y - (p.x + p.y)) < 4)
+      //     // notblue = true
       if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
         pop++
       }
     });
     if (pop > maxpop)
       notorange = true;
-    let arr = []
+
     if (neutralarr.length < nq)
       neutralarr.forEach(e => {
         if ((e.x == p.x && e.y == p.y)) {
@@ -112,13 +119,23 @@ exports.new = () => {
       neutralarr.push({ x: p.x, y: p.y })
     }
     else if (p.type == 1) {
-      data.unit.push(makeUnit(rndUnit(), p.x, p.y, p.type));
       bluearr.push({ x: p.x, y: p.y })
     }
     else if (p.type == 2) {
-      data.unit.push(makeUnit(rndUnit(), p.x, p.y, p.type));
       orangearr.push({ x: p.x, y: p.y })
     }
+
+  });
+  if (bluearr.length - orangearr.length > 0)
+    bluearr.pop()
+  if (bluearr.length - orangearr.length < 0)
+    orangearr.pop()
+
+  bluearr.forEach(e => {
+    data.unit.push(makeUnit(rndUnit(), e.x, e.y, 1));
+  });
+  orangearr.forEach(e => {
+    data.unit.push(makeUnit(rndUnit(), e.x, e.y, 2));
 
   });
   return data
