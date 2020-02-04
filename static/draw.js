@@ -41,7 +41,7 @@ function drawBoard() {
 
   for (x = shiftX; x <= canvas.width; x += dh) {
     for (y = shiftY; y <= canvas.height; y += dh) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+      ctx.strokeStyle = 'rgba(200,200,200,0.1)';
       // ctx.fillStyle = 'rgba(0,0,0,0.1)';
       ctx.globalAlpha = 0.2;
       ctx.moveTo(x, 0);
@@ -247,7 +247,7 @@ function drawField(name, x, y, mask) {
   // } else if (name == 'team2') {
   //   drawProp('team', x, y, false, '2', true, false);
   // }else{
-  let p = dh / 10;
+  let p = dh / 15;
   let img = getImg(name, x, y, mask[0]);
   let h = dh + 2 * p;
   let w = img.width * (h / img.height);
@@ -292,7 +292,7 @@ function drawLife(quantity, x, y) {
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
 
-function drawProp(name, x, y, m, team, isReady, isActive) {
+function drawProp(name, x, y, m, team, isReady, isActive, size) {
   let color = false;
   if (!data.chooseteam && data.bonus == 'ready') {
     if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
@@ -306,14 +306,18 @@ function drawProp(name, x, y, m, team, isReady, isActive) {
   }
   if (isActive && team == 1) color = 'rgba(0,255,0,1)';
   if (team == 3) color = 'rgba(255, 255, 0,1)';
-  let p = dh / 10;
+  let p = 0
+  if (size)
+    p= dh / size;
   let img = getImg(name, x, y);
   let h = dh + 2 * p;
   let w = img.width * (h / img.height);
 
   if (m) {
     let df = () => {
+      // ctx.drawImage(img, 0, 0, img.width, img.height *0.75 ,(x * dh - p + shiftX) * -1 - w, y * dh - p + shiftY, w, h*0.75);
       ctx.drawImage(img, (x * dh - p + shiftX) * -1 - w, y * dh - p + shiftY, w, h);
+
     }
     ctx.save();
     ctx.scale(-1, 1);
@@ -360,7 +364,7 @@ function drawSize(name, x, y, w, h) {
   if (img === undefined || img === null) {
     img = questionmark;
   }
-  // console.log(img);
+  // ctx.drawImage(img, 0, 0, img.width, img.height/2 ,x * dh + shiftX, y * dh + shiftY, dh*2 , dh );
   ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h);
 }
 

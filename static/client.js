@@ -105,7 +105,7 @@ window.onload = function () {
   inputMouse();
   inputServer();
   step(new Date().getTime());
-  socket.emit("login", { id: findGetParameter("id"), pass: findGetParameter("key") });
+  login();
 };
 
 
@@ -127,7 +127,38 @@ let render = () => {
   let renderfield = () => {
     for (let y = 8; y >= 0; y--) {
       for (let x = 8; x >= 0; x--) {
-        drawField(data.field[x][y], x, y, fieldmask[x][y]);
+        drawField('back', x, y, fieldmask[x][y]);
+        // drawImgNormal('cliff', x, y, fieldmask[x][y]);
+
+      }
+    }
+    // for (let y = 8; y >= 0; y--) {
+    //   for (let x = 8; x >= 0; x--) {
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < 9; x++) {
+        let v = 0
+        // if (data.field[x][y] == 'ground')
+        //   v = 0.4
+        //     if (data.field[x][y] == 'team1' || data.field[x][y] == 'team2')
+        //   v = 0.2
+        // if (data.field[x][y] == 'ground') data.field[x][y] = 'water'
+
+        drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
+        if (data.field[x][y] == 'ground' && data.field[x][y - 1] == 'grass')
+          drawImgNormal('cliff', x, y, fieldmask[x][y]);
+        if (data.field[x][y] == 'water' && data.field[x][y - 1] == 'grass')
+          drawImgNormal('water.grass.cliff', x, y, fieldmask[x][y]);
+        if (data.field[x][y] == 'water' && (data.field[x][y - 1] == 'team1' || data.field[x][y - 1] == 'team2'))
+          drawImgNormal('water.team.cliff', x, y, fieldmask[x][y]);
+
+        if (data.field[x][y] == 'ground' && (data.field[x][y - 1] == 'team1' || data.field[x][y - 1] == 'team2'))
+          drawImgNormal('team.cliff', x, y, fieldmask[x][y]);
+
+
+
+
+
+        // drawField(data.field[x][y], x, y + v, fieldmask[x][y]);
         // drawImg("grass", x, y);
       }
     }
@@ -139,7 +170,19 @@ let render = () => {
       for (let x = 0; x < 9; x++) {
         let u = data.unit.filter(u => u.x == x && u.y == y)[0];
         if (u) {
-          drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
+          // let v = -0.15
+          if (data.field[x][y] == 'ground')
+            drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
+          else
+            if (data.field[x][y] == 'water') {
+
+              drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
+              drawImgNormal('drawn', x, y, fieldmask[x][y]);
+
+            }
+
+            else
+              drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
           drawLife(u.life, u.x, u.y);
           if (u.status)
             drawStatus(u.status, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
@@ -454,4 +497,8 @@ let endturn = () => {
     socket.emit("endturn");
   blocked = true;
 
+}
+
+let login = () => {
+  socket.emit("login", { id: findGetParameter("id"), pass: findGetParameter("key") });
 }

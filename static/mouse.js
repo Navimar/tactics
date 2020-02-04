@@ -22,6 +22,13 @@ function getTouchPos(canvas, evt) {
 let taptime;
 let right = false;
 function inputMouse() {
+
+  window.addEventListener('focus', () => {
+    // console.log('hi!');
+    login();
+  });
+
+
   document.oncontextmenu = function (e) {
     return false;
   }
