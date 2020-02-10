@@ -4,14 +4,9 @@ const en = require('./engine');
 // const barraks = require('./barraks');
 const _ = require('lodash');
 
-let barraks = {};
+let barraks = [];
 Object.keys(meta).forEach(function (key) {
-  let val = meta[key];
-  if (barraks[val.class]) {
-    barraks[val.class].push(key);
-  } else {
-    barraks[val.class] = [key];
-  }
+  _.times(meta[key].weight, () => barraks.push(key));
 });
 
 exports.new = () => {
@@ -20,11 +15,7 @@ exports.new = () => {
     return en.makeUnit(tp, x, y, team, life)
   }
   let rndUnit = () => {
-    let chance = [];
-    // _.times(7, () => chance.push(barraks.hero));
-    _.times(7, () => chance.push(barraks.champion));
-    _.times(1, () => chance.push(barraks.support));
-    return _.sample(_.sample(chance));
+    return _.sample(barraks);
   }
   let c = 0;
   let data = {
@@ -50,17 +41,17 @@ exports.new = () => {
     let ground = 1
     let grass = 1
     let n = 3
-    if (data.field[p.x + 1]&&data.field[p.x + 1][p.y] == 'ground') ground += n;
-    if (data.field[p.x][p.y + 1]&&data.field[p.x][p.y + 1] == 'ground') ground += n;
-    if (data.field[p.x][p.y - 1]&&data.field[p.x][p.y - 1] == 'ground') ground += n;
-    if (data.field[p.x - 1]&&data.field[p.x - 1][p.y] == 'ground') ground += n;
+    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += n;
+    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'ground') ground += n;
+    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'ground') ground += n;
+    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'ground') ground += n;
 
-    if (data.field[p.x + 1]&&data.field[p.x + 1][p.y] == 'grass') grass += n;
-    if (data.field[p.x][p.y + 1]&&data.field[p.x][p.y + 1] == 'grass') grass += n;
+    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'grass') grass += n;
+    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'grass') grass += n;
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'grass') grass += n;
-    if (data.field[p.x - 1]&&data.field[p.x - 1][p.y] == 'grass') grass += n;
+    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'grass') grass += n;
 
-    if (_.random(ground + grass-1) < ground)
+    if (_.random(ground + grass - 1) < ground)
       data.field[p.x][p.y] = 'ground'
     else
       data.field[p.x][p.y] = 'grass'
@@ -97,7 +88,7 @@ exports.new = () => {
     let notblue, notorange, notneutral = false;
     let pop = 0;
 
-    if (p.x < 1 || p.x>2) notorange = true
+    if (p.x < 1 || p.x > 2) notorange = true
     if (p.x < 6 || p.x > 7) notblue = true
     if (p.y == 0 || p.y == 8) {
       notorange = true

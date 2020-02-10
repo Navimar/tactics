@@ -1,7 +1,7 @@
 const en = require('./engine');
 
 exports.warrior = {
-  class: 'never',
+  weight: 0,
   life: 3,
   img: 'warrior',
   akt: (akt) => {
@@ -15,8 +15,39 @@ exports.warrior = {
     wd.tire();
   }
 }
+exports.diger = {
+  class: 'support',
+  life:3,
+  weight: 100,
+  img: 'diger',
+  akt: (akt) => {
+    let akts = akt.move().concat(akt.hand('diger'))
+    akts.push({
+      x: akt.me.x,
+      y: akt.me.y,
+      img: 'diger',
+    });
+    akts = akts.filter(a => {
+      if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
+        return false
+      else
+        return true
+    });
+    return akts
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  diger: (wd) => {
+    if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+      wd.game.field[wd.target.x][wd.target.y] = 'ground'
+    else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
+      wd.game.field[wd.target.x][wd.target.y] = 'grass'
+    wd.tire();
+  }
+}
 exports.mashroom = {
-  class: 'never',
+  weight: 0,
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
@@ -31,7 +62,7 @@ exports.mashroom = {
   }
 }
 exports.telepath = {
-  class: 'champion',
+  weight:100,
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -48,7 +79,7 @@ exports.telepath = {
   }
 }
 exports.hatchery = {
-  class: 'support',
+  weight: 15,
   life: 3,
   img: 'hatchery',
   akt: (akt) => {
@@ -66,7 +97,7 @@ exports.hatchery = {
   }
 }
 exports.bird = {
-  class: 'support',
+  weight: 20,
   life: 3,
   img: 'bird',
   akt: (akt) => {
@@ -106,7 +137,8 @@ exports.bird = {
 }
 
 exports.kicker = {
-  class: 'champion',
+  weight: 100,
+
   life: 3,
   img: 'kicker',
   akt: (akt) => {
@@ -128,7 +160,8 @@ exports.kicker = {
 }
 
 exports.electric = {
-  class: 'champion',
+  weight: 100,
+
   life: 3,
   img: 'electric',
   akt: (akt) => {
@@ -166,7 +199,8 @@ exports.electric = {
 }
 
 exports.bear = {
-  class: 'champion',
+  weight: 100,
+
   life: 3,
   img: 'bear',
   akt: (akt) => {
@@ -200,7 +234,8 @@ exports.bear = {
 
 
 exports.frog = {
-  class: 'champion',
+  weight: 100,
+
   life: 3,
   img: 'frog',
   onEndturn: (wd) => {
@@ -252,7 +287,6 @@ exports.frog = {
 // морф, превращается в любого до конца хода
 // бесполщадная мозгососка
 //некромант (создает духа/поднимает на один ход)
-// Копатель выкопатель яма
 // нидус-червь
 // Осадный танк тратит ход для осадного положения и не стреляет в упор. Убивает.
 // Огнемётчик вместо заразителя

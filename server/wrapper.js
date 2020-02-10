@@ -9,9 +9,9 @@ module.exports = (game, me, target) => {
     target,
     walk: () => {
       let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y)
-      if (game.field[target.x][target.y] != game.field[me.x][me.y] && tire == 1) {
-        tire = 3;
-      }
+      // if (game.field[target.x][target.y] != game.field[me.x][me.y] && tire == 1 && game.field[target.x][target.y]!='') {
+      //   tire = 3;
+      // }
       en.move(game, me, target.x, target.y);
       // me.energy -= d
       me.energy -= tire;
