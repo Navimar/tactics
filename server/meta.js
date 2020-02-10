@@ -18,7 +18,7 @@ exports.warrior = {
 exports.diger = {
   class: 'support',
   life:3,
-  weight: 100,
+  weight: 50,
   img: 'diger',
   akt: (akt) => {
     let akts = akt.move().concat(akt.hand('diger'))

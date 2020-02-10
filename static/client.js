@@ -191,7 +191,7 @@ let render = () => {
 
         else
           drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
-      drawLife(u.life, u.x, u.y);
+      // drawLife(u.life, u.x, u.y);
       if (u.status)
         drawStatus(u.status, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
     }
@@ -267,9 +267,29 @@ let renderpanel = () => {
   } else {
     drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
   }
+
   drawTxt(data.leftturns + '', c[0][0] + 0.15, c[0][1] + 0.15, '#222')
   drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.5 + 0.15, '#090')
   drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.5 + 0.15, '#f00')
+  let team1 = 0
+  let team2 = 0
+
+  data.unit.forEach((u) => {
+    if (u.color == 1)
+      team1 += u.life
+    if (u.color == 2)
+      team2 += u.life
+  });
+  if (team1 - team2 > 0) {
+    team1 -= team2;
+    team2 -= team2
+  } else {
+    team2 -= team1;
+    team1 -= team1
+  }
+  drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
+  drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
+
   if (data.win == 'win') {
     drawSize('win', c[1][0], c[1][1], 2, 2)
   }
@@ -373,7 +393,7 @@ let onMouseDown = () => {
   if (!socket.connected) {
     tip('Подключение к серверу...', 3, 3, '#FF0', 5, '2vmax verdana');
     login();
-  }else {
+  } else {
     local.tip = false;
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7))) {
       if (data.finished) {
