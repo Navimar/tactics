@@ -163,7 +163,7 @@ exports.endturn = (game, p) => {
 }
 
 exports.setbonus = (game, p, bonus) => {
-  game.bonus[p] = bonus;
+  game.bonus[3-p] = bonus;
   if (game.sandbox) {
     game.bonus[1] = bonus;
     game.bonus[2] = bonus;
@@ -178,9 +178,9 @@ exports.setbonus = (game, p, bonus) => {
     }
     game.chooseteam = true;
   }
-  else {
-    game.turn = game.turn == 1 ? 2 : 1;
-  }
+  // else {
+  //   game.turn = game.turn == 1 ? 2 : 1;
+  // }
   send.data(game);
 }
 function addbonus(game, unit) {
