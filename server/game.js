@@ -87,7 +87,9 @@ exports.rematch = (p) => {
   let game = creategame(p1, p2)
   game.sandbox = sandbox;
   p1.game = game;
+  p1.number =1
   p2.game = game;
+  p2.number =2
   send.data(game);
 }
 
