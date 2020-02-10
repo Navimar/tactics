@@ -41,9 +41,9 @@ exports.data = (game) => {
       chooseteam: game.chooseteam,
       trail: game.trail,
       bonus: (() => {
-        if (game.bonus[player] === null) return 'choose'
+        if (game.bonus[3-player] === null) return 'choose'
         if (game.bonus[1] !== null && game.bonus[2] !== null) return 'ready'
-        if (game.bonus[player] !== null) return 'wait'
+        if (game.bonus[3-player] !== null) return 'wait'
       })(),
       win: (() => {
         if (game.winner != 0) {
