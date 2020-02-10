@@ -37,32 +37,32 @@ exports.socket = (socket, e, msg) => {
   }
   if (e == 'order') {
     let p = player.bySocket(socket);
-    if (p) {
-      game.order(p, msg.unit, msg.akt);
+    if (p && p.number) {
+      game.order(p.game,p.number, msg.unit, msg.akt);
     }
   }
   if (e == 'bonus') {
     let p = player.bySocket(socket);
-    if (p) {
-      game.setbonus(p, msg);
+    if (p && p.number) {
+      game.setbonus(p.game,p.number, msg);
     }
   }
   if (e == 'surrender') {
     let p = player.bySocket(socket);
-    if (p) {
-      game.surrender(p, msg);
+    if (p && p.number) {
+      game.surrender(p.game,p.number, msg);
     }
   }
   if (e == 'rematch') {
     let p = player.bySocket(socket);
-    if (p) {
+    if (p && p.number) {
       game.rematch(p, msg);
     }
   }
   if (e == 'endturn') {
     let p = player.bySocket(socket);
-    if (p) {
-      game.endturn(p);
+    if (p && p.game) {
+      game.endturn(p.game, p.number);
     }
   }
 };

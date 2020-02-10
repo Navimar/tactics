@@ -12,7 +12,9 @@ const _ = require('lodash');
 exports.new = (p1, p2) => {
   let game = creategame(p1, p2)
   p1.game = game;
+  p1.number = 1
   p2.game = game;
+  p2.number = 2
   return game;
 }
 let creategame = (p1, p2) => {
@@ -34,9 +36,8 @@ let creategame = (p1, p2) => {
   }
   return game;
 }
-exports.order = (p, u, akt) => {
+exports.order = (game, p, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
-  let game = p.game;
   if (game && !game.finished) {
     fisher(game);
     game.trail = [];
@@ -67,8 +68,7 @@ exports.order = (p, u, akt) => {
     }
   }
 }
-exports.surrender = (p) => {
-  let game = p.game;
+exports.surrender = (game,p) => {
   if (game && !game.finished) {
     game.finished = true
     if (game.players[0].id == p.id)
@@ -89,11 +89,10 @@ exports.rematch = (p) => {
   p1.game = game;
   p2.game = game;
   send.data(game);
-
 }
 
 
-exports.endturn = (p) => {
+exports.endturn = (game, p) => {
 
   function cnFlag() {
     let flag1 = 0
@@ -113,7 +112,6 @@ exports.endturn = (p) => {
     }
     game.finished = true
   }
-  let game = p.game;
   if (game && !game.finished) {
     let one, two
     game.unit.forEach(u => {
@@ -162,9 +160,12 @@ exports.endturn = (p) => {
   }
 }
 
-exports.setbonus = (p, bonus) => {
-  let game = p.game;
-  game.bonus[game.turn] = bonus;
+exports.setbonus = (game, p, bonus) => {
+  game.bonus[p] = bonus;
+  if (game.sandbox) {
+    game.bonus[1] = bonus;
+    game.bonus[2] = bonus;
+  }
   if (game.bonus[1] !== null && game.bonus[2] !== null) {
     if (game.bonus[1] < game.bonus[2]) {
       game.bonus[1] = 0;
@@ -174,7 +175,8 @@ exports.setbonus = (p, bonus) => {
       game.turn = 2;
     }
     game.chooseteam = true;
-  } else {
+  }
+  else {
     game.turn = game.turn == 1 ? 2 : 1;
   }
   send.data(game);
