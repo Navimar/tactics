@@ -61,8 +61,7 @@ exports.hatchery = {
     // console.log(u)
     wd.tire()
     // console.log('zerg',u)
-    // u.isReady = false;
-    u.energy = 0
+    u.isReady = false;
 
   }
 }

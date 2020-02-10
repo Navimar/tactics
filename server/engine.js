@@ -84,6 +84,8 @@ en.move = (game, unit, x, y) => {
   } else {
     require('./send').logicerror(game, 'move cant find the unit')
   }
+  if (game.field[unit.x][unit.y] == 'team1' && unit.team == 2) game.field[unit.x][unit.y] = 'team2';
+  if (game.field[unit.x][unit.y] == 'team2' && unit.team == 1) game.field[unit.x][unit.y] = 'team1';
 }
 en.addStatus = (unit, st) => {
   unit.status = st;

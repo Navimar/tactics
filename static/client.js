@@ -99,7 +99,7 @@ let leftclickcn = 0;
 let nextunit = 0;
 let orientation = 'h'
 let fisherStart = false
-
+let connected = false
 window.onload = function () {
   render();
   inputMouse();
@@ -124,7 +124,6 @@ function step(lastTime) {
 
 let render = () => {
   resize();
-
 
   let renderfield = (x, y) => {
     // for (let y = 8; y >= 0; y--) {
@@ -216,7 +215,6 @@ let render = () => {
     }
   }
   let rendertip = () => {
-
     if (local.tip && local.tip.dur > 0)
       drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
   }
@@ -230,7 +228,7 @@ let render = () => {
       renderfield(x, y)
     }
     for (let x = 0; x < 9; x++) {
-      renderunit(x,y);
+      renderunit(x, y);
     }
   }
   if (local.sandclock) {
@@ -239,6 +237,9 @@ let render = () => {
   renderpanel();
   rendertrail();
   renderakt();
+  if (!socket.connected)
+    tip('Разорвано соединение с сервером...', 3, 3, '#F00', 5, '2vmax verdana');
+
   rendertip();
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
@@ -369,17 +370,21 @@ let getAkt = (x, y) => {
 }
 
 let onMouseDown = () => {
-  local.tip = false;
-  if (data.bonus == 'ready') {
-    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
-      endturn();
-    } else
-      if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7)) && data.turn) {
-        if (data.finished) {
-          rematch();
-        } else {
-          surrender();
-        }
+  if (!socket.connected) {
+    tip('Подключение к серверу...', 3, 3, '#FF0', 5, '2vmax verdana');
+    login();
+  }else {
+    local.tip = false;
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7))) {
+      if (data.finished) {
+        rematch();
+      } else {
+        surrender();
+      }
+    }
+    if (data.bonus == 'ready') {
+      if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
+        endturn();
       }
       else {
         if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
@@ -408,44 +413,47 @@ let onMouseDown = () => {
           local.unit = false;
         }
       }
-    // local.focus = false;
-    // local.akt = [];
+      // local.focus = false;
+      // local.akt = [];
 
-    if (local.unit && !local.unit.isReady) {
-      tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
+      if (local.unit && !local.unit.isReady) {
+        tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
 
-      //     local.akt = local.unit.akt;
-      //     local.focus = { x: unit.x, y: unit.y };
-    }
-    leftclickcn++
-    if (leftclickcn == 5) {
-      let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
-      if (mobile)
-        txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
-      tip(txt, mouseCell.x, mouseCell.y, '#550000')
+        //     local.akt = local.unit.akt;
+        //     local.focus = { x: unit.x, y: unit.y };
+      }
+      leftclickcn++
+      if (leftclickcn == 5) {
+        let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
+        if (mobile)
+          txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
+        tip(txt, mouseCell.x, mouseCell.y, '#550000')
 
-      leftclickcn = 2;
+        leftclickcn = 2;
+      }
+    } else if (data.bonus == 'choose') {
+      if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11))) {
+        let b
+        if (mouseCell.x > 8)
+          b = (mouseCell.x - 9) * 9 + mouseCell.y;
+        if (mouseCell.y > 8)
+          b = (mouseCell.y - 9) * 9 + mouseCell.x;
+        sendbonus(b);
+      } else {
+        tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+      }
+    } else if (data.bonus == 'wait') {
+      tip('Соперник еще выбирает бонус. Подождите', mouseCell.x, mouseCell.y, '#222')
     }
-  } else if (data.bonus == 'choose') {
-    if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11))) {
-      let b
-      if (mouseCell.x > 8)
-        b = (mouseCell.x - 9) * 9 + mouseCell.y;
-      if (mouseCell.y > 8)
-        b = (mouseCell.y - 9) * 9 + mouseCell.x;
-      sendbonus(b);
-    } else {
-      tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
-    }
-  } else if (data.bonus == 'wait') {
-    tip('Соперник еще выбирает бонус. Подождите', mouseCell.x, mouseCell.y, '#222')
+    render();
   }
-  render();
 }
 
 let onMouseDownRight = () => {
   local.tip = false;
   nextunit = 0;
+  if (blocked)
+    tip('Секундочку...', mouseCell.x, mouseCell.y, '#005500')
   if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
@@ -496,7 +504,6 @@ let surrender = () => {
   if (!blocked)
     socket.emit("surrender");
   blocked = true;
-
 }
 let rematch = () => {
   if (!blocked)

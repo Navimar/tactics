@@ -9,10 +9,12 @@ module.exports = (game, me, target) => {
     target,
     walk: () => {
       let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y)
+      if (game.field[target.x][target.y] != game.field[me.x][me.y] && tire == 1) {
+        tire = 3;
+      }
       en.move(game, me, target.x, target.y);
+      // me.energy -= d
       me.energy -= tire;
-      if (game.field[me.x][me.y] == 'team1' && me.team == 2) game.field[me.x][me.y] = 'team2';
-      if (game.field[me.x][me.y] == 'team2' && me.team == 1) game.field[me.x][me.y] = 'team1';
     },
     damage: (x, y, d) => {
       if (x != undefined && y != undefined) {
@@ -44,7 +46,7 @@ module.exports = (game, me, target) => {
       en.move(game, me, xto, yto);
     },
     addStatus: (st) => {
-      en.addStatus( en.unitInPoint(game,target.x, target.y), st);
+      en.addStatus(en.unitInPoint(game, target.x, target.y), st);
     },
     addUnit: (tp, life) => {
       return en.addUnit(game, tp, target.x, target.y, me.team, life)

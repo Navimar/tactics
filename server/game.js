@@ -29,13 +29,13 @@ let creategame = (p1, p2) => {
     winner: 0,
     leftturns: 14,
     started: time.clock(),
-    destraction: 0,
+    // destraction: 0,
     finished: false,
   }
   return game;
 }
 exports.order = (p, u, akt) => {
-  //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не могу уронить сервер или сжулиьничать
+  //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
   let game = p.game;
   if (game && !game.finished) {
     fisher(game);
@@ -71,7 +71,10 @@ exports.surrender = (p) => {
   let game = p.game;
   if (game && !game.finished) {
     game.finished = true
-    game.winner = game.turn == 1 ? 2 : 1;
+    if (game.players[0].id == p.id)
+      game.winner = 2;
+    else
+      game.winner = 1;
     send.data(game);
   }
 }
@@ -91,8 +94,28 @@ exports.rematch = (p) => {
 
 
 exports.endturn = (p) => {
+
+  function cnFlag() {
+    let flag1 = 0
+    let flag2 = 0;
+    for (let x = 0; x < 9; x++) {
+      for (let y = 0; y < 9; y++) {
+        if (game.field[x][y] == 'team1')
+          flag1++;
+        if (game.field[x][y] == 'team2')
+          flag2++
+      }
+    }
+    if (flag1 > flag2) {
+      game.winner = 1
+    } else {
+      game.winner = 2
+    }
+    game.finished = true
+  }
   let game = p.game;
   if (game && !game.finished) {
+    let one, two
     game.unit.forEach(u => {
       if (_.isFunction(meta[u.tp].onEndturn)) {
         // console.log('isFunction');
@@ -103,25 +126,28 @@ exports.endturn = (p) => {
       }
       u.energy = 3;
       u.isReady = true;
+      if (u.team == 1) {
+        one = true;
+      }
+      if (u.team == 2) {
+        two = true;
+      }
     });
+    if (!one && two) {
+      game.winner = 2
+      game.finished = true
+    }
+    if (one && !two) {
+      game.finished = true
+      game.winner = 1;
+    }
+    if (!one && !two) {
+      cnFlag();
+    }
 
     game.leftturns--;
     if (game.leftturns == 0) {
-      let flag1 = 0
-      let flag2 = 0;
-      for (let x = 0; x < 9; x++) {
-        for (let y = 0; y < 9; y++) {
-          if (game.field[x][y] == 'team1')
-            flag1++;
-          if (game.field[x][y] == 'team2')
-            flag2++
-        }
-      }
-      if (flag1 > flag2) {
-        game.winner = 1
-      } else {
-        game.winner = 2
-      }
+      cnFlag();
     } else {
       if (game.fisher[game.turn - 1] < 0) {
         // game.winner = game.turn == 1 ? 2 : 1;
@@ -154,7 +180,7 @@ exports.setbonus = (p, bonus) => {
   send.data(game);
 }
 function addbonus(game, unit) {
-  console.log(game.bonus[game.turn])
+  // console.log(game.bonus[game.turn])
   if (unit.team !== game.turn) {
     game.unit.forEach(u => {
       if (u.team == 1) { u.team = 2; } else
@@ -189,43 +215,43 @@ let fisher = (game) => {
 
 }
 
-let destraction = (game) => {
-  let land = 'water'
-  let des = game.destraction % 4
-  // console.log('des', des)
-  let d = 0
-  if (game.destraction)
-    d = (game.destraction - des) / 4;
-  // console.log('d', d)
+// let destraction = (game) => {
+//   let land = 'water'
+//   let des = game.destraction % 4
+//   // console.log('des', des)
+//   let d = 0
+//   if (game.destraction)
+//     d = (game.destraction - des) / 4;
+//   // console.log('d', d)
 
-  if (des == 0) {
-    for (let x = 0; x < 9; x++) {
-      for (let y = 0 + d; y < 1 + d; y++) {
-        game.field[x][y] = land;
-      }
-    }
-  }
-  else if (des == 1) {
-    for (let x = 8 - d; x < 9 - d; x++) {
-      for (let y = 0; y < 9; y++) {
-        game.field[x][y] = land;
-      }
-    }
-  }
-  else if (des == 2) {
-    for (let x = 0; x < 9; x++) {
-      for (let y = 8 - d; y < 9 - d; y++) {
-        game.field[x][y] = land;
-      }
-    }
-  }
-  else if (des == 3) {
-    for (let x = 0 + d; x < 1 + d; x++) {
-      for (let y = 0; y < 9; y++) {
-        game.field[x][y] = land;
-      }
-    }
-  }
-  game.destraction++
-  if (game.destraction > 15) game.finished = true;
-}
+//   if (des == 0) {
+//     for (let x = 0; x < 9; x++) {
+//       for (let y = 0 + d; y < 1 + d; y++) {
+//         game.field[x][y] = land;
+//       }
+//     }
+//   }
+//   else if (des == 1) {
+//     for (let x = 8 - d; x < 9 - d; x++) {
+//       for (let y = 0; y < 9; y++) {
+//         game.field[x][y] = land;
+//       }
+//     }
+//   }
+//   else if (des == 2) {
+//     for (let x = 0; x < 9; x++) {
+//       for (let y = 8 - d; y < 9 - d; y++) {
+//         game.field[x][y] = land;
+//       }
+//     }
+//   }
+//   else if (des == 3) {
+//     for (let x = 0 + d; x < 1 + d; x++) {
+//       for (let y = 0; y < 9; y++) {
+//         game.field[x][y] = land;
+//       }
+//     }
+//   }
+//   game.destraction++
+//   if (game.destraction > 15) game.finished = true;
+// }
