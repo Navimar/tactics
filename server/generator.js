@@ -57,17 +57,11 @@ exports.new = () => {
       data.field[p.x][p.y] = 'grass'
   });
 
-
-  // data.field[1][1] = 'team' + rndTeam();
-  // data.field[1][7] = 'team' + rndTeam();
+  // data.field[2][2] = 'team' + rndTeam();
+  // data.field[2][6] = 'team' + rndTeam();
   // data.field[4][4] = 'team' + rndTeam();
-  // data.field[7][7] = 'team' + rndTeam();
-  // data.field[7][1] = 'team' + rndTeam();
-  data.field[2][2] = 'team' + rndTeam();
-  data.field[2][6] = 'team' + rndTeam();
-  data.field[4][4] = 'team' + rndTeam();
-  data.field[6][6] = 'team' + rndTeam();
-  data.field[6][2] = 'team' + rndTeam();
+  // data.field[6][6] = 'team' + rndTeam();
+  // data.field[6][2] = 'team' + rndTeam();
 
   points = []
 

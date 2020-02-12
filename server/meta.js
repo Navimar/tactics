@@ -280,7 +280,7 @@ exports.frog = {
   img: 'frog',
   onEndturn: (wd) => {
     wd.me.data.lastjump = false;
-    wd.me.data.maxdamage = 0;
+    wd.me.data.damage = 0;
   },
   akt: (akt) => {
     let akts = akt.move()

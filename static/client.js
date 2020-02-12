@@ -190,7 +190,9 @@ let render = () => {
         }
 
         else
-          drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
+          // drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
+      drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive, 20);
+
       // drawLife(u.life, u.x, u.y);
       if (u.status)
         drawStatus(u.status, u.x, u.y, u.m, u.color, u.isReady, u.isActive);

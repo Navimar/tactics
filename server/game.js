@@ -29,7 +29,7 @@ let creategame = (p1, p2) => {
     field: data.field,
     turn: 1,
     winner: 0,
-    leftturns: 14,
+    leftturns: 10,
     started: time.clock(),
     // destraction: 0,
     finished: false,
