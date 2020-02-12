@@ -61,7 +61,7 @@ en.damage = (game, unit, d) => {
     if (d) { unit.life -= d } else {
       unit.life--;
     }
-    // if (unit.life <= 0) en.death(game, unit);
+    if (unit.life <= 0) en.death(game, unit);
     game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
   } else {
     // require('./send').logicerror(game, 'damage cant find the unit')
