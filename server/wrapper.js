@@ -19,12 +19,21 @@ module.exports = (game, me, target) => {
       me.energy -= tire;
     },
     damage: (x, y, d) => {
+      let trail = 'damage';
       if (x != undefined && y != undefined) {
-        en.damage(game, en.unitInPoint(game, x, y), d);
+        let u = en.unitInPoint(game, x, y)
+        if (me.team+'' == u.team+'')
+          trail = 'ff'
+        en.damage(game, u, d, trail);
       } else if (x != undefined && y == undefined) {
-        en.damage(game, en.unitInPoint(game, x.x, x.y), d);
+        let u = en.unitInPoint(game, x.x, x.y)
+        if (me.team == u.team)
+          trail = 'ff'
+        en.damage(game, u, d, trail);
       } else {
-        en.damage(game, en.unitInPoint(game, target.x, target.y), d);
+        if (me.team == target.unit.team)
+          trail = 'ff'
+        en.damage(game, target.unit, d, trail);
       }
     },
     noenergy: () => {

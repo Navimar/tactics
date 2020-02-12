@@ -15,10 +15,52 @@ exports.warrior = {
     wd.tire();
   }
 }
+exports.glider = {
+  weight: 500,
+  life: 3,
+  img: 'glider',
+  akt: (akt) => {
+    let akts = akt.hand('glider')
+    akts = akts.filter(a => {
+      let dx = a.x - akt.me.x
+      let dy = a.y - akt.me.y
+      let tx = akt.me.x + dx
+      let ty = akt.me.y + dy
+      do {
+        tx += dx
+        ty += dy
+      } while (en.isOccupied(akt.game, tx, ty) == 1);
+      if (en.isOccupied(akt.game, tx, ty) == -1) {
+        // console.log(tx,ty)
+        return false
+      }
+      else return true;
+    })
+    akts = akts.concat(akt.move());
+    return akts
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  glider: (wd) => {
+    let dx = wd.target.x - wd.me.x
+    let dy = wd.target.y - wd.me.y
+    let tx = wd.me.x + dx
+    let ty = wd.me.y + dy
+    do {
+      wd.damage(tx, ty)
+      tx += dx
+      ty += dy
+    }
+    while (wd.unitInPoint(tx, ty));
+    wd.go(tx, ty)
+    wd.tire();
+  }
+}
 exports.diger = {
   class: 'support',
-  life:3,
-  weight: 50,
+  life: 3,
+  weight: 0,
   img: 'diger',
   akt: (akt) => {
     let akts = akt.move().concat(akt.hand('diger'))
@@ -62,7 +104,7 @@ exports.mashroom = {
   }
 }
 exports.telepath = {
-  weight:100,
+  weight: 100,
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -79,7 +121,7 @@ exports.telepath = {
   }
 }
 exports.hatchery = {
-  weight: 15,
+  weight: 0,
   life: 3,
   img: 'hatchery',
   akt: (akt) => {
@@ -97,7 +139,7 @@ exports.hatchery = {
   }
 }
 exports.bird = {
-  weight: 20,
+  weight: 0,
   life: 3,
   img: 'bird',
   akt: (akt) => {
@@ -161,7 +203,6 @@ exports.kicker = {
 
 exports.electric = {
   weight: 100,
-
   life: 3,
   img: 'electric',
   akt: (akt) => {
@@ -200,7 +241,6 @@ exports.electric = {
 
 exports.bear = {
   weight: 100,
-
   life: 3,
   img: 'bear',
   akt: (akt) => {
@@ -240,6 +280,7 @@ exports.frog = {
   img: 'frog',
   onEndturn: (wd) => {
     wd.me.data.lastjump = false;
+    wd.me.data.maxdamage = 0;
   },
   akt: (akt) => {
     let akts = akt.move()
@@ -271,7 +312,12 @@ exports.frog = {
     let x = (wd.target.x - wd.me.x) * 2
     let y = (wd.target.y - wd.me.y) * 2
     wd.go(x + wd.me.x, y + wd.me.y);
-    wd.damage();
+    if (!wd.me.data.damage)
+      wd.me.data.damage = 0
+    if (wd.me.data.damage < 15) {
+      wd.damage();
+      wd.me.data.damage++
+    }
   }
 }
 

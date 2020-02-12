@@ -56,13 +56,16 @@ en.makeUnit = (tp, x, y, team, life) => {
     life,
   }
 }
-en.damage = (game, unit, d) => {
+en.damage = (game, unit, d, trail) => {
   if (unit) {
     if (d) { unit.life -= d } else {
       unit.life--;
     }
     // if (unit.life <= 0) en.death(game, unit);
-    game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
+    if (!trail)
+      game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
+    if (trail)
+      game.trail.push({ img: trail, x: unit.x, y: unit.y });
   } else {
     // require('./send').logicerror(game, 'damage cant find the unit')
   }

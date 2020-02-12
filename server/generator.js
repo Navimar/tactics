@@ -38,7 +38,7 @@ exports.new = () => {
   points = _.sampleSize(points, 81);
 
   points.forEach(p => {
-    let ground = 1
+    let ground = 0
     let grass = 1
     let n = 3
     if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += n;

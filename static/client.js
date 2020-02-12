@@ -283,9 +283,13 @@ let renderpanel = () => {
   if (team1 - team2 > 0) {
     team1 -= team2;
     team2 -= team2
+    drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090', '5vmax verdana')
+
   } else {
     team2 -= team1;
     team1 -= team1
+    drawTxt(team2 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#f00', '5vmax verdana')
+
   }
   if (data.win == 'win') {
     drawSize('win', c[1][0], c[1][1], 2, 2)
@@ -293,10 +297,8 @@ let renderpanel = () => {
   if (data.win == 'defeat') {
     drawSize('defeat', c[1][0], c[1][1], 2, 2)
   }
-  drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
-  drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
 
-  
+
 
 
   if (data.bonus == 'choose') {
