@@ -44,7 +44,8 @@ en.addUnit = (game, tp, x, y, team, life) => {
 en.makeUnit = (tp, x, y, team, life) => {
   let m = x < 5 ? false : true;
   return {
-    status: false,
+    status: [],
+    akt:[],
     isReady: true,
     energy: 3,
     tp,
@@ -61,7 +62,7 @@ en.damage = (game, unit, d) => {
     if (d) { unit.life -= d } else {
       unit.life--;
     }
-    if (unit.life <= 0) en.death(game, unit);
+    // if (unit.life <= 0) en.death(game, unit);
     game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
   } else {
     // require('./send').logicerror(game, 'damage cant find the unit')
@@ -84,11 +85,11 @@ en.move = (game, unit, x, y) => {
   } else {
     require('./send').logicerror(game, 'move cant find the unit')
   }
-  if (game.field[unit.x][unit.y] == 'team1' && unit.team == 2) game.field[unit.x][unit.y] = 'team2';
-  if (game.field[unit.x][unit.y] == 'team2' && unit.team == 1) game.field[unit.x][unit.y] = 'team1';
 }
 en.addStatus = (unit, st) => {
-  unit.status = st;
+  if (unit) {
+    unit.status.push(st)
+  }
 }
 
 module.exports = en;

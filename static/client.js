@@ -26,6 +26,7 @@ let data = {
     ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],],
   unit: [{
     img: 'barbarian',
+    status: [],
     x: 5,
     y: 3,
     m: true,
@@ -45,6 +46,7 @@ let data = {
     ]
   },
   {
+    status: [],
     img: 'zombie',
     life: 2,
     x: 5,
@@ -60,6 +62,7 @@ let data = {
     ]
   },
   {
+    status: [],
     img: 'aerostat',
     life: 1,
     x: 2,
@@ -191,9 +194,8 @@ let render = () => {
 
         else
           drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
-      drawLife(u.life, u.x, u.y);
-      if (u.status)
-        drawStatus(u.status, u.x, u.y, u.m, u.color, u.isReady, u.isActive);
+      // drawLife(u.life, u.x, u.y);
+      u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
     }
   }
   let renderakt = () => {
@@ -296,7 +298,7 @@ let renderpanel = () => {
   drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
   drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
 
-  
+
 
 
   if (data.bonus == 'choose') {

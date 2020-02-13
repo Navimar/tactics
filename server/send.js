@@ -2,11 +2,8 @@ const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
 const wrapper = require('./wrapper');
-const status = require('./status');
-
-
-const time = require('./time');
-
+const onAkt = require('./onAkt');
+// const time = require('./time');
 
 exports.web = (p, game) => {
   msg = game.data;
@@ -41,9 +38,9 @@ exports.data = (game) => {
       chooseteam: game.chooseteam,
       trail: game.trail,
       bonus: (() => {
-        if (game.bonus[3-player] === null) return 'choose'
+        if (game.bonus[3 - player] === null) return 'choose'
         if (game.bonus[1] !== null && game.bonus[2] !== null) return 'ready'
-        if (game.bonus[3-player] !== null) return 'wait'
+        if (game.bonus[3 - player] !== null) return 'wait'
       })(),
       win: (() => {
         if (game.winner != 0) {
@@ -79,17 +76,19 @@ exports.data = (game) => {
           return false
       })(),
     };
+
     game.unit.forEach(u => {
-      let img = _.isFunction(meta[u.tp].img) ? meta[u.tp].img(u.data) : meta[u.tp].img;
-      let akt = [];
+      u.akt = [];
       if (u.isReady) {
-        akt = meta[u.tp].akt(akter(game, u));
-        game.unit.forEach(stu => {
-          akt = stu.status && _.isFunction(status[stu.status].onAkt) ? status[stu.status].onAkt(akter(game, stu), akt) : akt;
-        });
+        u.akt = meta[u.tp].akt(akter(game, u));
       }
+      onAkt.telepath(game);
+      onAkt.slime(game);
+    });
+
+    game.unit.forEach(u => {
       send.unit.push({
-        img,
+        img: _.isFunction(meta[u.tp].img) ? meta[u.tp].img(u.data) : meta[u.tp].img,
         status: u.status,
         isActive: u.isActive,
         isReady: u.isReady,
@@ -97,7 +96,7 @@ exports.data = (game) => {
         m: u.m,
         x: u.x,
         y: u.y,
-        akt,
+        akt: u.akt,
         color: (() => {
           if (player == 1) return u.team;
           if (player == 2) return (() => {
@@ -107,7 +106,7 @@ exports.data = (game) => {
           })();
         })(),
         canMove: (() => {
-          if ((game.chooseteam && u.team != 3) || u.team == player || u.status == 'telepath')
+          if ((game.chooseteam && u.team != 3) || u.team == player || u.status.includes('telepath'))
             return true;
           return false;
         })(),

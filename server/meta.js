@@ -18,7 +18,7 @@ exports.warrior = {
 exports.diger = {
   class: 'support',
   life:3,
-  weight: 50,
+  weight: 0,
   img: 'diger',
   akt: (akt) => {
     let akts = akt.move().concat(akt.hand('diger'))
@@ -47,7 +47,7 @@ exports.diger = {
   }
 }
 exports.glider = {
-  weight: 100,
+  weight: 0,
   life: 3,
   img: 'glider',
   akt: (akt) => {
@@ -104,7 +104,7 @@ exports.mashroom = {
   }
 }
 exports.telepath = {
-  weight:100,
+  weight:50,
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -121,7 +121,7 @@ exports.telepath = {
   }
 }
 exports.hatchery = {
-  weight: 15,
+  weight: 0,
   life: 3,
   img: 'hatchery',
   akt: (akt) => {
@@ -139,7 +139,7 @@ exports.hatchery = {
   }
 }
 exports.bird = {
-  weight: 20,
+  weight: 0,
   life: 3,
   img: 'bird',
   akt: (akt) => {
@@ -197,47 +197,51 @@ exports.kicker = {
     while (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == 0) {
       wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
     }
+    if (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == -1)
+      wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
     wd.damage(wd.target.unit);
   }
 }
 
-exports.electric = {
-  weight: 100,
-
+exports.slime = {
+  weight: 50,
   life: 3,
-  img: 'electric',
+  img: 'slime',
   akt: (akt) => {
     // return [{ x: 5, y: 5, img: 'move' }]
-    return akt.move().concat(akt.hand('electric'))
+    return akt.move()
+      // .concat(akt.hand('electric'))
   },
   move: (wd) => {
     wd.walk();
+    
   },
-  electric: (wd) => {
-    let marks = new Map();
-    marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
-    let nw = true;
-    while (nw) {
-      nw = false;
-      wd.game.unit.forEach((u) => {
-        if (u != wd.me) {
-          let npt = en.near(u.x, u.y)
-          npt.forEach((n) => {
-            if (marks.get(n.x + '_' + n.y)) {
-              if (!marks.get(u.x + '_' + u.y)) {
-                marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
-                nw = true;
-              }
-            }
-          });
-        }
-      });
-    }
-    marks.forEach((v, k, m) => {
-      wd.damage(v.x, v.y);
-    });
-    wd.tire();
-  }
+  
+  // electric: (wd) => {
+  //   let marks = new Map();
+  //   marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
+  //   let nw = true;
+  //   while (nw) {
+  //     nw = false;
+  //     wd.game.unit.forEach((u) => {
+  //       if (u != wd.me) {
+  //         let npt = en.near(u.x, u.y)
+  //         npt.forEach((n) => {
+  //           if (marks.get(n.x + '_' + n.y)) {
+  //             if (!marks.get(u.x + '_' + u.y)) {
+  //               marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
+  //               nw = true;
+  //             }
+  //           }
+  //         });
+  //       }
+  //     });
+  //   }
+  //   marks.forEach((v, k, m) => {
+  //     wd.damage(v.x, v.y);
+  //   });
+  //   wd.tire();
+  // }
 }
 
 exports.bear = {
@@ -251,7 +255,7 @@ exports.bear = {
     points = points.filter(pt => {
       let x = (2 * akt.me.x - pt.x)
       let y = (2 * akt.me.y - pt.y)
-      return en.isOccupied(akt.game, pt.x, pt.y) && !en.isOccupied(akt.game, x, y)
+      return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y)!=1
     });
     points.forEach((pt) => {
       akts.push({
@@ -276,8 +280,7 @@ exports.bear = {
 
 
 exports.frog = {
-  weight: 100,
-
+  weight: 0,
   life: 3,
   img: 'frog',
   onEndturn: (wd) => {

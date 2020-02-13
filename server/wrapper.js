@@ -27,6 +27,15 @@ module.exports = (game, me, target) => {
         en.damage(game, en.unitInPoint(game, target.x, target.y), d);
       }
     },
+    kill: (x, y, d) => {
+      if (x != undefined && y != undefined) {
+        en.death(game, en.unitInPoint(game, x, y));
+      } else if (x != undefined && y == undefined) {
+        en.death(game, en.unitInPoint(game, x.x, x.y));
+      } else {
+        en.death(game, en.unitInPoint(game, target.x, target.y));
+      }
+    },
     noenergy: () => {
       me.energy = 0;
     },
@@ -47,8 +56,11 @@ module.exports = (game, me, target) => {
     go: (xto, yto) => {
       en.move(game, me, xto, yto);
     },
-    addStatus: (st) => {
-      en.addStatus(en.unitInPoint(game, target.x, target.y), st);
+    addStatus: (st, x, y) => {
+      if (x && y)
+        en.addStatus(en.unitInPoint(game, x, y), st);
+      else
+        en.addStatus(target.unit, st);
     },
     addUnit: (tp, life) => {
       return en.addUnit(game, tp, target.x, target.y, me.team, life)

@@ -4,7 +4,9 @@ const wrapper = require('./wrapper');
 const send = require('./send');
 const en = require('./engine');
 const generator = require('./generator');
-const status = require('./status');
+
+const onOrder = require('./onOrder');
+const onEndTurn = require('./onEndTurn');
 
 const _ = require('lodash');
 
@@ -64,11 +66,15 @@ exports.order = (game, p, u, akt) => {
         unit.m = false;
       }
       meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
+
+      onOrder.slime(game);
+      onOrder.capture(game);
+
       send.data(game);
     }
   }
 }
-exports.surrender = (game,p) => {
+exports.surrender = (game, p) => {
   if (game && !game.finished) {
     game.finished = true
     if (game.players[0].id == p.id)
@@ -87,9 +93,9 @@ exports.rematch = (p) => {
   let game = creategame(p1, p2)
   game.sandbox = sandbox;
   p1.game = game;
-  p1.number =1
+  p1.number = 1
   p2.game = game;
-  p2.number =2
+  p2.number = 2
   send.data(game);
 }
 
@@ -121,9 +127,9 @@ exports.endturn = (game, p) => {
         // console.log('isFunction');
         meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
       }
-      if (u.status && _.isFunction(status[u.status].onEndturn)) {
-        status[u.status].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
-      }
+      // if (u.status && _.isFunction(status[u.status].onEndturn)) {
+      //   status[u.status].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
+      // }
       u.energy = 3;
       u.isReady = true;
       if (u.team == 1) {
@@ -158,12 +164,15 @@ exports.endturn = (game, p) => {
     }
     game.turn = game.turn == 1 ? 2 : 1;
     fisher(game)
+
+    onEndTurn.telepath(game);
+
     send.data(game);
   }
 }
 
 exports.setbonus = (game, p, bonus) => {
-  game.bonus[3-p] = bonus;
+  game.bonus[3 - p] = bonus;
   if (game.sandbox) {
     game.bonus[1] = bonus;
     game.bonus[2] = bonus;
