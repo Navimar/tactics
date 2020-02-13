@@ -46,6 +46,48 @@ exports.diger = {
     wd.tire();
   }
 }
+exports.glider = {
+  weight: 100,
+  life: 3,
+  img: 'glider',
+  akt: (akt) => {
+    let akts = akt.hand('glider')
+    akts = akts.filter(a => {
+      let dx = a.x - akt.me.x
+      let dy = a.y - akt.me.y
+      let tx = akt.me.x + dx
+      let ty = akt.me.y + dy
+      do {
+        tx += dx
+        ty += dy
+      } while (en.isOccupied(akt.game, tx, ty) == 1);
+      if (en.isOccupied(akt.game, tx, ty) == -1) {
+        // console.log(tx,ty)
+        return false
+      }
+      else return true;
+    })
+    akts = akts.concat(akt.move());
+    return akts
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  glider: (wd) => {
+    let dx = wd.target.x - wd.me.x
+    let dy = wd.target.y - wd.me.y
+    let tx = wd.me.x + dx
+    let ty = wd.me.y + dy
+    do {
+      wd.damage(tx, ty)
+      tx += dx
+      ty += dy
+    }
+    while (wd.unitInPoint(tx, ty));
+    wd.go(tx, ty)
+    wd.tire();
+  }
+}
 exports.mashroom = {
   weight: 0,
   life: 3,
