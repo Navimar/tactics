@@ -15,13 +15,37 @@ exports.warrior = {
     wd.tire();
   }
 }
+
+exports.zombie = {
+  weight: 100,
+  life: 3,
+  img: 'zombie',
+  akt: (akt) => {
+    return akt.move().concat(akt.hand('zombie'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  zombie: (wd) => {
+    if (wd.target.unit.status.includes('zombie')) {
+      wd.target.unit.status.remove('zombie')
+      wd.target.unit.tp = 'zombie';
+      wd.changeTeam(wd.target.unit);
+      wd.target.unit.isReady = false;
+    }
+    else
+      wd.addStatus('zombie');
+    wd.tire();
+  }
+}
+
 exports.diger = {
   class: 'support',
-  life:3,
-  weight: 0,
+  life: 3,
+  weight: 50,
   img: 'diger',
   akt: (akt) => {
-    let akts = akt.move().concat(akt.hand('diger'))
+    let akts = akt.freemove().concat(akt.hand('diger'))
     akts.push({
       x: akt.me.x,
       y: akt.me.y,
@@ -35,15 +59,15 @@ exports.diger = {
     });
     return akts
   },
-  move: (wd) => {
-    wd.walk();
+  fly: (wd) => {
+    wd.flywalk();
   },
   diger: (wd) => {
     if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
       wd.game.field[wd.target.x][wd.target.y] = 'ground'
     else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
       wd.game.field[wd.target.x][wd.target.y] = 'grass'
-    wd.tire();
+    // wd.tire();
   }
 }
 exports.glider = {
@@ -104,7 +128,7 @@ exports.mashroom = {
   }
 }
 exports.telepath = {
-  weight:50,
+  weight: 50,
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -139,7 +163,7 @@ exports.hatchery = {
   }
 }
 exports.bird = {
-  weight: 0,
+  weight: 50,
   life: 3,
   img: 'bird',
   akt: (akt) => {
@@ -165,15 +189,15 @@ exports.bird = {
     wd.tire();
   },
   bird: (wd) => {
-    wd.damage(wd.me.x - 1, wd.me.y - 1, 3);
-    wd.damage(wd.me.x, wd.me.y - 1, 3);
-    wd.damage(wd.me.x + 1, wd.me.y - 1, 3);
-    wd.damage(wd.me.x + 1, wd.me.y, 3);
-    wd.damage(wd.me.x - 1, wd.me.y, 3);
-    wd.damage(wd.me.x - 1, wd.me.y + 1, 3);
-    wd.damage(wd.me.x, wd.me.y + 1, 3);
-    wd.damage(wd.me.x + 1, wd.me.y + 1, 3);
-    wd.damage(undefined, undefined, 3);
+    wd.kill(wd.me.x - 1, wd.me.y - 1,);
+    wd.kill(wd.me.x, wd.me.y - 1, );
+    wd.kill(wd.me.x + 1, wd.me.y - 1, );
+    wd.kill(wd.me.x + 1, wd.me.y );
+    wd.kill(wd.me.x - 1, wd.me.y, );
+    wd.kill(wd.me.x - 1, wd.me.y + 1, );
+    wd.kill(wd.me.x, wd.me.y + 1, );
+    wd.kill(wd.me.x + 1, wd.me.y + 1, );
+    wd.kill();
     wd.tire();
   }
 }
@@ -210,13 +234,13 @@ exports.slime = {
   akt: (akt) => {
     // return [{ x: 5, y: 5, img: 'move' }]
     return akt.move()
-      // .concat(akt.hand('electric'))
+    // .concat(akt.hand('electric'))
   },
   move: (wd) => {
     wd.walk();
-    
+
   },
-  
+
   // electric: (wd) => {
   //   let marks = new Map();
   //   marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
@@ -255,7 +279,7 @@ exports.bear = {
     points = points.filter(pt => {
       let x = (2 * akt.me.x - pt.x)
       let y = (2 * akt.me.y - pt.y)
-      return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y)!=1
+      return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y) != 1
     });
     points.forEach((pt) => {
       akts.push({

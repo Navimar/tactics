@@ -18,6 +18,12 @@ module.exports = (game, me, target) => {
       // me.energy -= d
       me.energy -= tire;
     },
+    flywalk: () => {
+      let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y)
+      en.move(game, me, target.x, target.y);
+      // me.energy -= d
+      me.energy -= tire;
+    },
     damage: (x, y, d) => {
       if (x != undefined && y != undefined) {
         en.damage(game, en.unitInPoint(game, x, y), d);
@@ -27,7 +33,7 @@ module.exports = (game, me, target) => {
         en.damage(game, en.unitInPoint(game, target.x, target.y), d);
       }
     },
-    kill: (x, y, d) => {
+    kill: (x, y) => {
       if (x != undefined && y != undefined) {
         en.death(game, en.unitInPoint(game, x, y));
       } else if (x != undefined && y == undefined) {
@@ -65,5 +71,9 @@ module.exports = (game, me, target) => {
     addUnit: (tp, life) => {
       return en.addUnit(game, tp, target.x, target.y, me.team, life)
     },
+    changeTeam: (unit) => {
+      if (unit.team != 3)
+        unit.team = 3 - unit.team;
+    }
   }
 }

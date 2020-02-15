@@ -5,6 +5,31 @@ module.exports = (game, me) => {
   return {
     me,
     game,
+    freemove: () => {
+      let akts = []
+      let points = [{ x: me.x, y: me.y }];
+
+      _.times(me.energy, () => {
+        points.forEach((pt) => {
+          let near = en.near(pt.x, pt.y)
+          near = near.filter(np => {
+            return !en.isOccupied(game, np.x, np.y)
+          });
+          points = points.concat(near)
+        });
+      })
+      points = removeDuplicates(points);
+      points = points.filter(pt => !en.isOccupied(game, pt.x, pt.y))
+
+      points.forEach((pt) => {
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'fly',
+        })
+      });
+      return akts;
+    },
     move: () => {
       let akts = []
       let points = [{ x: me.x, y: me.y }];
@@ -20,7 +45,7 @@ module.exports = (game, me) => {
           points = points.concat(near)
         });
         // points = points.filter(pt =>
-          
+
         // )
         // points = points.filter(pt => {
         //   let f = en.fieldInPoint(game, pt.x, pt.y)
