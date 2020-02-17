@@ -77,7 +77,7 @@ exports.order = (game, p, u, akt) => {
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
     game.finished = true
-    if (game.players[0].id == p.id)
+    if (p==1)
       game.winner = 2;
     else
       game.winner = 1;

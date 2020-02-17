@@ -17,7 +17,7 @@ exports.socket = (socket, e, msg) => {
     } else {
       let p = player.byId(msg.id)
       if (p) {
-        if (p.key == sha(msg.pass)) {
+        if (p.key == sha(msg.pass.slice(0, -1))) {
           p.socket = socket;
           send.successfulLogin(socket);
           send.data(p.game);
@@ -77,7 +77,7 @@ exports.bot = (msg, bot) => {
   }
   if (text == '/play') {
     if (p.game) {
-      send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p), bot);
+      send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p)+'u', bot);
     } else {
       send.bot(id, 'нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot);
     }
@@ -88,7 +88,7 @@ exports.bot = (msg, bot) => {
   else if (text == '/sandbox') {
     game.new(p, p)
     p.game.sandbox = true;
-    send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p), bot);
+    send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
   }
   else if (text == '/cancel') {
     queue.cancel(p)
