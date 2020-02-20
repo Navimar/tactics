@@ -12,8 +12,8 @@ exports.find = (p, bot) => {
             send.bot(p.id, "Вы нашли игру", bot);
             // console.log(queue);
             send.bot(queue[0].id, "Вы нашли игру", bot);
-            send.bot(p.id, config.ip + ":" + config.port + "/?id=" + p.id + "&key=" + player.setKey(p), bot);
-            send.bot(queue[0].id, config.ip + ":" + config.port + "/?id=" + queue[0].id + "&key=" + player.setKey(queue[0]), bot);
+            send.bot(p.id, config.ip + ":" + config.port + "/?id=" + p.id + "&key=" + player.setKey(p) + 'u', bot);
+            send.bot(queue[0].id, config.ip + ":" + config.port + "/?id=" + queue[0].id + "&key=" + player.setKey(queue[0]) + 'u', bot);
             queue = [];
         } else {
             queue = [p];

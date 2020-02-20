@@ -33,6 +33,7 @@ exports.success = (socket) => {
 exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
+      sticker: game.sticker,
       finished: game.finished,
       leftturns: game.leftturns,
       chooseteam: game.chooseteam,

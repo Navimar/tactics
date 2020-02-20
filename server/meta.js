@@ -1,4 +1,5 @@
 const en = require('./engine');
+const _ = require('lodash');
 
 exports.warrior = {
   weight: 0,
@@ -9,6 +10,80 @@ exports.warrior = {
   },
   move: (wd) => {
     wd.walk();
+  },
+  warrior: (wd) => {
+    wd.damage();
+    wd.tire();
+  }
+}
+
+exports.aerostat = {
+  weight: 50,
+  life: 3,
+  img: 'aerostat',
+  akt: (akt) => {
+    let akts = []
+    let points = en.allPoints();
+    points = points.filter(pt => {
+      if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
+        return true
+    });
+    points.forEach((pt) => {
+      let u = en.unitInPoint(akt.game, pt.x, pt.y)
+      if (u && u.tp != 'aerostat')
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'take',
+        })
+      else if (!u)
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'fly',
+        })
+    });
+    let mark = akt.game.sticker.filter(m => m.x == akt.me.x && m.y == akt.me.y);
+    if (mark[0] && akt.me.data.drop == false) {
+      akts.push({
+        x: akt.me.x,
+        y: akt.me.y,
+        img: 'drop',
+      })
+    }
+    return akts;
+  },
+  fly: (wd) => {
+    if (wd.me.data.drop) {
+      let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
+      if (mark[0]) {
+        en.addUnit(wd.game, mark[0].img, wd.me.x, wd.me.y, mark[0].team, 3)
+        wd.game.sticker.remove(mark[0])
+      }
+    }
+    let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)[0]
+    if (mark) {
+      mark.x = wd.target.x
+      mark.y = wd.target.y
+    }
+    wd.flywalk();
+    wd.me.data.drop = false;
+  },
+  drop: (wd) => {
+    wd.me.data.drop = true;
+  },
+  take: (wd) => {
+    let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
+    if (mark[0]) {
+      en.addUnit(wd.game, mark[0].img, wd.me.x, wd.me.y, mark[0].team, 3)
+      wd.game.sticker.remove(mark[0])
+    }
+    wd.makesticker(wd.target.unit, wd.target.x, wd.target.y)
+    wd.kill(wd.target.unit);
+
+    // wd.target.unit.small = true;
+    wd.flywalk();
+    wd.me.data.drop = false;
   },
   warrior: (wd) => {
     wd.damage();
@@ -42,7 +117,7 @@ exports.zombie = {
 exports.diger = {
   class: 'support',
   life: 3,
-  weight: 50,
+  weight: 25,
   img: 'diger',
   akt: (akt) => {
     let akts = akt.freemove().concat(akt.hand('diger'))
@@ -113,11 +188,11 @@ exports.glider = {
   }
 }
 exports.mashroom = {
-  weight: 0,
+  weight: 1,
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
-    return akt.move().concat(akt.hand('mashroom'))
+    return akt.move()
   },
   move: (wd) => {
     wd.walk();
@@ -145,7 +220,7 @@ exports.telepath = {
   }
 }
 exports.hatchery = {
-  weight: 0,
+  weight: 25,
   life: 3,
   img: 'hatchery',
   akt: (akt) => {
@@ -154,7 +229,7 @@ exports.hatchery = {
     return akts;
   },
   hatchery: (wd) => {
-    let u = wd.addUnit('warrior', 2)
+    let u = wd.addUnit('mashroom', 2)
     // console.log(u)
     wd.tire()
     // console.log('zerg',u)
@@ -189,19 +264,63 @@ exports.bird = {
     wd.tire();
   },
   bird: (wd) => {
-    wd.kill(wd.me.x - 1, wd.me.y - 1,);
-    wd.kill(wd.me.x, wd.me.y - 1, );
-    wd.kill(wd.me.x + 1, wd.me.y - 1, );
-    wd.kill(wd.me.x + 1, wd.me.y );
-    wd.kill(wd.me.x - 1, wd.me.y, );
-    wd.kill(wd.me.x - 1, wd.me.y + 1, );
-    wd.kill(wd.me.x, wd.me.y + 1, );
-    wd.kill(wd.me.x + 1, wd.me.y + 1, );
+    wd.kill(wd.me.x - 1, wd.me.y - 1);
+    wd.kill(wd.me.x, wd.me.y - 1);
+    wd.kill(wd.me.x + 1, wd.me.y - 1);
+    wd.kill(wd.me.x + 1, wd.me.y);
+    wd.kill(wd.me.x - 1, wd.me.y);
+    wd.kill(wd.me.x - 1, wd.me.y + 1);
+    wd.kill(wd.me.x, wd.me.y + 1);
+    wd.kill(wd.me.x + 1, wd.me.y + 1);
     wd.kill();
     wd.tire();
   }
 }
 
+exports.plant = {
+  weight: 50,
+  life: 3,
+  img: 'plant',
+  akt: (akt) => {
+    let akts = [];
+    let points = en.allPoints();
+    points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
+    points.forEach((pt) => {
+      akts.push({
+        x: pt.x,
+        y: pt.y,
+        img: 'plant',
+      })
+    });
+    return akts;
+  },
+  // move: (wd) => {
+  //   wd.go(wd.target.x, wd.target.y);
+  //   wd.tire();
+  // },
+  plant: (wd) => {
+    let u = wd.addUnit('plantik', 2)
+    u.isReady = false;
+
+    wd.tire();
+  }
+}
+
+exports.plantik = {
+  weight: 0,
+  life: 3,
+  img: 'plantik',
+  akt: (akt) => {
+    // return [{ x: 5, y: 5, img: 'move' }]
+    // return akt.move()
+    // .concat(akt.hand('electric'))
+    return []
+  },
+  move: (wd) => {
+    wd.walk();
+
+  },
+}
 exports.kicker = {
   weight: 100,
 
@@ -277,9 +396,10 @@ exports.bear = {
     let akts = akt.move()
     let points = en.near(akt.me.x, akt.me.y);
     points = points.filter(pt => {
-      let x = (2 * akt.me.x - pt.x)
-      let y = (2 * akt.me.y - pt.y)
-      return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y) != 1
+      // let x = (2 * akt.me.x - pt.x)
+      // let y = (2 * akt.me.y - pt.y)
+      // return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y) != 1
+      return en.isOccupied(akt.game, pt.x, pt.y)
     });
     points.forEach((pt) => {
       akts.push({
@@ -297,19 +417,16 @@ exports.bear = {
     wd.tire();
     let x = (wd.me.x - wd.target.x)
     let y = (wd.me.y - wd.target.y)
+    wd.kill(x + wd.me.x, y + wd.me.y);
     wd.move(x + wd.me.x, y + wd.me.y);
-    wd.damage(x + wd.me.x, y + wd.me.y);
   }
 }
 
 
 exports.frog = {
-  weight: 0,
+  weight: 50,
   life: 3,
   img: 'frog',
-  onEndturn: (wd) => {
-    wd.me.data.lastjump = false;
-  },
   akt: (akt) => {
     let akts = akt.move()
     let points = en.near(akt.me.x, akt.me.y);
@@ -340,7 +457,10 @@ exports.frog = {
     let x = (wd.target.x - wd.me.x) * 2
     let y = (wd.target.y - wd.me.y) * 2
     wd.go(x + wd.me.x, y + wd.me.y);
-    wd.damage();
+    if (wd.target.unit.status == 'frog')
+      wd.kill(wd.target.unit);
+    else
+      wd.addStatus('frog');
   }
 }
 
@@ -364,7 +484,6 @@ exports.frog = {
 // вечный стазис???
 // Бессмертие - жизнь в ход
 // вампир?
-// Телепат
 // Штамповщик
 // берсерк, умирает если не атакует
 

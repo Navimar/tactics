@@ -11,6 +11,7 @@ let local = {
   turn: 1,
 };
 let data = {
+  sticker:[],
   fisher: ['???', '!!!'],
   leftturns: 'нет подключения к серверу',
   trail: [],
@@ -216,6 +217,14 @@ let render = () => {
       }
     }
   }
+  let rendersticker = (x, y) => {
+        let u = data.sticker.filter(u => u.x == x && u.y == y)[0];
+        if (u) {
+          console.log(u)
+          drawSize(u.img, x+0.2, y+0.4, 0.6,0.6)
+        }
+
+  }
   let rendertip = () => {
     if (local.tip && local.tip.dur > 0)
       drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
@@ -232,11 +241,15 @@ let render = () => {
     for (let x = 0; x < 9; x++) {
       renderunit(x, y);
     }
+    for (let x = 0; x < 9; x++) {
+      rendersticker(x,y);
+    }
   }
   if (local.sandclock) {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)
   }
   renderpanel();
+
   rendertrail();
   renderakt();
   if (!socket.connected)
@@ -406,7 +419,7 @@ let onMouseDown = () => {
       }
     }
     if (data.bonus == 'ready') {
-      if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1))) {
+      if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
         endturn();
       }
       else {
@@ -539,7 +552,6 @@ let endturn = () => {
   if (!blocked)
     socket.emit("endturn");
   blocked = true;
-
 }
 
 let login = () => {

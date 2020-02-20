@@ -3,7 +3,7 @@ const en = require('./engine');
 exports.slime = (game) => {
     game.unit.forEach(u => {
         u.akt = u.akt.filter(a => {
-            if (u.status.includes('slime') && (a.img == 'move' || a.img == 'fly')) {
+            if (u.status.includes('slime') && (a.img == 'move' || a.img == 'fly' || a.img == 'take')) {
                 return false;
             } else {
                 return true;

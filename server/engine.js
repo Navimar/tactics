@@ -49,7 +49,7 @@ en.makeUnit = (tp, x, y, team, life) => {
   let m = x < 5 ? false : true;
   return {
     status: [],
-    akt:[],
+    akt: [],
     isReady: true,
     energy: 3,
     tp,
@@ -95,5 +95,7 @@ en.addStatus = (unit, st) => {
     unit.status.push(st)
   }
 }
-
+// en.makemark = (game, img, x, y) => {
+//   game.mark.push({ img, x, y })
+// }
 module.exports = en;

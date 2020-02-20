@@ -6,8 +6,8 @@ const en = require('./engine');
 const generator = require('./generator');
 
 const onOrder = require('./onOrder');
+const onTire = require('./onTire');
 const onEndTurn = require('./onEndTurn');
-
 const _ = require('lodash');
 
 
@@ -33,7 +33,7 @@ let creategame = (p1, p2) => {
     winner: 0,
     leftturns: 14,
     started: time.clock(),
-    // destraction: 0,
+    sticker: [],
     finished: false,
   }
   return game;
@@ -51,12 +51,10 @@ exports.order = (game, p, u, akt) => {
       game.unit.forEach(u => {
         // console.log(u.energy,u.isReady)
         u.isActive = false;
-        if (u.energy < 3 && u != unit) {
-          if (_.isFunction(meta[u.tp].onTire)) {
-            // console.log('isFunction');
-            meta[u.tp].onTire(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
-          }
+        if (u.energy < 3 && u != unit && u.isReady) {
           wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+          onTire.frog(game);
+
         }
       });
       unit.isActive = true;
@@ -77,7 +75,7 @@ exports.order = (game, p, u, akt) => {
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
     game.finished = true
-    if (p==1)
+    if (p == 1)
       game.winner = 2;
     else
       game.winner = 1;
@@ -123,10 +121,10 @@ exports.endturn = (game, p) => {
   if (game && !game.finished) {
     let one, two
     game.unit.forEach(u => {
-      if (_.isFunction(meta[u.tp].onEndturn)) {
-        // console.log('isFunction');
-        meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
-      }
+      // if (_.isFunction(meta[u.tp].onEndturn)) {
+      //   // console.log('isFunction');
+      //   meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
+      // }
       // if (u.status && _.isFunction(status[u.status].onEndturn)) {
       //   status[u.status].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
       // }
@@ -166,6 +164,7 @@ exports.endturn = (game, p) => {
     fisher(game)
 
     onEndTurn.telepath(game);
+    onEndTurn.frog(game);
 
     send.data(game);
   }

@@ -1,5 +1,5 @@
 const en = require('./engine');
-// const en = require('./engine');
+const meta = require('./meta');
 const _ = require('lodash');
 
 module.exports = (game, me, target) => {
@@ -74,6 +74,9 @@ module.exports = (game, me, target) => {
     changeTeam: (unit) => {
       if (unit.team != 3)
         unit.team = 3 - unit.team;
+    },
+    makesticker(unit, x, y) {
+        game.sticker.push({ img: meta[unit.tp].img, x, y,team:unit.team })
     }
   }
 }
