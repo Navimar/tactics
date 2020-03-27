@@ -75,8 +75,5 @@ module.exports = (game, me, target) => {
       if (unit.team != 3)
         unit.team = 3 - unit.team;
     },
-    makesticker(unit, x, y) {
-        game.sticker.push({ img: meta[unit.tp].img, x, y,team:unit.team })
-    }
   }
 }

@@ -43,8 +43,7 @@ exports.aerostat = {
           img: 'fly',
         })
     });
-    let mark = akt.game.sticker.filter(m => m.x == akt.me.x && m.y == akt.me.y);
-    if (mark[0] && akt.me.data.drop == false) {
+    if (akt.me.sticker && akt.me.data.drop == false) {
       akts.push({
         x: akt.me.x,
         y: akt.me.y,
@@ -55,16 +54,10 @@ exports.aerostat = {
   },
   fly: (wd) => {
     if (wd.me.data.drop) {
-      let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
-      if (mark[0]) {
-        en.addUnit(wd.game, mark[0].img, wd.me.x, wd.me.y, mark[0].team, 3)
-        wd.game.sticker.remove(mark[0])
+      if (wd.me.sticker) {
+        en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+        wd.me.sticker = false
       }
-    }
-    let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)[0]
-    if (mark) {
-      mark.x = wd.target.x
-      mark.y = wd.target.y
     }
     wd.flywalk();
     wd.me.data.drop = false;
@@ -73,12 +66,12 @@ exports.aerostat = {
     wd.me.data.drop = true;
   },
   take: (wd) => {
-    let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
-    if (mark[0]) {
-      en.addUnit(wd.game, mark[0].img, wd.me.x, wd.me.y, mark[0].team, 3)
-      wd.game.sticker.remove(mark[0])
+    // let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
+    if (wd.me.sticker) {
+      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+      wd.me.sticker = false;
     }
-    wd.makesticker(wd.target.unit, wd.target.x, wd.target.y)
+    wd.me.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
     wd.kill(wd.target.unit);
 
     // wd.target.unit.small = true;

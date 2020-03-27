@@ -11,7 +11,6 @@ let local = {
   turn: 1,
 };
 let data = {
-  sticker:[],
   fisher: ['???', '!!!'],
   leftturns: 'нет подключения к серверу',
   trail: [],
@@ -194,8 +193,11 @@ let render = () => {
         }
 
         else
-          drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 15);
+          drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 18);
       // drawLife(u.life, u.x, u.y);
+
+      if (u.sticker)
+        drawSize(u.sticker, x + 0.2, y + 0.4, 0.6, 0.6)
       u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
     }
   }
@@ -217,14 +219,6 @@ let render = () => {
       }
     }
   }
-  let rendersticker = (x, y) => {
-        let u = data.sticker.filter(u => u.x == x && u.y == y)[0];
-        if (u) {
-          console.log(u)
-          drawSize(u.img, x+0.2, y+0.4, 0.6,0.6)
-        }
-
-  }
   let rendertip = () => {
     if (local.tip && local.tip.dur > 0)
       drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
@@ -241,9 +235,9 @@ let render = () => {
     for (let x = 0; x < 9; x++) {
       renderunit(x, y);
     }
-    for (let x = 0; x < 9; x++) {
-      rendersticker(x,y);
-    }
+    // for (let x = 0; x < 9; x++) {
+    //   rendersticker(x,y);
+    // }
   }
   if (local.sandclock) {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)

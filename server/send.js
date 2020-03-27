@@ -97,6 +97,7 @@ exports.data = (game) => {
         m: u.m,
         x: u.x,
         y: u.y,
+        sticker: u.sticker ? meta[u.sticker.tp].img : false,
         akt: u.akt,
         color: (() => {
           if (player == 1) return u.team;
