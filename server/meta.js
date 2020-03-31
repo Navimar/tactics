@@ -450,7 +450,7 @@ exports.frog = {
     let x = (wd.target.x - wd.me.x) * 2
     let y = (wd.target.y - wd.me.y) * 2
     wd.go(x + wd.me.x, y + wd.me.y);
-    if (wd.target.unit.status == 'frog')
+    if (wd.target.unit.status.includes('frog'))
       wd.kill(wd.target.unit);
     else
       wd.addStatus('frog');
