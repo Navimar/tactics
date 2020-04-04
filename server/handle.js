@@ -38,19 +38,19 @@ exports.socket = (socket, e, msg) => {
   if (e == 'order') {
     let p = player.bySocket(socket);
     if (p && p.number) {
-      game.order(p.game,p.number, msg.unit, msg.akt);
+      game.order(p.game, p.number, msg.unit, msg.akt);
     }
   }
   if (e == 'bonus') {
     let p = player.bySocket(socket);
     if (p && p.number) {
-      game.setbonus(p.game,p.number, msg);
+      game.setbonus(p.game, p.number, msg);
     }
   }
   if (e == 'surrender') {
     let p = player.bySocket(socket);
     if (p && p.number) {
-      game.surrender(p.game,p.number, msg);
+      game.surrender(p.game, p.number, msg);
     }
   }
   if (e == 'rematch') {
@@ -77,7 +77,7 @@ exports.bot = (msg, bot) => {
   }
   if (text == '/play') {
     if (p.game) {
-      send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p)+'u', bot);
+      send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
     } else {
       send.bot(id, 'нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot);
     }
@@ -93,6 +93,10 @@ exports.bot = (msg, bot) => {
   else if (text == '/cancel') {
     queue.cancel(p)
     send.bot(id, 'поиск отменен');
+  }
+  else if (text == '/rank') {
+    send.bot(id, 'Ваш ранг ' + p.rank, bot);
+
   }
   else {
     send.bot(id, '/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot)

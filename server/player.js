@@ -1,9 +1,16 @@
-
+const fs = require('fs');
 const sha = require("sha256");
 const player = [];
 
 exports.register = (id) => {
-    let p = { id, socket: false, key: false }
+    let p = { id, rank: 0, socket: false, key: false }
+    fs.readFile('data/' + p.id, 'utf8', function (err, data) {
+        if (data) {
+            console.log(data);
+            p.rank = parseInt(data);
+        }
+
+    });
     player.push(p);
     return p;
 }
@@ -14,6 +21,14 @@ exports.byId = (id) => {
         }
     }
     return false;
+}
+
+exports.wins = (winner, loser) => {
+    winner.rank = Math.ceil(winner.rank + loser.rank * 0.1 * (1 - winner.rank / 100000) + 10)
+    loser.rank = Math.floor(loser.rank * 0.9);
+    fs.writeFile('data/' + winner.id, winner.rank, function (err) {
+        if (err) throw err;
+    });
 }
 
 exports.bySocket = (socket) => {

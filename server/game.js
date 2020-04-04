@@ -3,6 +3,7 @@ const time = require('./time');
 const wrapper = require('./wrapper');
 const send = require('./send');
 const en = require('./engine');
+const player = require('./player');
 const generator = require('./generator');
 
 const onOrder = require('./onOrder');
@@ -35,6 +36,13 @@ let creategame = (p1, p2) => {
     started: time.clock(),
     sticker: [],
     finished: false,
+    end: (pn) => {
+      if (!game.sandbox) {
+        pn--;
+        if (pn == 0) player.wins(p1, p2)
+        if (pn == 1) player.wins(p2, p1)
+      }
+    }
   }
   return game;
 }
@@ -75,10 +83,14 @@ exports.order = (game, p, u, akt) => {
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
     game.finished = true
-    if (p == 1)
+    if (p == 1) {
       game.winner = 2;
-    else
+      game.end(2);
+    }
+    else {
       game.winner = 1;
+      game.end(1);
+    }
     send.data(game);
   }
 }
@@ -113,8 +125,10 @@ exports.endturn = (game, p) => {
     }
     if (flag1 > flag2) {
       game.winner = 1
+      game.end(1);
     } else {
       game.winner = 2
+      game.end(2);
     }
     game.finished = true
   }
@@ -140,10 +154,12 @@ exports.endturn = (game, p) => {
     if (!one && two) {
       game.winner = 2
       game.finished = true
+      game.end(2);
     }
     if (one && !two) {
       game.finished = true
       game.winner = 1;
+      game.end(1);
     }
     if (!one && !two) {
       cnFlag();
