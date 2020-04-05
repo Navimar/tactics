@@ -39,6 +39,7 @@ let creategame = (p1, p2) => {
     started: time.clock(),
     sticker: [],
     finished: false,
+    chooseteam: true,
     end: (pn) => {
       if (!game.sandbox) {
         pn--;
