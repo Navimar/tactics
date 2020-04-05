@@ -5,7 +5,6 @@ const send = require('./send');
 const en = require('./engine');
 const player = require('./player');
 const generator = require('./generator');
-
 const onOrder = require('./onOrder');
 const onTire = require('./onTire');
 const onEndTurn = require('./onEndTurn');
@@ -27,10 +26,14 @@ let creategame = (p1, p2) => {
     fisher: [120, 120],
     trail: [],
     lastturntime: [],
-    bonus: [null, null, null],
+    bonus: [null, p2.rank, p1.rank],
     unit: data.unit,
     field: data.field,
-    turn: 1,
+    turn: (() => {
+      if (p1.rank > p2.rank)
+        return 2
+      else return 1
+    })(),
     winner: 0,
     leftturns: 14,
     started: time.clock(),
