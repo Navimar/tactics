@@ -135,6 +135,8 @@ exports.diger = {
       wd.game.field[wd.target.x][wd.target.y] = 'ground'
     else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
       wd.game.field[wd.target.x][wd.target.y] = 'grass'
+    else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
+      wd.game.field[wd.target.x][wd.target.y] = 'grass'
     // wd.tire();
   }
 }
@@ -181,9 +183,26 @@ exports.glider = {
   }
 }
 exports.mashroom = {
-  weight: 1,
+  neutral: true,
+  weight: 5,
   life: 3,
   img: 'mashroom',
+  akt: (akt) => {
+    return akt.move()
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  mashroom: (wd) => {
+    wd.damage();
+    wd.tire();
+  }
+}
+exports.fountain = {
+  neutral: true,
+  weight: 1,
+  life: 3,
+  img: 'fountain',
   akt: (akt) => {
     return akt.move()
   },
@@ -271,7 +290,7 @@ exports.bird = {
 }
 
 exports.plant = {
-  weight: 50,
+  weight: 20,
   life: 3,
   img: 'plant',
   akt: (akt) => {
@@ -460,14 +479,8 @@ exports.frog = {
 
 //разбрасывает бомбы, а потом одинм ходом взрывает, лучше чем бить с руки так как площадь, но если взрывать по одной, то не лучше
 
-//залепляет по цепочке, никто не может отойти пока не прервет цепочку или не отпнет прилипалу
-
 //телепортер оглушитель
 // Трибот делится на троих
-// Дерижабль
-// бык толкатель
-// морф, превращается в любого до конца хода
-// бесполщадная мозгососка
 //некромант (создает духа/поднимает на один ход)
 // нидус-червь
 // Осадный танк тратит ход для осадного положения и не стреляет в упор. Убивает.
@@ -480,5 +493,4 @@ exports.frog = {
 // Штамповщик
 // берсерк, умирает если не атакует
 
-// Зомби(зомбиапокалипсис)ча
 // Башня тьмы ночь

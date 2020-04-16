@@ -1,6 +1,34 @@
 const en = require('./engine');
+const _ = require('lodash');
 
 
+exports.spill = (game) => {
+  let ok = true;
+  for (let x = 0; x < 9; x++) {
+    for (let y = 0; y < 9; y++) {
+      if (game.field[x][y] == 'water')
+        game.field[x][y] = 'ground'
+    }
+  }
+  game.unit.forEach((unit) => {
+    if (unit.tp == 'fountain') if (game.field[unit.x][unit.y] == 'ground') game.field[unit.x][unit.y] = 'water';
+  });
+  while (ok) {
+    ok = false;
+    for (let x = 0; x < 9; x++) {
+      for (let y = 0; y < 9; y++) {
+        if (game.field[x][y] == 'ground') {
+          en.near(x, y).forEach((p) => {
+            if (game.field[p.x][p.y] == 'water') {
+              game.field[x][y] = 'water'
+              ok = true;
+            }
+          });
+        }
+      }
+    }
+  }
+}
 exports.capture = (game) => {
   game.unit.forEach((unit) => {
     if (game.field[unit.x][unit.y] == 'team1' && unit.team == 2) game.field[unit.x][unit.y] = 'team2';

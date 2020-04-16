@@ -1,2 +1,2 @@
-./node_modules/.bin/pm2 start app.js --name 'server'  --watch server --max-restarts=0
-./node_modules/.bin/pm2 logs
+pm2 start app.js --name 'userver'  --watch server --max-restarts=0
+pm2 logs

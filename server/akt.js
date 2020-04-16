@@ -40,7 +40,7 @@ module.exports = (game, me) => {
           near = near.filter(np => {
             let nf = en.fieldInPoint(game, np.x, np.y)
             let pf = en.fieldInPoint(game, pt.x, pt.y)
-            return !en.isOccupied(game, np.x, np.y) && (nf == pf || nf.slice(0, -1) == 'team' || pf.slice(0, -1) == 'team')
+            return !en.isOccupied(game, np.x, np.y) && (nf == pf || _.includes(['team1','team2', 'water'], nf) || _.includes(['team1','team2', 'water'], pf))
           });
           points = points.concat(near)
         });

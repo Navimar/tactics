@@ -6,7 +6,13 @@ const _ = require('lodash');
 
 let barraks = [];
 Object.keys(meta).forEach(function (key) {
-  _.times(meta[key].weight, () => barraks.push(key));
+  if (!meta[key].neutral)
+    _.times(meta[key].weight, () => barraks.push(key));
+});
+let neutrals = [];
+Object.keys(meta).forEach(function (key) {
+  if (meta[key].neutral)
+    _.times(meta[key].weight, () => neutrals.push(key));
 });
 
 exports.new = () => {
@@ -16,6 +22,9 @@ exports.new = () => {
   }
   let rndUnit = () => {
     return _.sample(barraks);
+  }
+  let rndNeutral = () => {
+    return _.sample(neutrals);
   }
   let c = 0;
   let data = {
@@ -145,7 +154,7 @@ exports.new = () => {
     if (p.type.length > 1) p.type.remove(0);
     p.type = _.sample(p.type);
     if (p.type == 3) {
-      data.unit.push(makeUnit('mashroom', p.x, p.y, p.type));
+      data.unit.push(makeUnit(rndNeutral(), p.x, p.y, p.type));
       neutralarr.push({ x: p.x, y: p.y })
     }
     else if (p.type == 1) {
@@ -171,100 +180,6 @@ exports.new = () => {
   return data
 
 }
-//   let t1p;
-//   do {
-//     t1p = _.sample(points)
-//     c++;
-
-//   } while (!(t1p.x == 0 || t1p.x == 8 || t1p.y == 0 || t1p.y == 8) && c < 1000);
-//   data.unit.push(makeUnit(rndUnit(), t1p.x, t1p.y, 1));
-
-
-//   do {
-//     t2p = _.sample(points)
-//     c++;
-
-//   } while (!(t2p.x == 0 || t2p.x == 8 || t2p.y == 0 || t2p.y == 8) || Math.abs(t2p.x + t2p.y - (t1p.x + t1p.y)) < 4 && c < 1000);
-//   data.unit.push(makeUnit(rndUnit(), t2p.x, t2p.y, 2));
-
-//   t1p = [t1p]
-//   t2p = [t2p]
-//   _.times(6, (n) => {
-//     c = 0
-//     let np = _.sample(points)
-//     let near
-//     do {
-//       np = _.sample(points)
-//       near = false
-//       t1p.forEach(e => {
-//         // console.log(e.x, e.y, np.x, np.y)
-//         if (Math.abs(e.x + e.y - (np.x + np.y)) < 4) {
-//           near = true
-//         }
-//       });
-//       t2p.forEach(e => {
-//         if ((e.x == np.x && e.y == np.y) || (Math.abs(e.x + e.y - (np.x + np.y)) > 8)) near = true;
-//       });
-//       c++;
-
-//     } while (near && c < 1000)
-//     data.unit.push(makeUnit(rndUnit(), np.x, np.y, 2));
-//     t2p.push({ x: np.x, y: np.y });
-
-//     np = _.sample(points)
-//     near
-//     do {
-//       np = _.sample(points)
-//       near = false
-//       t2p.forEach(e => {
-//         // console.log(e.x, e.y, np.x, np.y)
-//         if (Math.abs(e.x + e.y - (np.x + np.y)) < 4) {
-//           near = true
-//         }
-//       });
-//       t1p.forEach(e => {
-//         if ((e.x == np.x && e.y == np.y) || (Math.abs(e.x + e.y - (np.x + np.y)) > 8)) near = true;
-//       });
-//       c++;
-
-//     } while (near && c < 1000)
-//     data.unit.push(makeUnit(rndUnit(), np.x, np.y, 1));
-//     t1p.push({ x: np.x, y: np.y });
-//   });
-//   let tnp = [];
-//   _.times(_.random(7), (n) => {
-//     do {
-//       np = _.sample(points)
-//       near = false
-//       t1p.forEach(e => {
-//         if (e.x == np.x && e.y == np.y) near = true;
-//       });
-//       t2p.forEach(e => {
-//         if (e.x == np.x && e.y == np.y) near = true;
-//       });
-//       tnp.forEach(e => {
-//         if (e.x == np.x && e.y == np.y) near = true;
-//       });
-//       c++;
-//     } while (near && c < 1000)
-//     data.unit.push(makeUnit('mashroom', np.x, np.y, 3));
-//     tnp.push({ x: np.x, y: np.y });
-//   });
-//   return data
-// }
-
-// let makeUnit = (tp, x, y, team) => {
-//   let life = meta[tp].life;
-//   return en.makeUnit(tp, x, y, team, life)
-// }
-
-// let rndUnit = () => {
-//   let chance = [];
-//   // _.times(7, () => chance.push(barraks.hero));
-//   _.times(7, () => chance.push(barraks.champion));
-//   _.times(1, () => chance.push(barraks.support));
-//   return _.sample(_.sample(chance));
-// }
 
 let rndTeam = () => {
   return (Math.random() >= 0.5) ? 1 : 2;

@@ -79,6 +79,7 @@ exports.order = (game, p, u, akt) => {
 
       onOrder.slime(game);
       onOrder.capture(game);
+      onOrder.spill(game);
 
       send.data(game);
     }
