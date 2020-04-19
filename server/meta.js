@@ -184,7 +184,7 @@ exports.glider = {
 }
 exports.mashroom = {
   neutral: true,
-  weight: 5,
+  weight: 4,
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
@@ -198,6 +198,33 @@ exports.mashroom = {
     wd.tire();
   }
 }
+exports.pusher = {
+  weight: 100,
+  life: 3,
+  img: 'pusher',
+  akt: (akt) => {
+    let arr = akt.move()
+    if (akt.me.energy > 0)
+      arr = arr.concat(akt.hand('push'))
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  push: (wd) => {
+    let x = (wd.target.unit.x - wd.me.x)
+    let y = (wd.target.unit.y - wd.me.y)
+    i = 0
+    while (en.inField(wd.target.x + x * i, wd.target.y + y * i) && en.unitInPoint(wd.game, wd.target.x + x * i, wd.target.y + y * i)) {
+      i++
+    }
+    for (z = i; z--; z < 0) {
+      wd.teleport(wd.game, wd.target.x + x * z, wd.target.y + y * z, wd.target.x + x * (z + 1), wd.target.y + y * (z + 1))
+    }
+    wd.go(wd.target.x, wd.target.y)
+    wd.me.energy--
+  }
+}
 exports.fountain = {
   neutral: true,
   weight: 1,
@@ -209,10 +236,6 @@ exports.fountain = {
   move: (wd) => {
     wd.walk();
   },
-  mashroom: (wd) => {
-    wd.damage();
-    wd.tire();
-  }
 }
 exports.telepath = {
   weight: 50,
@@ -314,6 +337,28 @@ exports.plant = {
     let u = wd.addUnit('plantik', 2)
     u.isReady = false;
 
+    wd.tire();
+  }
+}
+exports.worm = {
+  weight: 50,
+  life: 3,
+  img: 'worm',
+  akt: (akt) => {
+    let akts = [];
+    let points = en.allPoints();
+    // points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
+    points.forEach((pt) => {
+      akts.push({
+        x: pt.x,
+        y: pt.y,
+        img: 'worm',
+      })
+    });
+    return akts;
+  },
+  worm: (wd) => {
+    wd.spoil('worm', wd.target.x, wd.target.y, { unit: wd.me }, wd.me.team)
     wd.tire();
   }
 }
@@ -477,20 +522,3 @@ exports.frog = {
 }
 
 
-//разбрасывает бомбы, а потом одинм ходом взрывает, лучше чем бить с руки так как площадь, но если взрывать по одной, то не лучше
-
-//телепортер оглушитель
-// Трибот делится на троих
-//некромант (создает духа/поднимает на один ход)
-// нидус-червь
-// Осадный танк тратит ход для осадного положения и не стреляет в упор. Убивает.
-// Огнемётчик вместо заразителя
-// поджигает землю, юнитов, погибшние юнниты оставляют огонек
-// феникс
-// вечный стазис???
-// Бессмертие - жизнь в ход
-// вампир?
-// Штамповщик
-// берсерк, умирает если не атакует
-
-// Башня тьмы ночь

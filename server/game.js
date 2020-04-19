@@ -38,6 +38,7 @@ let creategame = (p1, p2) => {
     leftturns: 14,
     started: time.clock(),
     sticker: [],
+    spoil:[],
     finished: false,
     chooseteam: true,
     end: (pn) => {
@@ -186,6 +187,7 @@ exports.endturn = (game, p) => {
 
     onEndTurn.telepath(game);
     onEndTurn.frog(game);
+    onEndTurn.worm(game);
 
     send.data(game);
   }

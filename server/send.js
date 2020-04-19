@@ -34,6 +34,15 @@ exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
       sticker: game.sticker,
+      spoil: (() => {
+        let arr = []
+        game.spoil.forEach(s => {
+          console.log(s.team,player);
+          if (s.team == player || s.team == 3)
+            arr.push(s);
+        });
+        return arr
+      })(),
       finished: game.finished,
       leftturns: game.leftturns,
       chooseteam: game.chooseteam,

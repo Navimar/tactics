@@ -235,6 +235,13 @@ function drawImg(name, x, y) {
   ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
   // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
 }
+function drawSpoil(name, x, y) {
+  let p = dh / 10;
+  let img = getImg(name+'.spoil', x, y);
+  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
+  // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
+}
+
 function drawStatus(name, x, y) {
   let p = dh / 10;
   let img = getImg(name + '.stt', x, y);

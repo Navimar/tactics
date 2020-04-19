@@ -14,6 +14,7 @@ let data = {
   fisher: ['???', '!!!'],
   leftturns: 'нет подключения к серверу',
   trail: [],
+  spoil: [],
   field:
     [['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],
     ['water', 'water', 'water', 'water', 'water', 'water', 'water', 'water', 'water',],
@@ -201,6 +202,13 @@ let render = () => {
       u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
     }
   }
+  let renderspoil = (x, y) => {
+    let u = data.spoil.filter(u => u.x == x && u.y == y)[0];
+    if (u) {
+      drawSpoil(u.name, u.x, u.y);
+    };
+
+  }
   let renderakt = () => {
     if (local.unit && local.unit.akt) {
       local.unit.akt.forEach(a => {
@@ -233,6 +241,9 @@ let render = () => {
       renderfield(x, y)
     }
     for (let x = 0; x < 9; x++) {
+      renderspoil(x, y);
+    }
+    for (let x = 0; x < 9; x++) {
       renderunit(x, y);
     }
     // for (let x = 0; x < 9; x++) {
@@ -243,7 +254,6 @@ let render = () => {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)
   }
   renderpanel();
-
   rendertrail();
   renderakt();
   if (!socket.connected)
@@ -277,7 +287,7 @@ let renderpanel = () => {
     drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
   }
 
-  drawTxt(data.leftturns + '', c[0][0] + 0.15, c[0][1] + 0.15, '#222')
+  drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222')
   drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.5 + 0.15, '#090')
   drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.5 + 0.15, '#f00')
   let team1 = 0

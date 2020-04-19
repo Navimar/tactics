@@ -56,11 +56,18 @@ module.exports = (game, me, target) => {
       me.isActive = false;
       // console.log(me,'tire wrapper');
     },
+    teleport: (game, xfrom, yfrom, xto, yto) => {
+      let u = en.unitInPoint(game, xfrom, yfrom);
+      en.move(game, u, xto, yto);
+    },
     move: (xto, yto) => {
       en.move(game, target.unit, xto, yto);
     },
     go: (xto, yto) => {
       en.move(game, me, xto, yto);
+    },
+    spoil: (name, x, y, data, team) => {
+      en.addSpoil(game, name, x, y, data, team)
     },
     addStatus: (st, x, y) => {
       if (x && y)

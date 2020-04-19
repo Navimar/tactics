@@ -43,7 +43,9 @@ en.addUnit = (game, tp, x, y, team, life) => {
   let u = en.makeUnit(tp, x, y, team, life)
   game.unit.push(u); return u;
 }
-
+en.addSpoil = (game, name, x, y, data, team) => {
+  game.spoil.push({ name, data, x, y, team })
+}
 
 en.makeUnit = (tp, x, y, team, life) => {
   let m = x < 5 ? false : true;
