@@ -75,8 +75,15 @@ module.exports = (game, me, target) => {
       else
         en.addStatus(target.unit, st);
     },
-    addUnit: (tp, life) => {
-      return en.addUnit(game, tp, target.x, target.y, me.team, life)
+    addUnit: (tp, x, y, team) => {
+      if (!_.isFinite(x) || !_.isFinite(x)) {
+        x = target.x
+        y = target.y
+      }
+      if (!team)
+        team = me.team
+      if (!en.unitInPoint(game, x, y) && en.inField(x, y))
+        return en.addUnit(game, tp, x, y, team)
     },
     changeTeam: (unit) => {
       if (unit.team != 3)

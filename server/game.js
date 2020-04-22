@@ -5,9 +5,7 @@ const send = require('./send');
 const en = require('./engine');
 const player = require('./player');
 const generator = require('./generator');
-const onOrder = require('./onOrder');
-const onTire = require('./onTire');
-const onEndTurn = require('./onEndTurn');
+const rules = require('./rules');
 const _ = require('lodash');
 
 
@@ -66,8 +64,9 @@ exports.order = (game, p, u, akt) => {
         u.isActive = false;
         if (u.energy < 3 && u != unit && u.isReady) {
           wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-          onTire.frog(game);
-
+          //onTire
+          rules.frog(game);
+          rules.aerostat(game);
         }
       });
       unit.isActive = true;
@@ -78,9 +77,12 @@ exports.order = (game, p, u, akt) => {
       }
       meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
 
-      onOrder.slime(game);
-      onOrder.capture(game);
-      onOrder.spill(game);
+      //onOrder
+      rules.slime(game);
+      rules.capture(game);
+      rules.spill(game);
+      rules.split(game, unit, akt)
+      rules.fireend(game);
 
       send.data(game);
     }
@@ -141,13 +143,6 @@ exports.endturn = (game, p) => {
   if (game && !game.finished) {
     let one, two
     game.unit.forEach(u => {
-      // if (_.isFunction(meta[u.tp].onEndturn)) {
-      //   // console.log('isFunction');
-      //   meta[u.tp].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
-      // }
-      // if (u.status && _.isFunction(status[u.status].onEndturn)) {
-      //   status[u.status].onEndturn(wrapper(game, u, { x: u.x, y: u.y, unit: u }));
-      // }
       u.energy = 3;
       u.isReady = true;
       if (u.team == 1) {
@@ -185,9 +180,20 @@ exports.endturn = (game, p) => {
     game.turn = game.turn == 1 ? 2 : 1;
     fisher(game)
 
-    onEndTurn.telepath(game);
-    onEndTurn.frog(game);
-    onEndTurn.worm(game);
+    //onEndTurn
+    rules.telepath(game);
+    rules.frog(game);
+    rules.aerostat(game);
+    rules.worm(game);
+    rules.firestt(game);
+    rules.splitOnEndturn(game)
+
+    
+
+    rules.slime(game);
+    rules.capture(game);
+    rules.spill(game);
+    rules.fireend(game);
 
     send.data(game);
   }

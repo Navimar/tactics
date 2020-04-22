@@ -270,12 +270,13 @@ let renderpanel = () => {
     [-2, 0],
     [-2, 2],
     [-2, 7],
+    [-2, 5]
   ]
   if (orientation == 'h') {
     c.forEach(e => e.reverse());
   }
   if (data.finished) {
-    drawSize('rematch', c[2][0], c[2][1], 2, 2)
+    drawSize('rematch', c[3][0], c[3][1], 2, 2)
 
   } else {
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
@@ -288,8 +289,8 @@ let renderpanel = () => {
   }
 
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222')
-  drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.5 + 0.15, '#090')
-  drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.5 + 0.15, '#f00')
+  drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
+  drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
   let team1 = 0
   let team2 = 0
 
@@ -417,9 +418,16 @@ let onMouseDown = () => {
     local.tip = false;
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7))) {
       if (data.finished) {
-        rematch();
+        // rematch();
       } else {
         surrender();
+      }
+    }
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
+      if (data.finished) {
+        rematch();
+      } else {
+        // surrender();
       }
     }
     if (data.bonus == 'ready') {

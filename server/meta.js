@@ -17,6 +17,35 @@ exports.warrior = {
   }
 }
 
+exports.firebat = {
+  weight: 100,
+  life: 3,
+  img: 'firebat',
+  akt: (akt) => {
+    let arr = akt.move()
+    let far = akt.hand('firebat')
+    if (far) {
+      far = far.filter(e => {
+        if (en.unitInPoint(akt.game, e.x, e.y).status == 'fire' || en.unitInPoint(akt.game, e.x, e.y).status == 'fire2')
+          return false
+        if (akt.game.field[e.x][e.y] == 'water')
+          return false
+        return true
+      });
+      arr = arr.concat(far)
+    }
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  firebat: (wd) => {
+    wd.addStatus('fire');
+    wd.tire();
+  }
+}
+
+
 exports.aerostat = {
   weight: 50,
   life: 3,
@@ -50,6 +79,13 @@ exports.aerostat = {
         img: 'drop',
       })
     }
+    if (akt.me.sticker && akt.me.data.drop == true) {
+      akts.push({
+        x: akt.me.x,
+        y: akt.me.y,
+        img: 'undrop',
+      })
+    }
     return akts;
   },
   fly: (wd) => {
@@ -64,6 +100,9 @@ exports.aerostat = {
   },
   drop: (wd) => {
     wd.me.data.drop = true;
+  },
+  undrop: (wd) => {
+    wd.me.data.drop = false;
   },
   take: (wd) => {
     // let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
@@ -184,7 +223,7 @@ exports.glider = {
 }
 exports.mashroom = {
   neutral: true,
-  weight: 4,
+  weight: 10,
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
@@ -227,7 +266,7 @@ exports.pusher = {
 }
 exports.fountain = {
   neutral: true,
-  weight: 1,
+  weight: 3,
   life: 3,
   img: 'fountain',
   akt: (akt) => {
@@ -254,6 +293,30 @@ exports.telepath = {
     wd.tire();
   }
 }
+exports.spliter = {
+  weight: 40,
+  life: 3,
+  img: 'spliter',
+  akt: (akt) => {
+    let akts = akt.move().concat(akt.hand('spliter'))
+    // akts.forEach(e => e.img = 'hatchery');
+    return akts;
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  spliter: (wd) => {
+    wd.addStatus('spliter');
+    // console.log(wd.target);
+    let u = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x), wd.target.y + (wd.target.y - wd.me.y), wd.target.unit.team)
+    let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
+    if (u)
+      u.status.push('spliter')
+    if (u2)
+      u2.status.push('spliter')
+    wd.tire();
+  }
+}
 exports.hatchery = {
   weight: 25,
   life: 3,
@@ -264,12 +327,12 @@ exports.hatchery = {
     return akts;
   },
   hatchery: (wd) => {
-    let u = wd.addUnit('mashroom', 2)
+    let u = wd.addUnit('mashroom')
     // console.log(u)
     wd.tire()
     // console.log('zerg',u)
-    u.isReady = false;
-
+    if (u)
+      u.isReady = false;
   }
 }
 exports.bird = {
@@ -300,21 +363,31 @@ exports.bird = {
   },
   bird: (wd) => {
     wd.kill(wd.me.x - 1, wd.me.y - 1);
+    wd.spoil('fire', wd.me.x - 1, wd.me.y - 1, false, 3);
     wd.kill(wd.me.x, wd.me.y - 1);
+    wd.spoil('fire', wd.me.x, wd.me.y - 1, false, 3);
     wd.kill(wd.me.x + 1, wd.me.y - 1);
+    wd.spoil('fire', wd.me.x + 1, wd.me.y - 1, false, 3);
     wd.kill(wd.me.x + 1, wd.me.y);
+    wd.spoil('fire', wd.me.x + 1, wd.me.y, false, 3);
     wd.kill(wd.me.x - 1, wd.me.y);
+    wd.spoil('fire', wd.me.x - 1, wd.me.y, false, 3);
     wd.kill(wd.me.x - 1, wd.me.y + 1);
+    wd.spoil('fire', wd.me.x - 1, wd.me.y + 1, false, 3);
     wd.kill(wd.me.x, wd.me.y + 1);
-    wd.kill(wd.me.x + 1, wd.me.y + 1);
+    wd.spoil('fire', wd.me.x, wd.me.y + 1, false, 3);
+    wd.kill(wd.me.x + 1, wd.me.y + 1)
+    wd.spoil('fire', wd.me.x + 1, wd.me.y + 1, false, 3);
     wd.kill();
+    wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
     wd.tire();
   }
 }
 
 exports.plant = {
-  weight: 20,
+  weight: 2,
   life: 3,
+  neutral: true,
   img: 'plant',
   akt: (akt) => {
     let akts = [];
@@ -404,7 +477,7 @@ exports.kicker = {
 }
 
 exports.slime = {
-  weight: 50,
+  weight: 25,
   life: 3,
   img: 'slime',
   akt: (akt) => {

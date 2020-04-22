@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
-const wrapper = require('./wrapper');
 const onAkt = require('./onAkt');
-// const time = require('./time');
 
 exports.web = (p, game) => {
   msg = game.data;
@@ -37,7 +35,7 @@ exports.data = (game) => {
       spoil: (() => {
         let arr = []
         game.spoil.forEach(s => {
-          console.log(s.team,player);
+          // console.log(s.team,player);
           if (s.team == player || s.team == 3)
             arr.push(s);
         });
