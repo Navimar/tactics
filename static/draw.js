@@ -235,11 +235,13 @@ function drawImg(name, x, y) {
   ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
   // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
 }
+
 function drawSpoil(name, x, y) {
   let p = dh / 10;
-  let img = getImg(name+'.spoil', x, y);
-  ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
-  // ctx.drawImage(img, x * dh + shiftX, y * dh+shiftY, dh, dh);
+  let img = getImg(name + '.spoil', x, y);
+  // let img = getImg(name, x, y, mask[0]);
+  // ctx.drawImage(img, x * dh-p + shiftX, y * dh-p, dh +2*p, dh+2*p);
+  ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
 }
 
 function drawStatus(name, x, y) {
@@ -276,7 +278,13 @@ function drawTrail(name, x, y) {
 }
 function drawAkt(name, x, y) {
   let p = 0;
-  let img = getImg(name + '.akt', x, y);
+
+  // ctx.save();
+  // let img = getImg('underAkt', x, y);
+  // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
+  // ctx.restore();
+
+  img = getImg(name + '.akt', x, y);
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.3)';
   ctx.globalCompositeOperation = 'source-over';
@@ -285,6 +293,9 @@ function drawAkt(name, x, y) {
   ctx.shadowBlur = 0;
   ctx.drawImage(img, x * dh - p + shiftX, y * dh - p + shiftY, dh + 2 * p, dh + 2 * p);
   ctx.restore();
+
+
+
 
   // ctx.drawImage(img, x * dh + shiftX, y * dh, dh, dh);
 }
@@ -315,7 +326,7 @@ function drawProp(name, x, y, m, team, isReady, isActive, size) {
   if (team == 3) color = 'rgba(255, 255, 0,1)';
   let p = 0
   if (size)
-    p= dh / size;
+    p = dh / size;
   let img = getImg(name, x, y);
   let h = dh + 2 * p;
   let w = img.width * (h / img.height);
@@ -350,9 +361,10 @@ function drawProp(name, x, y, m, team, isReady, isActive, size) {
 }
 
 
-function drawImgNormal(name, x, y) {
+function drawImgNormal(name, x, y, mask) {
   let p = dh / 10;
   let img = getImg(name);
+  // let img = getImg(name, x, y, mask[0]);
   // ctx.drawImage(img, x * dh-p + shiftX, y * dh-p, dh +2*p, dh+2*p);
   ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
 }
