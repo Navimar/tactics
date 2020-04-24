@@ -49,14 +49,39 @@ exports.worm = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		if (game.spoil[i].name == 'worm' && game.spoil[i].team == game.turn) {
 			let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-			if (game.spoil[i].data.unit != unit) {
-				en.death(game, unit);
-				en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
+			if (en.isAlive(game, game.spoil[i].data.unit )){
+				if (game.spoil[i].data.unit != unit) {
+					en.death(game, unit);
+					en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
+				}
 			}
 			game.spoil.splice(i, 1)
 		}
 	}
 }
+exports.landmine = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		if (game.spoil[i].name == 'landmine' && game.spoil[i].team == game.turn) {
+			en.addUnit(game, 'landmine', game.spoil[i].x, game.spoil[i].y, game.spoil[i].team);
+			game.spoil.splice(i, 1)
+		}
+	}
+}
+
+exports.landmineexplosion = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		let sp = game.spoil[i];
+		if (sp.name == 'landmine') {
+			let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
+			if (u) {
+				en.death(game, u);
+				en.addUnit(game, 'landmine', game.spoil[i].x, game.spoil[i].y, game.spoil[i].team);
+				game.spoil.splice(i, 1);
+			}
+		}
+	}
+}
+
 exports.frog = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('frog')

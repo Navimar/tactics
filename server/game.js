@@ -7,6 +7,8 @@ const player = require('./player');
 const generator = require('./generator');
 const rules = require('./rules');
 const _ = require('lodash');
+const bot = require('./bot');
+
 
 
 exports.new = (p1, p2) => {
@@ -36,16 +38,9 @@ let creategame = (p1, p2) => {
     leftturns: 14,
     started: time.clock(),
     sticker: [],
-    spoil:[],
+    spoil: [],
     finished: false,
     chooseteam: true,
-    end: (pn) => {
-      if (!game.sandbox) {
-        pn--;
-        if (pn == 0) player.wins(p1, p2)
-        if (pn == 1) player.wins(p2, p1)
-      }
-    }
   }
   return game;
 }
@@ -79,25 +74,39 @@ exports.order = (game, p, u, akt) => {
 
       //onOrder
       rules.slime(game);
-      rules.capture(game);
       rules.spill(game);
       rules.split(game, unit, akt)
+      rules.landmineexplosion(game);
+      rules.capture(game);
       rules.fireend(game);
 
       send.data(game);
     }
   }
 }
+let endgame = (game, winner) => {
+  game.finished = true;
+  game.winner = winner;
+  let words = ['Вы победили.', 'Вы проиграли.']
+
+  if (!game.sandbox) {
+    let pn = winner - 1;
+    if (pn == 0) player.wins(p1, p2)
+    if (pn == 1) player.wins(p2, p1)
+    send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank, bot);
+    send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[0].rank, bot);
+  }
+  if (winner == 2)
+    words = words.reverse()
+  
+}
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
-    game.finished = true
     if (p == 1) {
-      game.winner = 2;
-      game.end(2);
+      endgame(game,2);
     }
     else {
-      game.winner = 1;
-      game.end(1);
+      endgame(game,1);
     }
     send.data(game);
   }
@@ -132,13 +141,10 @@ exports.endturn = (game, p) => {
       }
     }
     if (flag1 > flag2) {
-      game.winner = 1
-      game.end(1);
+      endgame(game,1);
     } else {
-      game.winner = 2
-      game.end(2);
+      endgame(game,2);
     }
-    game.finished = true
   }
   if (game && !game.finished) {
     let one, two
@@ -153,14 +159,10 @@ exports.endturn = (game, p) => {
       }
     });
     if (!one && two) {
-      game.winner = 2
-      game.finished = true
-      game.end(2);
+      endgame(game,2);
     }
     if (one && !two) {
-      game.finished = true
-      game.winner = 1;
-      game.end(1);
+      endgame(game,1);
     }
     if (!one && !two) {
       cnFlag();
@@ -184,16 +186,19 @@ exports.endturn = (game, p) => {
     rules.telepath(game);
     rules.frog(game);
     rules.aerostat(game);
+    rules.landmine(game);
     rules.worm(game);
     rules.firestt(game);
     rules.splitOnEndturn(game)
 
-    
+
 
     rules.slime(game);
     rules.capture(game);
     rules.spill(game);
     rules.fireend(game);
+    rules.landmineexplosion(game);
+
 
     send.data(game);
   }

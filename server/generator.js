@@ -83,7 +83,7 @@ exports.new = () => {
   let neutralarr = []
   let orangearr = []
   let bluearr = []
-  let nq = _.random(7)
+  let nq = _.random(9)
   let maxunit = 91;
   let maxpop = 3;
 

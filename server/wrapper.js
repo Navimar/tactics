@@ -51,6 +51,9 @@ module.exports = (game, me, target) => {
     unitInPoint: (x, y) => {
       return en.unitInPoint(game, x, y);
     },
+    spoilInPoint: (x, y) => {
+      return en.spoilInPoint(game, x, y);
+    },
     tire: () => {
       me.isReady = false;
       me.isActive = false;

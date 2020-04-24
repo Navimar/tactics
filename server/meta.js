@@ -294,7 +294,7 @@ exports.telepath = {
   }
 }
 exports.spliter = {
-  weight: 40,
+  weight: 10,
   life: 3,
   img: 'spliter',
   akt: (akt) => {
@@ -431,8 +431,41 @@ exports.worm = {
     return akts;
   },
   worm: (wd) => {
-    wd.spoil('worm', wd.target.x, wd.target.y, { unit: wd.me }, wd.me.team)
+    // for (i = wd.game.spoil.length; i--; i > 0) {
+    //   if (wd.game.spoil[i].name == 'worm'
+    //     && wd.game.spoil[i].data.unit == wd.me
+    //     && wd.game.spoil[i].team == wd.game.turn
+    //   ) {
+    //     console.log(wd.game.spoil[i].data.unit)
+    //     console.log(wd.me)
+    //     wd.game.spoil.splice(i, 1)
+    //   }
+    // }
+    wd.spoil('worm', wd.target.x, wd.target.y, { unit: wd.me }, wd.game.turn)
     wd.tire();
+  }
+}
+
+exports.landmine = {
+  weight: 30,
+  life: 3,
+  img: 'landmine',
+  akt: (akt) => {
+    let akts = akt.move()
+    akts.forEach(e => e.img = 'landmine');
+    akts = akts.filter(a => {
+      let sarr = en.spoilInPoint(akt.game, a.x, a.y).filter(s => {
+        return s.name == 'landmine'
+      });
+      if (sarr.length > 0)
+        return false
+      return true
+    });
+    return akts;
+  },
+  landmine: (wd) => {
+    wd.spoil('landmine', wd.target.x, wd.target.y, false, wd.me.team)
+    wd.kill(wd.me.x, wd.me.y);
   }
 }
 
@@ -519,7 +552,6 @@ exports.slime = {
 
 exports.bear = {
   weight: 100,
-
   life: 3,
   img: 'bear',
   akt: (akt) => {

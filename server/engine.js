@@ -28,13 +28,15 @@ en.isOccupied = (game, x, y) => {
 en.unitInPoint = (game, x, y) => {
   return game.unit.filter(u => u.x == x && u.y == y)[0];
 }
+en.spoilInPoint = (game, x, y) => {
+  return game.spoil.filter(u => u.x == x && u.y == y);
+}
 en.fieldInPoint = (game, x, y) => {
   return game.field[x][y]
 }
 en.death = (game, unit) => {
   if (unit) {
     game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
-
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 }
@@ -74,7 +76,10 @@ en.damage = (game, unit, d) => {
     // require('./send').logicerror(game, 'damage cant find the unit')
   }
 }
-
+en.isAlive = (game, unit) => {
+  if (game.unit.indexOf(unit) >= 0)
+    return true
+}
 en.move = (game, unit, x, y) => {
   if (unit) {
     game.trail.push({ img: 'move', x: unit.x, y: unit.y });
