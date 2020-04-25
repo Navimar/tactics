@@ -90,23 +90,29 @@ let endgame = (game, winner) => {
   let words = ['Вы победили.', 'Вы проиграли.']
 
   if (!game.sandbox) {
+    let dif0 = game.players[0].rank
+    let dif1 = game.players[1].rank
     let pn = winner - 1;
-    if (pn == 0) player.wins(p1, p2)
-    if (pn == 1) player.wins(p2, p1)
-    send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank, bot);
-    send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[0].rank, bot);
+    if (pn == 0) player.wins(game.players[0], game.players[1])
+    if (pn == 1) player.wins(game.players[1], game.players[0])
+    dif0 = game.players[0].rank - dif0
+    dif1 = game.players[1].rank - dif1
+    if (dif0 > 0) dif0 = '+' + dif0
+    if (dif1 > 0) dif1 = '+' + dif1
+    send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
+    send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }
   if (winner == 2)
     words = words.reverse()
-  
+
 }
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
     if (p == 1) {
-      endgame(game,2);
+      endgame(game, 2);
     }
     else {
-      endgame(game,1);
+      endgame(game, 1);
     }
     send.data(game);
   }
@@ -141,9 +147,9 @@ exports.endturn = (game, p) => {
       }
     }
     if (flag1 > flag2) {
-      endgame(game,1);
+      endgame(game, 1);
     } else {
-      endgame(game,2);
+      endgame(game, 2);
     }
   }
   if (game && !game.finished) {
@@ -159,10 +165,10 @@ exports.endturn = (game, p) => {
       }
     });
     if (!one && two) {
-      endgame(game,2);
+      endgame(game, 2);
     }
     if (one && !two) {
-      endgame(game,1);
+      endgame(game, 1);
     }
     if (!one && !two) {
       cnFlag();

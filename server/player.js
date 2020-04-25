@@ -22,8 +22,8 @@ exports.byId = (id) => {
 }
 
 exports.wins = (winner, loser) => {
-    winner.rank = Math.ceil(winner.rank + loser.rank * 0.03 * (1 - winner.rank / 100000) + 1)
-    loser.rank = Math.floor(loser.rank * 0.97);
+    winner.rank = Math.ceil(winner.rank + loser.rank * 3/100 * (1 - winner.rank / 100000) + 1)
+    loser.rank = Math.floor(loser.rank * 97/100);
     fs.writeFile('data/' + winner.id, winner.rank, function (err) {
         if (err) throw err;
     });
