@@ -88,7 +88,8 @@ let endgame = (game, winner) => {
   game.finished = true;
   game.winner = winner;
   let words = ['Вы победили.', 'Вы проиграли.']
-
+  if (winner == 2)
+    words = words.reverse()
   if (!game.sandbox) {
     let dif0 = game.players[0].rank
     let dif1 = game.players[1].rank
@@ -102,8 +103,7 @@ let endgame = (game, winner) => {
     send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
     send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }
-  if (winner == 2)
-    words = words.reverse()
+  
 
 }
 exports.surrender = (game, p) => {
