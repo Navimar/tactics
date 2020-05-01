@@ -14,7 +14,7 @@ exports.main = (io) => {
         return this;
     };
 
-    test();
+    // test();
     input.tick();
     input.socket(io);
     input.bot();

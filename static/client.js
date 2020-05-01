@@ -187,14 +187,11 @@ let render = () => {
         drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
       else
         if (data.field[x][y] == 'water') {
-
           drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
           drawImgNormal('drawn', x, y, fieldmask[x][y]);
-
         }
-
         else
-          drawProp(u.img, u.x, u.y - 0.18, u.m, u.color, u.isReady, u.isActive, 18);
+          drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive, 18);
       // drawLife(u.life, u.x, u.y);
 
       if (u.sticker)
@@ -277,11 +274,10 @@ let renderpanel = () => {
   }
   if (data.finished) {
     drawSize('rematch', c[3][0], c[3][1], 2, 2)
-
   } else {
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
-
   }
+
   if (data.turn) {
     drawSize('turn', c[0][0], c[0][1], 2, 2)
   } else {
@@ -307,6 +303,16 @@ let renderpanel = () => {
     team2 -= team1;
     team1 -= team1
   }
+
+  let arr = [];
+  data.unit.forEach((u) => {
+    if (u.color == 1 && u.isReady && !u.isActive) {
+      arr.push(u);
+    }
+  });
+  drawSize('next', c[1][0], c[1][1], 2, 2)
+  drawTxt(arr.length + '', c[1][0] + 1, c[1][1] + 1.5, '#222')
+
   if (data.win == 'win') {
     drawSize('win', c[1][0], c[1][1], 2, 2)
   }
@@ -315,9 +321,6 @@ let renderpanel = () => {
   }
   // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
   // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
-
-
-
 
   if (data.bonus == 'choose') {
     let i = 0;
@@ -434,43 +437,58 @@ let onMouseDown = () => {
       if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
         endturn();
       }
-      else {
-        if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
-          local.unit = getUnit(mouseCell.x, mouseCell.y);
-          if (!local.unit) {
-            let arr = [];
-            data.unit.forEach((u) => {
-              if (u.color == 1 && u.isReady) {
-                arr.push(u);
-              }
-            });
-            if (arr[nextunit] && local.unit != arr[nextunit]) {
-              local.unit = arr[nextunit];
-              nextunit++;
-            } else {
-              nextunit = 0;
-              local.unit = arr[nextunit];
-              nextunit++;
-            }
+      else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 2 && mouseCell.x < 4) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 2 && mouseCell.y < 4))) {
+        let arr = [];
+        data.unit.forEach((u) => {
+          if (u.color == 1 && u.isReady) {
+            arr.push(u);
           }
-          else if (local.unit.color == 3 && !local.unit.canMove) {
-            local.unit = false;
-            tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
-          }
+        });
+        if (arr[nextunit] && local.unit != arr[nextunit]) {
+          local.unit = arr[nextunit];
+          nextunit++;
         } else {
-          local.unit = false;
+          nextunit = 0;
+          local.unit = arr[nextunit];
+          nextunit++;
         }
       }
+      else if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
+        let gu = getUnit(mouseCell.x, mouseCell.y);
+        if (gu) local.unit = gu
+        //если выделил пустоту
+        else {
+          // let arr = [];
+          // data.unit.forEach((u) => {
+          //   if (u.color == 1 && u.isReady) {
+          //     arr.push(u);
+          //   }
+          // });
+          // if (arr[nextunit] && local.unit != arr[nextunit]) {
+          //   local.unit = arr[nextunit];
+          //   nextunit++;
+          // } else {
+          //   nextunit = 0;
+          //   local.unit = arr[nextunit];
+          //   nextunit++;
+          // }
+        }
+      } else {
+        //нажал на себя
+        local.unit = false;
+      }
+      leftclickcn++
       // local.focus = false;
       // local.akt = [];
-
+      if (local.unit && local.unit.color == 3 && !local.unit.canMove) {
+        local.unit = false;
+        tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
+      }
       if (local.unit && !local.unit.isReady) {
         tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
-
         //     local.akt = local.unit.akt;
         //     local.focus = { x: unit.x, y: unit.y };
       }
-      leftclickcn++
       if (leftclickcn == 5) {
         let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
         if (mobile)

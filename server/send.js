@@ -10,7 +10,7 @@ exports.web = (p, game) => {
 }
 
 exports.bot = (id, text, bot) => {
-  bot.sendMessage(id, text);
+  bot.telegram.sendMessage(id, text)
 };
 
 exports.wrongId = (socket, id) => {

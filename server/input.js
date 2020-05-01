@@ -83,8 +83,6 @@ input.socket = (io) => {
 };
 
 input.bot = () => {
-    // Create a bot that uses 'polling' to fetch new updates
-
     bot.on('text', msg => {
         handle.bot(msg, bot);
     });

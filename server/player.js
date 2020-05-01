@@ -1,19 +1,22 @@
 const fs = require('fs');
 const sha = require("sha256");
-const player = [];
+const config = require('./config');
 
-exports.register = (id) => {
+const playerArr = [];
+
+let player = {}
+player.register = (id) => {
     let p = { id, rank: 1000, socket: false, key: false }
     fs.readFile('data/' + p.id, 'utf8', function (err, data) {
         if (data) {
             p.rank = parseInt(data);
         }
     });
-    player.push(p);
+    playerArr.push(p);
     return p;
 }
-exports.byId = (id) => {
-    for (let p of player) {
+player.byId = (id) => {
+    for (let p of playerArr) {
         if (p.id == id) {
             return p;
         }
@@ -21,9 +24,9 @@ exports.byId = (id) => {
     return false;
 }
 
-exports.wins = (winner, loser) => {
-    winner.rank = Math.ceil(winner.rank + loser.rank * 3/100 * (1 - winner.rank / 100000) + 1)
-    loser.rank = Math.floor(loser.rank * 97/100);
+player.wins = (winner, loser) => {
+    winner.rank = Math.ceil(winner.rank + loser.rank * 3 / 100 * (1 - winner.rank / 100000) + 1)
+    loser.rank = Math.floor(loser.rank * 97 / 100);
     fs.writeFile('data/' + winner.id, winner.rank, function (err) {
         if (err) throw err;
     });
@@ -32,8 +35,8 @@ exports.wins = (winner, loser) => {
     });
 }
 
-exports.bySocket = (socket) => {
-    for (let p of player) {
+player.bySocket = (socket) => {
+    for (let p of playerArr) {
         if (p.socket == socket) {
             return p;
         }
@@ -41,21 +44,24 @@ exports.bySocket = (socket) => {
     return false
 }
 
-exports.setSocket = (id, socket) => {
-    for (let p of player) {
+player.setSocket = (id, socket) => {
+    for (let p of playerArr) {
         if (p.id == id) {
             p.socket = socket;
             return p;
         }
     }
-    player.push({ id, socket });
+    playerArr.push({ id, socket });
 }
 
-exports.setKey = (p) => {
+player.setKey = (p) => {
     const token = GenerateToken();
     p.key = sha(token);
     return token;
 };
+player.link = (p, game) => {
+    return (config.ip + ":" + config.port + "/?id=" + p.id + "&key=" + player.setKey(p) + 'u')
+}
 
 function GenerateToken(stringLength) {
     // set the length of the string
@@ -75,3 +81,4 @@ function GenerateToken(stringLength) {
     }
     return rndString;
 }
+module.exports = player;

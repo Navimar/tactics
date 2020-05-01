@@ -408,8 +408,8 @@ exports.plant = {
   // },
   plant: (wd) => {
     let u = wd.addUnit('plantik', 2)
+    if(u)
     u.isReady = false;
-
     wd.tire();
   }
 }

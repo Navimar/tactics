@@ -46,6 +46,15 @@ function inputMouse() {
     window.addEventListener('resize', afterOrientationChange);
   });
 
+  // canvas.addEventListener('gestureend', function (e) {
+  //   console.log('gesture evt')
+  //   console.log(e)
+  //   if (e.scale < 1.0) {
+  //     // User moved fingers closer together
+  //   } else if (e.scale > 1.0) {
+  //     // User moved fingers further apart
+  //   }
+  // }, false);
 
   canvas.addEventListener("touchstart", e => {
     mobile = true;
@@ -56,6 +65,7 @@ function inputMouse() {
     }
     tapTime = local.time;
     tapDown = true;
+    // drawImgNormal('tap', mouseCell.x, mouseCell.y);
     e.preventDefault();
   }, false);
   canvas.addEventListener("touchend", e => {

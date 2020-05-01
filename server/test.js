@@ -14,9 +14,11 @@ let socket = {
 }
 let answer;
 let bot = {
-    sendMessage: (id, text) => {
-        answer = { id, text };
-        // console.log('answer', answer);
+    telegram: {
+        sendMessage: (id, text) => {
+            answer = { id, text };
+            // console.log('answer', answer);
+        }
     }
 }
 module.exports = () => {

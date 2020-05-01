@@ -67,19 +67,22 @@ exports.socket = (socket, e, msg) => {
   }
 };
 
-exports.bot = (msg, bot) => {
-  // console.log(msg);
-  let id = msg.from.id;
-  let text = msg.text;
+exports.bot = (ctx, bot) => {
+  let id = ctx.message.chat.id;
+  let text = ctx.message.text;
   let p = player.byId(id);
   if (!p) {
     p = player.register(id);
   }
-  if (text == '/play') {
+  if (text == '/start') {
+    send.bot(id, 'Добро пожаловать в Unitcraft. Вам представился шанс продемонстрировать всю глубину тактической мысли игрокам со всего света.\nВызовите /help, чтобы увидеть полный список команд.', bot);
+
+  }
+  else if (text == '/play' || text == '/games') {
     if (p.game) {
-      send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
+      send.bot(id, `Список активных игр:\n${config.ip}:` + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
     } else {
-      send.bot(id, 'нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot);
+      send.bot(id, 'Нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot);
     }
   }
   else if (text == '/find') {
@@ -88,17 +91,17 @@ exports.bot = (msg, bot) => {
   else if (text == '/sandbox') {
     game.new(p, p)
     p.game.sandbox = true;
-    send.bot(id, config.ip + ":" + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
+    send.bot(id, `Пройдите по ссылке, чтобы начать игру с самим собой:\n` + player.link(p), bot);
   }
   else if (text == '/cancel') {
     queue.cancel(p)
-    send.bot(id, 'поиск отменен');
+    send.bot(id, 'поиск отменен',bot);
   }
   else if (text == '/rank') {
     send.bot(id, 'Ваш ранг ' + p.rank, bot);
 
   }
   else {
-    send.bot(id, '/sandbox чтобы играть самому с собой\n/find чтобы найти соперника\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг', bot)
+    send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг', bot)
   }
 };
