@@ -1,5 +1,6 @@
 const input = require('./input');
 const test = require('./test');
+const meta = require('./meta');
 
 exports.main = (io) => {
 
@@ -13,8 +14,22 @@ exports.main = (io) => {
         }
         return this;
     };
+    let i = 0;
 
-    // test();
+    let arr = []
+    Object.keys(meta).forEach(function (key) {
+        arr.push({
+            name: key, rank: meta[key].rank
+        });
+    });
+    arr = arr.sort((a, b) => { return a.rank - b.rank })
+  arr.forEach((e) => {
+        if (meta[e.name].weight > 0) {
+            i++
+            console.log(i, e.name, e.rank)
+        }
+    });
+
     input.tick();
     input.socket(io);
     input.bot();

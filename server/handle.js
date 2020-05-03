@@ -10,6 +10,7 @@ exports.socket = (socket, e, msg) => {
   if (e == 'login') {
     if (!msg.id) {
       p = player.register(0);
+      p.rank = 999999;
       p.socket = socket;
       game.new(p, p);
       p.game.sandbox = true;
@@ -37,8 +38,8 @@ exports.socket = (socket, e, msg) => {
   }
   if (e == 'order') {
     let p = player.bySocket(socket);
-    if (p && p.number) {
-      game.order(p.game, p.number, msg.unit, msg.akt);
+    if (p) {
+      game.order(p.game, msg.unit, msg.akt);
     }
   }
   if (e == 'bonus') {
@@ -95,7 +96,7 @@ exports.bot = (ctx, bot) => {
   }
   else if (text == '/cancel') {
     queue.cancel(p)
-    send.bot(id, 'поиск отменен',bot);
+    send.bot(id, 'поиск отменен', bot);
   }
   else if (text == '/rank') {
     send.bot(id, 'Ваш ранг ' + p.rank, bot);

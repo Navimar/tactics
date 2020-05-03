@@ -4,21 +4,21 @@ const en = require('./engine');
 // const barraks = require('./barraks');
 const _ = require('lodash');
 
-let barraks = [];
-Object.keys(meta).forEach(function (key) {
-  if (!meta[key].neutral)
-    _.times(meta[key].weight, () => barraks.push(key));
-});
-let neutrals = [];
-Object.keys(meta).forEach(function (key) {
-  if (meta[key].neutral)
-    _.times(meta[key].weight, () => neutrals.push(key));
-});
+exports.new = (rank) => {
+  let barraks = [];
+  Object.keys(meta).forEach(function (key) {
+    if (!meta[key].neutral && meta[key].rank<=rank)
+      _.times(meta[key].weight, () => barraks.push(key));
+  });
+  let neutrals = [];
+  Object.keys(meta).forEach(function (key) {
+    if (meta[key].neutral && meta[key].rank <= rank)
+      _.times(meta[key].weight, () => neutrals.push(key));
+  });
 
-exports.new = () => {
   let makeUnit = (tp, x, y, team) => {
-    let life = meta[tp].life;
-    return en.makeUnit(tp, x, y, team, life)
+    // let life = meta[tp].life;
+    return en.makeUnit(tp, x, y, team)
   }
   let rndUnit = () => {
     return _.sample(barraks);

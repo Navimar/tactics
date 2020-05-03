@@ -6,7 +6,7 @@ const playerArr = [];
 
 let player = {}
 player.register = (id) => {
-    let p = { id, rank: 1000, socket: false, key: false }
+    let p = { id, rank: 0, socket: false, key: false }
     fs.readFile('data/' + p.id, 'utf8', function (err, data) {
         if (data) {
             p.rank = parseInt(data);
@@ -25,7 +25,7 @@ player.byId = (id) => {
 }
 
 player.wins = (winner, loser) => {
-    winner.rank = Math.ceil(winner.rank + loser.rank * 3 / 100 * (1 - winner.rank / 100000) + 1)
+    winner.rank = Math.ceil(winner.rank + loser.rank * 3 / 100 * (1 - winner.rank / 100000) + 10)
     loser.rank = Math.floor(loser.rank * 97 / 100);
     fs.writeFile('data/' + winner.id, winner.rank, function (err) {
         if (err) throw err;

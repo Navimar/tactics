@@ -20,13 +20,15 @@ exports.new = (p1, p2) => {
   return game;
 }
 let creategame = (p1, p2) => {
-  let data = generator.new();
+  let data = generator.new(Math.min(p1.rank, p2.rank));
   let game = {
     players: [p1, p2],
     fisher: [120, 120],
+    gold: [0, 0],
     trail: [],
     lastturntime: [],
-    bonus: [null, p2.rank, p1.rank],
+    // bonus: [null, p2.rank, p1.rank],
+    bonus: [null, null, null],
     unit: data.unit,
     field: data.field,
     turn: (() => {
@@ -41,47 +43,66 @@ let creategame = (p1, p2) => {
     spoil: [],
     finished: false,
     chooseteam: true,
+    // chooseteam: false,
   }
   return game;
 }
-exports.order = (game, p, u, akt) => {
+exports.order = (game, u, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
   if (game && !game.finished) {
     fisher(game);
     game.trail = [];
-    let unit = en.unitInPoint(game, u.x, u.y);
-    if (unit) {
 
-      if (game.chooseteam) addbonus(game, unit)
+    // console.log(akt.img)
 
+    if (akt.img == 'build') {
+      console.log('build')
+      let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
+      newu.isReady = false;
+      game.gold[game.turn - 1] -= 5;
       game.unit.forEach(u => {
-        // console.log(u.energy,u.isReady)
-        u.isActive = false;
-        if (u.energy < 3 && u != unit && u.isReady) {
+        if (u.energy < 3 && u.isReady) {
           wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
           //onTire
           rules.frog(game);
           rules.aerostat(game);
         }
       });
-      unit.isActive = true;
-      if (unit.x - akt.x > 0) {
-        unit.m = true;
-      } else if (unit.x - akt.x < 0) {
-        unit.m = false;
+    } else {
+      let unit = en.unitInPoint(game, u.x, u.y);
+      if (unit) {
+
+        if (game.chooseteam) addbonus(game, unit)
+
+        game.unit.forEach(u => {
+          // console.log(u.energy,u.isReady)
+          u.isActive = false;
+          if (u.energy < 3 && u != unit && u.isReady) {
+            wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+            //onTire
+            rules.frog(game);
+            rules.aerostat(game);
+          }
+        });
+        unit.isActive = true;
+        if (unit.x - akt.x > 0) {
+          unit.m = true;
+        } else if (unit.x - akt.x < 0) {
+          unit.m = false;
+        }
+        meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
+        rules.split(game, unit, akt)
       }
-      meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
-
-      //onOrder
-      rules.slime(game);
-      rules.spill(game);
-      rules.split(game, unit, akt)
-      rules.landmineexplosion(game);
-      rules.capture(game);
-      rules.fireend(game);
-
-      send.data(game);
     }
+    //onOrder
+    rules.slime(game);
+    rules.spill(game);
+    rules.landmineexplosion(game);
+    rules.capture(game);
+    rules.fireend(game);
+
+    send.data(game);
+
   }
 }
 let endgame = (game, winner) => {
@@ -103,7 +124,7 @@ let endgame = (game, winner) => {
     send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
     send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }
-  
+
 
 }
 exports.surrender = (game, p) => {
@@ -136,22 +157,19 @@ exports.rematch = (p) => {
 exports.endturn = (game, p) => {
 
   function cnFlag() {
-    let flag1 = 0
-    let flag2 = 0;
+    let flag = [0, 0]
     for (let x = 0; x < 9; x++) {
       for (let y = 0; y < 9; y++) {
         if (game.field[x][y] == 'team1')
-          flag1++;
+          flag[0]++
         if (game.field[x][y] == 'team2')
-          flag2++
+          flag[1]++
       }
     }
-    if (flag1 > flag2) {
-      endgame(game, 1);
-    } else {
-      endgame(game, 2);
-    }
+    game.gold[game.turn - 1] += flag[game.turn - 1];
+    return flag
   }
+
   if (game && !game.finished) {
     let one, two
     game.unit.forEach(u => {
@@ -171,12 +189,22 @@ exports.endturn = (game, p) => {
       endgame(game, 1);
     }
     if (!one && !two) {
-      cnFlag();
+      let flag = cnFlag();
+      if (flag[0] > flag[1]) {
+        endgame(game, 1);
+      } else {
+        endgame(game, 2);
+      }
     }
 
     game.leftturns--;
     if (game.leftturns == 0) {
-      cnFlag();
+      let flag = cnFlag();
+      if (flag[0] > flag[1]) {
+        endgame(game, 1);
+      } else {
+        endgame(game, 2);
+      }
     } else {
       if (game.fisher[game.turn - 1] < 0) {
         // game.winner = game.turn == 1 ? 2 : 1;
@@ -185,6 +213,7 @@ exports.endturn = (game, p) => {
         game.fisher[game.turn - 1] += 120;
       }
     }
+    cnFlag()
     game.turn = game.turn == 1 ? 2 : 1;
     fisher(game)
 
@@ -197,14 +226,11 @@ exports.endturn = (game, p) => {
     rules.firestt(game);
     rules.splitOnEndturn(game)
 
-
-
     rules.slime(game);
     rules.capture(game);
     rules.spill(game);
     rules.fireend(game);
     rules.landmineexplosion(game);
-
 
     send.data(game);
     send.bot(game.players[game.turn - 1].id, 'Ваш ход!\n Если потеряли ссылку на игру вызовите команду /play', bot);
@@ -240,19 +266,21 @@ function addbonus(game, unit) {
         if (u.team == 2) u.team = 1;
     });
   }
-  if (game.bonus[3 - game.turn]) {
-    while (game.bonus[3 - game.turn] > 0) {
-      for (let x = 0; x < 9; x++) {
-        for (let y = 0; y < 9; y++) {
-          let u = en.unitInPoint(game, x, y);
-          if (u && game.bonus[3 - game.turn] > 0 && u.team != 3 && u.team != game.turn) {
-            u.life++ , game.bonus[3 - game.turn]--
-          }
-        }
-      }
-    }
-    game.bonus[game.turn] = 0;
-  }
+  game.gold[0] = game.bonus[1]
+  game.gold[1] = game.bonus[2]
+  // if (game.bonus[3 - game.turn]) {
+  //   while (game.bonus[3 - game.turn] > 0) {
+  //     for (let x = 0; x < 9; x++) {
+  //       for (let y = 0; y < 9; y++) {
+  //         let u = en.unitInPoint(game, x, y);
+  //         if (u && game.bonus[3 - game.turn] > 0 && u.team != 3 && u.team != game.turn) {
+  //           u.life++ , game.bonus[3 - game.turn]--
+  //         }
+  //       }
+  //     }
+  //   }
+  //   game.bonus[game.turn] = 0;
+  // }
   game.chooseteam = false;
 }
 

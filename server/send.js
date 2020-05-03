@@ -73,6 +73,10 @@ exports.data = (game) => {
         return arr
       })(),
       unit: [],
+      gold: (() => {
+        if (player == 1) return game.gold;
+        if (player == 2) return game.gold.slice().reverse();
+      })(),
       fisher: (() => {
         if (player == 1) return game.fisher;
         if (player == 2) return game.fisher.slice().reverse();

@@ -41,15 +41,15 @@ en.death = (game, unit) => {
   }
 }
 
-en.addUnit = (game, tp, x, y, team, life) => {
-  let u = en.makeUnit(tp, x, y, team, life)
+en.addUnit = (game, tp, x, y, team) => {
+  let u = en.makeUnit(tp, x, y, team)
   game.unit.push(u); return u;
 }
 en.addSpoil = (game, name, x, y, data, team) => {
   game.spoil.push({ name, data, x, y, team })
 }
 
-en.makeUnit = (tp, x, y, team, life) => {
+en.makeUnit = (tp, x, y, team) => {
   let m = x < 5 ? false : true;
   return {
     status: [],
@@ -62,7 +62,6 @@ en.makeUnit = (tp, x, y, team, life) => {
     y,
     data: {},
     team,
-    life,
   }
 }
 en.damage = (game, unit, d) => {
