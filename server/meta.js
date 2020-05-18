@@ -4,6 +4,7 @@ const _ = require('lodash');
 exports.warrior = {
   weight: 0,
   rank: 0,
+  class: 'none',
   life: 3,
   img: 'warrior',
   akt: (akt) => {
@@ -21,6 +22,7 @@ exports.warrior = {
 exports.firebat = {
   weight: 100,
   rank: 80,
+  class: 'warrior',
   life: 3,
   img: 'firebat',
   akt: (akt) => {
@@ -51,6 +53,7 @@ exports.firebat = {
 exports.aerostat = {
   weight: 50,
   rank: 100,
+  class: 'spec',
   life: 3,
   img: 'aerostat',
   akt: (akt) => {
@@ -129,6 +132,7 @@ exports.aerostat = {
 exports.zombie = {
   weight: 100,
   rank: 50,
+  class: 'warrior',
   life: 3,
   img: 'zombie',
   akt: (akt) => {
@@ -154,6 +158,7 @@ exports.diger = {
   // life: 3,
   rank: 80,
   weight: 25,
+  class: 'spec',
   img: 'diger',
   akt: (akt) => {
     let akts = akt.freemove().concat(akt.hand('diger'))
@@ -186,6 +191,7 @@ exports.diger = {
 exports.glider = {
   weight: 0,
   life: 3,
+  class: 'spec',
   img: 'glider',
   akt: (akt) => {
     let akts = akt.hand('glider')
@@ -229,6 +235,7 @@ exports.mashroom = {
   neutral: true,
   rank: 0,
   weight: 10,
+  class: 'none',
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
@@ -245,6 +252,7 @@ exports.mashroom = {
 exports.pusher = {
   rank: 10,
   weight: 80,
+  class: 'archer',
   life: 3,
   img: 'pusher',
   akt: (akt) => {
@@ -273,6 +281,7 @@ exports.pusher = {
 exports.fountain = {
   neutral: true,
   rank: 70,
+  class: 'none',
   weight: 3,
   life: 3,
   img: 'fountain',
@@ -286,6 +295,7 @@ exports.fountain = {
 exports.telepath = {
   weight: 60,
   rank: 30,
+  class: 'spec',
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -304,6 +314,7 @@ exports.telepath = {
 exports.spliter = {
   weight: 10,
   rank: 145,
+  class: 'spec',
   life: 3,
   img: 'spliter',
   akt: (akt) => {
@@ -330,6 +341,7 @@ exports.hatchery = {
   weight: 20,
   life: 3,
   rank: 160,
+  class: 'spec',
   img: 'hatchery',
   akt: (akt) => {
     let akts = akt.move()
@@ -349,6 +361,7 @@ exports.bird = {
   weight: 50,
   rank: 20,
   life: 3,
+  class: 'spec',
   img: 'bird',
   akt: (akt) => {
     let akts = [];
@@ -399,6 +412,8 @@ exports.plant = {
   weight: 2,
   life: 3,
   rank: 60,
+  class: 'none',
+
   neutral: true,
   img: 'plant',
   akt: (akt) => {
@@ -419,7 +434,7 @@ exports.plant = {
   //   wd.tire();
   // },
   plant: (wd) => {
-    let u = wd.addUnit('plantik', 2)
+    let u = wd.addUnit('plantik', wd.target.x, wd.target.y,3)
     if (u)
       u.isReady = false;
     wd.tire();
@@ -429,6 +444,7 @@ exports.worm = {
   weight: 50,
   life: 3,
   rank: 100,
+  class: 'archer',
   img: 'worm',
   akt: (akt) => {
     let akts = [];
@@ -462,6 +478,7 @@ exports.worm = {
 exports.landmine = {
   weight: 30,
   rank: 115,
+  class: 'archer',
   life: 3,
   img: 'landmine',
   akt: (akt) => {
@@ -487,6 +504,7 @@ exports.plantik = {
   weight: 0,
   life: 3,
   img: 'plantik',
+  class: 'none',
   akt: (akt) => {
     // return [{ x: 5, y: 5, img: 'move' }]
     // return akt.move()
@@ -501,6 +519,7 @@ exports.plantik = {
 exports.kicker = {
   weight: 100,
   rank: 0,
+  class: 'warrior',
   life: 3,
   img: 'kicker',
   akt: (akt) => {
@@ -526,7 +545,7 @@ exports.kicker = {
 exports.slime = {
   weight: 25,
   rank: 130,
-  life: 3,
+  class: 'spec',
   img: 'slime',
   akt: (akt) => {
     // return [{ x: 5, y: 5, img: 'move' }]
@@ -568,6 +587,7 @@ exports.slime = {
 exports.bear = {
   rank: 40,
   weight: 100,
+  class: 'warrior',
   img: 'bear',
   akt: (akt) => {
     let akts = akt.move()
@@ -599,10 +619,10 @@ exports.bear = {
   }
 }
 
-
 exports.frog = {
   weight: 50,
   rank: 175,
+  class: 'archer',
   life: 3,
   img: 'frog',
   akt: (akt) => {

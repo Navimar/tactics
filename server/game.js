@@ -233,7 +233,9 @@ exports.endturn = (game, p) => {
     rules.landmineexplosion(game);
 
     send.data(game);
-    send.bot(game.players[game.turn - 1].id, 'Ваш ход!\n Если потеряли ссылку на игру вызовите команду /play', bot);
+
+    if (!game.sandbox)
+      send.bot(game.players[game.turn - 1].id, 'Ваш ход!\n Если потеряли ссылку на игру вызовите команду /play', bot);
   }
 }
 

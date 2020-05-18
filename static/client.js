@@ -408,7 +408,7 @@ let onUpdate = (val) => {
   // let unit = getUnit(mouseCell.x, mouseCell.y);
   // if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
   render();
-  if (allakts() == 0) {
+  if (allakts() == 0 && data.gold[0]<5) {
     endturn();
   }
 }

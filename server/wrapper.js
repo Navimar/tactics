@@ -11,7 +11,7 @@ module.exports = (game, me, target) => {
       let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y)
       let mf = en.fieldInPoint(game, me.x, me.y)
       let tf = en.fieldInPoint(game, target.x, target.y)
-      if ((mf != tf && mf.slice(0, -1) != 'team' && tf.slice(0, -1) != 'team') && tire == 1) {
+      if ((mf != tf && mf != 'water' && tf != 'water' && mf.slice(0, -1) != 'team' && tf.slice(0, -1) != 'team') && tire == 1) {
         tire = 3;
       }
       en.move(game, me, target.x, target.y);
