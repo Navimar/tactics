@@ -621,7 +621,7 @@ exports.bear = {
 
 exports.frog = {
   weight: 50,
-  rank: 175,
+  rank: 50,
   class: 'warrior',
   life: 3,
   img: 'frog',
