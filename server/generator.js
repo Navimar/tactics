@@ -5,11 +5,11 @@ const en = require('./engine');
 const _ = require('lodash');
 
 exports.new = (rank) => {
-  // let barraks = [];
-  // Object.keys(meta).forEach(function (key) {
-  //   if (!meta[key].neutral && meta[key].rank <= rank)
-  //     _.times(meta[key].weight, () => barraks.push(key));
-  // });
+  let barraks = [];
+  Object.keys(meta).forEach(function (key) {
+    if (!meta[key].neutral && meta[key].rank <= rank)
+      _.times(meta[key].weight, () => barraks.push(key));
+  });
   let warrior = [];
   let archer = [];
   let spec = [];
@@ -204,32 +204,32 @@ exports.new = (rank) => {
   orangearr = _.sampleSize(orangearr, 6);
 
 
-  let w = _.sample(warrior)
-  let a = _.sample(archer)
-  let s = _.sample(spec);
+  // let w = _.sample(warrior)
+  // let a = _.sample(archer)
+  // let s = _.sample(spec);
 
-  bluearr[0].tp = w;
-  bluearr[1].tp = w;
-  bluearr[2].tp = w;
-  bluearr[3].tp = a;
-  bluearr[4].tp = a;
-  bluearr[5].tp = s;
+  bluearr[0].tp = _.sample(warrior);
+  bluearr[1].tp = _.sample(warrior);
+  bluearr[2].tp = _.sample(warrior);
+  bluearr[3].tp = _.sample(archer);
+  bluearr[4].tp = _.sample(archer);
+  bluearr[5].tp = _.sample(spec);
 
-  w = _.sample(warrior);
-  a = _.sample(archer);
-  s = _.sample(spec);
+  // w = _.sample(warrior);
+  // a = _.sample(archer);
+  // s = _.sample(spec);
 
-  orangearr[0].tp = w;
-  orangearr[1].tp = w;
-  orangearr[2].tp = w;
-  orangearr[3].tp = a;
-  orangearr[4].tp = a;
-  orangearr[5].tp = s;
+  orangearr[0].tp = _.sample(warrior);
+  orangearr[1].tp = _.sample(warrior);
+  orangearr[2].tp = _.sample(warrior);
+  orangearr[3].tp = _.sample(archer);
+  orangearr[4].tp = _.sample(archer);
+  orangearr[5].tp = _.sample(spec);
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      
-      points.push({ x, y, tp: rndNeutral() });
+      if ((x < 1 || x > 2) && (x < 6 || x > 7) || y < 1 || y > 7)
+        points.push({ x, y, tp: rndNeutral() });
     }
   }
   points = _.sampleSize(points, _.random(9));

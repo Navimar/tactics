@@ -235,7 +235,7 @@ exports.endturn = (game, p) => {
     send.data(game);
 
     if (!game.sandbox)
-      send.bot(game.players[game.turn - 1].id, 'Ваш ход!\n Если потеряли ссылку на игру вызовите команду /play', bot);
+      send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
   }
 }
 

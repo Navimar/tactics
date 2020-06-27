@@ -84,7 +84,7 @@ exports.landmineexplosion = (game) => {
 
 exports.frog = (game) => {
 	game.unit.forEach((u) => {
-		u.status.remove('frog')
+		// u.status.remove('frog')
 		if (u.tp == 'frog')
 			u.data.lastjump = false;
 	});

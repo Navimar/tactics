@@ -130,9 +130,9 @@ exports.aerostat = {
 }
 
 exports.zombie = {
-  weight: 100,
+  weight: 0,
   rank: 50,
-  class: 'warrior',
+  class: 'none',
   life: 3,
   img: 'zombie',
   akt: (akt) => {
@@ -434,7 +434,7 @@ exports.plant = {
   //   wd.tire();
   // },
   plant: (wd) => {
-    let u = wd.addUnit('plantik', wd.target.x, wd.target.y,3)
+    let u = wd.addUnit('plantik', wd.target.x, wd.target.y, 3)
     if (u)
       u.isReady = false;
     wd.tire();
@@ -622,7 +622,7 @@ exports.bear = {
 exports.frog = {
   weight: 50,
   rank: 175,
-  class: 'archer',
+  class: 'warrior',
   life: 3,
   img: 'frog',
   akt: (akt) => {
@@ -655,8 +655,12 @@ exports.frog = {
     let x = (wd.target.x - wd.me.x) * 2
     let y = (wd.target.y - wd.me.y) * 2
     wd.go(x + wd.me.x, y + wd.me.y);
-    if (wd.target.unit.status.includes('frog'))
-      wd.kill(wd.target.unit);
+    if (wd.target.unit.status.includes('frog')) {
+      wd.target.unit.status.remove('frog')
+      wd.target.unit.tp = 'frog';
+      wd.changeTeam(wd.target.unit);
+      wd.target.unit.isReady = false;
+    }
     else
       wd.addStatus('frog');
   }
