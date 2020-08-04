@@ -2,6 +2,7 @@ const en = require('./engine');
 const _ = require('lodash');
 
 exports.warrior = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 0,
   rank: 0,
   class: 'none',
@@ -20,6 +21,8 @@ exports.warrior = {
 }
 
 exports.firebat = {
+ description: 'Жжот огоньком. У горящего юнита всего один ход, чтобы прыгнуть в воду, а иначе от него останется один только костер. Кто на костер встанет, тот и сам сгорит.',
+  name: 'Огнеметчик',
   weight: 100,
   rank: 80,
   class: 'warrior',
@@ -51,6 +54,8 @@ exports.firebat = {
 
 
 exports.aerostat = {
+  description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
+  name: 'Дерижабль',
   weight: 50,
   rank: 100,
   class: 'spec',
@@ -130,6 +135,7 @@ exports.aerostat = {
 }
 
 exports.zombie = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 0,
   rank: 50,
   class: 'none',
@@ -155,6 +161,7 @@ exports.zombie = {
 }
 
 exports.diger = {
+  name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
   // life: 3,
   rank: 80,
   weight: 25,
@@ -189,6 +196,7 @@ exports.diger = {
   }
 }
 exports.glider = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 0,
   life: 3,
   class: 'spec',
@@ -232,6 +240,8 @@ exports.glider = {
   }
 }
 exports.mashroom = {
+  name: 'Гриб',
+  description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
   neutral: true,
   rank: 0,
   weight: 10,
@@ -250,6 +260,8 @@ exports.mashroom = {
   }
 }
 exports.pusher = {
+  name: 'Толкатель',
+  description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
   rank: 10,
   weight: 80,
   class: 'archer',
@@ -279,6 +291,7 @@ exports.pusher = {
   }
 }
 exports.fountain = {
+  name: 'Фонтан', description: 'Разливает воду по низине в которой находится. Когда стоит на траве, то просто ждет случая оказаться в низине.',
   neutral: true,
   rank: 70,
   class: 'none',
@@ -293,6 +306,7 @@ exports.fountain = {
   },
 }
 exports.telepath = {
+  name: 'Внушитель', description: 'Заставляет юнита соперника выполнить любой приказ',
   weight: 60,
   rank: 30,
   class: 'spec',
@@ -312,6 +326,7 @@ exports.telepath = {
   }
 }
 exports.spliter = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 10,
   rank: 145,
   class: 'spec',
@@ -338,6 +353,7 @@ exports.spliter = {
   }
 }
 exports.hatchery = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 20,
   life: 3,
   rank: 160,
@@ -358,6 +374,7 @@ exports.hatchery = {
   }
 }
 exports.bird = {
+  name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
   weight: 50,
   rank: 20,
   life: 3,
@@ -409,6 +426,7 @@ exports.bird = {
 }
 
 exports.plant = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 2,
   life: 3,
   rank: 60,
@@ -441,6 +459,7 @@ exports.plant = {
   }
 }
 exports.worm = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 50,
   life: 3,
   rank: 100,
@@ -476,6 +495,7 @@ exports.worm = {
 }
 
 exports.landmine = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 30,
   rank: 115,
   class: 'archer',
@@ -501,6 +521,7 @@ exports.landmine = {
 }
 
 exports.plantik = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 0,
   life: 3,
   img: 'plantik',
@@ -519,6 +540,8 @@ exports.plantik = {
 exports.kicker = {
   weight: 100,
   rank: 0,
+  name: 'Пинатель',
+  description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
   class: 'warrior',
   life: 3,
   img: 'kicker',
@@ -543,6 +566,7 @@ exports.kicker = {
 }
 
 exports.slime = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 25,
   rank: 130,
   class: 'spec',
@@ -585,6 +609,7 @@ exports.slime = {
 }
 
 exports.bear = {
+  name: 'незаполнено', description: 'пока не придумал',
   rank: 40,
   weight: 100,
   class: 'warrior',
@@ -620,6 +645,7 @@ exports.bear = {
 }
 
 exports.frog = {
+  name: 'незаполнено', description: 'пока не придумал',
   weight: 50,
   rank: 50,
   class: 'warrior',

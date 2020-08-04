@@ -12,6 +12,9 @@ exports.web = (p, game) => {
 exports.bot = (id, text, bot) => {
   bot.telegram.sendMessage(id, text)
 };
+exports.botPhoto = (id, src, bot) => {
+  bot.telegram.sendPhoto(id, src)
+};
 
 exports.wrongId = (socket, id) => {
   socket.emit('login', 'wrong id ' + id);

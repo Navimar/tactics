@@ -1,6 +1,8 @@
 
 const player = require('./player');
 const game = require('./game');
+const meta = require('./meta');
+
 const queue = require('./queue');
 const send = require('./send.js');
 const config = require('./config');
@@ -75,6 +77,15 @@ exports.bot = (ctx, bot) => {
   if (!p) {
     p = player.register(id);
   }
+
+  let arr = []
+  Object.keys(meta).forEach(function (key) {
+    arr.push({
+      key, rank: meta[key].rank, name: meta[key].name
+    });
+  });
+  arr = arr.sort((a, b) => { return a.rank - b.rank })
+
   if (text == '/start') {
     send.bot(id, 'Добро пожаловать в Unitcraft. Вам представился шанс продемонстрировать всю глубину тактической мысли игрокам со всего света.\nВызовите /help, чтобы увидеть полный список команд.', bot);
 
@@ -99,10 +110,30 @@ exports.bot = (ctx, bot) => {
     send.bot(id, 'поиск отменен', bot);
   }
   else if (text == '/rank') {
-    send.bot(id, 'Ваш ранг ' + p.rank, bot);
+    let mes = 'Ваш ранг ' + p.rank
+    mes += '\n\nВам доступны юниты:';
+    arr.forEach((e) => {
+      if (meta[e.key].weight > 0) {
+        mes += '\n/' + e.key + ' ' + e.name
+      }
+    });
+    send.bot(id, mes, bot);
+  }
+  else if (text == '/tutorial') {
+    send.bot(id, 'Обучение пока не готово ¯\\_(ツ)_/¯\nНо я вам так расскажу. В общем это пошаговая игра. Просто ходите каждым юнитом в каждый свой ход и перебейте всех врагов :) Чтобы узнать способности юнитов и посмотреть какие юниты доступны на вашем ранге используйте команду /rank. Выигрывайте, чтобы открыть новых юнитов! В очереди на игру пока никого не водится, поэтому договаривайтесь об играх заранее, желающих сыграть можно найти в нашей группе @unitcraft', bot);
 
   }
   else {
-    send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг', bot)
+    let f = 1;
+    arr.forEach((e) => {
+      if (e.key == text.slice(1)) {
+        send.botPhoto(id, { source: __dirname + '/../img/' + e.key +'.png' }, bot )
+        send.bot(id, meta[e.key].description, bot)
+        f = 0
+      }
+    });
+    if (f) {
+      send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
+    }
   }
 };

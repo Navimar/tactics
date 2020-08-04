@@ -280,13 +280,26 @@ let renderpanel = () => {
   if (data.finished) {
     drawSize('rematch', c[3][0], c[3][1], 2, 2)
   } else {
+    // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
-  }
+  } 
 
-  if (data.turn) {
+
+  if (data.bonus == 'choose') {
+    drawSize('choose', c[0][0], c[0][1], 2, 2)
+  } else if (data.bonus == 'wait') {
+    drawSize('wait', c[0][0], c[0][1], 2, 2)
+  }
+  else if (data.turn) {
     drawSize('turn', c[0][0], c[0][1], 2, 2)
   } else {
     drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
+  }
+  if (data.win == 'win') {
+    drawSize('win', c[0][0], c[0][1], 2, 2)
+  }
+  if (data.win == 'defeat') {
+    drawSize('defeat', c[0][0], c[0][1], 2, 2)
   }
 
   drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
@@ -315,18 +328,14 @@ let renderpanel = () => {
     }
   });
   drawSize('next', c[1][0], c[1][1], 2, 2)
+
   drawTxt(arr.length + '', c[1][0] + 1, c[1][1] + 1.5, '#222')
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
   drawTxt(data.gold[0] + '', c[1][0] + 0.15, c[1][1] + 0.3, '#090')
   drawTxt(data.gold[1] + '', c[1][0] + 1 + 0.15, c[1][1] + 0.3, '#f00')
 
 
-  if (data.win == 'win') {
-    drawSize('win', c[1][0], c[1][1], 2, 2)
-  }
-  if (data.win == 'defeat') {
-    drawSize('defeat', c[1][0], c[1][1], 2, 2)
-  }
+
   // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
   // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
 
@@ -408,7 +417,7 @@ let onUpdate = (val) => {
   // let unit = getUnit(mouseCell.x, mouseCell.y);
   // if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
   render();
-  if (allakts() == 0 && data.gold[0]<5) {
+  if (allakts() == 0 && data.gold[0] < 5) {
     endturn();
   }
 }
@@ -438,7 +447,7 @@ let onMouseDown = () => {
         rematch();
       }
     }
-    else if (data.bonus == 'ready') {
+    else if (data.bonus == 'ready' && data.win != 'win' && data.win != 'defeat') {
       if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
         endturn();
       }

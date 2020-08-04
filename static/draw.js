@@ -61,12 +61,15 @@ function drawTxt(txt, x, y, color, font) {
   ctx.font = font;
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
+
   wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 4, 25);
 
   // drawBubble(x, y, px, py);
 
   function wrapText(context, text, marginLeft, marginTop, maxWidth, lineHeight) {
-    function dt() {
+    let lines = 1
+    let originalmarginttop = marginTop
+    function dt(line) {
       ctx.fillStyle = color;
       for (let blx = 1; blx <= 3; blx++) {
         for (let bly = 1; bly <= 3; bly++) {
@@ -83,27 +86,38 @@ function drawTxt(txt, x, y, color, font) {
       context.fillText(line, marginLeft, marginTop);
     }
     // console.log(text);
-    let words = text.split(" ");
-    let countWords = words.length;
-    let line = "";
-    for (let n = 0; n < countWords; n++) {
-      let testLine = line + words[n] + " ";
-      let testWidth = context.measureText(testLine).width;
-      if (testWidth > maxWidth || words[n] === '\n') {
-        dt();
-        if (words[n] === '\n') {
-          line = words[n].slice(1);
-        } else {
-          line = words[n] + " ";
+    let doit = () => {
+      let words = text.split(" ");
+      let countWords = words.length;
+      let line = "";
+      for (let n = 0; n < countWords; n++) {
+        let testLine = line + words[n] + " ";
+        let testWidth = context.measureText(testLine).width;
+        if (testWidth > maxWidth || words[n] === '\n') {
+          dt(line);
+          if (words[n] === '\n') {
+            line = words[n].slice(1);
+          } else {
+            line = words[n] + " ";
+          }
+          marginTop += lineHeight;
+          lines++
         }
-        marginTop += lineHeight;
+        else {
+          line = testLine;
+        }
+        dt(line);
       }
-      else {
-        line = testLine;
-      }
-      dt();
     }
-
+    doit()
+    if (lines > 1) {
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = 'black';
+      ctx.fillRect(x * dh + shiftX - maxWidth * 0.02, y * dh + shiftY, maxWidth, lineHeight * lines * 1.1);
+      ctx.globalAlpha = 1.0;
+    }
+    marginTop = originalmarginttop
+    doit()
   }
 
   function drawBubble(x, y, px, py) {
