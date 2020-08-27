@@ -111,6 +111,7 @@ window.onload = function () {
   inputServer();
   step(new Date().getTime());
   login();
+  renderhtml();
 };
 
 
@@ -126,6 +127,22 @@ function step(lastTime) {
   // });
 }
 
+let renderhtml = (login) => {
+
+
+  //<span>Введите ваш ID</span> <br>
+  // document.getElementById('menu').innerHTML =`
+  // <input placeholder="Введите ваш ID" contenteditable="true" id='userid'></input><button>Войти</button> или <>добавьте бота телеграм!<br>
+  // <button>Получить ID</button>
+  // `
+  let html = `
+   <span>Чтобы зарегестрироваться и играть с другими игроками добавьте <a href="http://t.me/unitcraftbot">телеграм бота</a><br>
+   А также заходите в <a href="http://t.me/unitcraft">наш чат в телеграме</a></span>
+  `
+  if (login == 'success')
+     html = `Ваш ID ` + findGetParameter("id");
+  document.getElementById('menu').innerHTML = html;
+}
 
 let render = () => {
   resize();
@@ -282,7 +299,7 @@ let renderpanel = () => {
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
-  } 
+  }
 
 
   if (data.bonus == 'choose') {
@@ -391,6 +408,7 @@ let onLogin = (val) => {
     alert(val);
   } else {
     console.log('successful login')
+    renderhtml(val);
   }
   render();
 }

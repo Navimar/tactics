@@ -6,13 +6,33 @@ html {
     touch-action: manipulation;
     padding: 0;
     margin: 0;
+}
+
+canvas {
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
-    /*
-     Introduced in IE 10.
-     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-   */
     -ms-user-select: none;
     user-select: none;
+}
+
+#chatbro {
+    display: inline-block;
+    width: 50%;
+}
+
+#menu {
+    width: 50%;
+    display: inline-block;
+    color: white;
+    vertical-align:top;
+}
+
+a {
+    color: cyan !important
+}
+
+span {
+    font-family: verdana;
+    font-size: 12px;
 }
