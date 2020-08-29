@@ -98,6 +98,7 @@ exports.order = (game, u, akt) => {
     rules.slime(game);
     rules.spill(game);
     rules.landmineexplosion(game);
+    rules.eggcrack(game);
     rules.capture(game);
     rules.fireend(game);
 
@@ -222,6 +223,7 @@ exports.endturn = (game, p) => {
     rules.frog(game);
     rules.aerostat(game);
     rules.landmine(game);
+    rules.egg(game);
     rules.worm(game);
     rules.firestt(game);
     rules.splitOnEndturn(game)
@@ -231,6 +233,7 @@ exports.endturn = (game, p) => {
     rules.spill(game);
     rules.fireend(game);
     rules.landmineexplosion(game);
+    rules.eggcrack(game);
 
     send.data(game);
 

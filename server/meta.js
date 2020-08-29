@@ -19,6 +19,25 @@ exports.warrior = {
     wd.tire();
   }
 }
+exports.chiken = {
+  name: 'Уменьшитель', description: 'Превращает юнита в яйцо. В конце хода юнит благополучно вылупится обратно, если конечно никто его не раздавит раньше.',
+  weight: 100,
+  rank: 0,
+  class: 'warrior',
+  life: 3,
+  img: 'chiken',
+  akt: (akt) => {
+    return akt.move().concat(akt.hand('chiken'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  chiken: (wd) => {
+    wd.spoil('egg', wd.target.x, wd.target.y, { tp: wd.target.unit.tp, team: wd.target.unit.team }, 3)
+    wd.kill(wd.target.unit);
+    wd.tire();
+  }
+}
 
 exports.firebat = {
  description: 'Жжот огоньком. У горящего юнита всего один ход, чтобы прыгнуть в воду, а иначе от него останется один только костер. Кто на костер встанет, тот и сам сгорит.',
@@ -262,7 +281,7 @@ exports.mashroom = {
 exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
-  rank: 10,
+  rank: 20,
   weight: 80,
   class: 'archer',
   life: 3,
@@ -376,7 +395,7 @@ exports.hatchery = {
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
   weight: 50,
-  rank: 20,
+  rank: 30,
   life: 3,
   class: 'spec',
   img: 'bird',
@@ -495,7 +514,7 @@ exports.worm = {
 }
 
 exports.landmine = {
-  name: 'незаполнено', description: 'пока не придумал',
+  name: 'Мина', description: 'Выкапывается и уничтожает юнита, если он на нее наступил. Закапывается после каждого передвижения',
   weight: 30,
   rank: 115,
   class: 'archer',
@@ -539,7 +558,7 @@ exports.plantik = {
 }
 exports.kicker = {
   weight: 100,
-  rank: 0,
+  rank: 10,
   name: 'Пинатель',
   description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
   class: 'warrior',

@@ -68,6 +68,28 @@ exports.landmine = (game) => {
 	}
 }
 
+exports.egg = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		if (game.spoil[i].name == 'egg') {
+			en.addUnit(game, game.spoil[i].data.tp, game.spoil[i].x, game.spoil[i].y, game.spoil[i].data.team);
+			game.spoil.splice(i, 1)
+		}
+	}
+}
+
+exports.eggcrack = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		let sp = game.spoil[i];
+		if (sp.name == 'egg') {
+			let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
+			if (u) {
+				game.trail.push({ img: 'egg', x: game.spoil[i].x, y: game.spoil[i].y });
+				game.spoil.splice(i, 1);
+			}
+		}
+	}
+}
+
 exports.landmineexplosion = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		let sp = game.spoil[i];

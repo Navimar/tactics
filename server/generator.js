@@ -15,6 +15,7 @@ exports.new = (rank) => {
   let spec = [];
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank) {
+
       if (meta[key].class == 'warrior')
         warrior.push(key)
       if (meta[key].class == 'archer')
@@ -235,10 +236,10 @@ exports.new = (rank) => {
   points = _.sampleSize(points, _.random(9));
 
   bluearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'kicker', e.x, e.y, 1));
+    data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 1));
   });
   orangearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'kicker', e.x, e.y, 2));
+    data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 2));
   });
   points.forEach(e => {
     data.unit.push(makeUnit(e.tp, e.x, e.y, 3));
