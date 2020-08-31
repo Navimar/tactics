@@ -268,20 +268,34 @@ exports.mashroom = {
   life: 3,
   img: 'mashroom',
   akt: (akt) => {
-    return akt.move()
+    let akts = []
+    let points = en.allPoints();
+    points = points.filter(pt => en.isOccupied(akt.game, pt.x, pt.y))
+    points.forEach((pt) => {
+      if (pt.x != akt.me.x || pt.y != akt.me.y) {
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'change',
+        })
+      }
+    });
+    return akts;
   },
   move: (wd) => {
     wd.walk();
   },
-  mashroom: (wd) => {
-    wd.damage();
-    wd.tire();
+  change: (wd) => {
+    let x = wd.me.x
+    let y = wd.me.y
+    wd.kill(x, y);
+    wd.teleport(wd.target.x, wd.target.y, x, y)
   }
 }
 exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
-  rank: 20,
+  rank: 70,
   weight: 80,
   class: 'archer',
   life: 3,
@@ -303,7 +317,7 @@ exports.pusher = {
       i++
     }
     for (z = i; z--; z < 0) {
-      wd.teleport(wd.game, wd.target.x + x * z, wd.target.y + y * z, wd.target.x + x * (z + 1), wd.target.y + y * (z + 1))
+      wd.teleport(wd.target.x + x * z, wd.target.y + y * z, wd.target.x + x * (z + 1), wd.target.y + y * (z + 1))
     }
     wd.go(wd.target.x, wd.target.y)
     wd.me.energy--
@@ -327,7 +341,7 @@ exports.fountain = {
 exports.telepath = {
   name: 'Внушитель', description: 'Заставляет юнита соперника выполнить любой приказ',
   weight: 60,
-  rank: 30,
+  rank: 40,
   class: 'spec',
   life: 3,
   img: 'telepath',
@@ -373,10 +387,10 @@ exports.spliter = {
 }
 exports.hatchery = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 20,
+  weight: 0,
   life: 3,
   rank: 160,
-  class: 'spec',
+  class: 'none',
   img: 'hatchery',
   akt: (akt) => {
     let akts = akt.move()
@@ -395,7 +409,7 @@ exports.hatchery = {
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
   weight: 50,
-  rank: 30,
+  rank: 10,
   life: 3,
   class: 'spec',
   img: 'bird',
@@ -471,7 +485,7 @@ exports.plant = {
   //   wd.tire();
   // },
   plant: (wd) => {
-    let u = wd.addUnit('plantik', wd.target.x, wd.target.y, 3)
+    let u = wd.addUnit('mashroom', wd.target.x, wd.target.y, 3)
     if (u)
       u.isReady = false;
     wd.tire();
@@ -558,7 +572,7 @@ exports.plantik = {
 }
 exports.kicker = {
   weight: 100,
-  rank: 10,
+  rank: 50,
   name: 'Пинатель',
   description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
   class: 'warrior',
@@ -629,7 +643,7 @@ exports.slime = {
 
 exports.bear = {
   name: 'незаполнено', description: 'пока не придумал',
-  rank: 40,
+  rank: 20,
   weight: 100,
   class: 'warrior',
   img: 'bear',
@@ -666,7 +680,7 @@ exports.bear = {
 exports.frog = {
   name: 'незаполнено', description: 'пока не придумал',
   weight: 50,
-  rank: 50,
+  rank: 30,
   class: 'warrior',
   life: 3,
   img: 'frog',
