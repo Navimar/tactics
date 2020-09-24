@@ -116,9 +116,9 @@ exports.order = (game, u, akt) => {
     }
     //onOrder
     rules.dead(game);
-    rules.slime(game);
     rules.spill(game);
     rules.landmineexplosion(game);
+    rules.slime(game);
     rules.eggcrack(game);
     rules.capture(game);
     rules.fireend(game);

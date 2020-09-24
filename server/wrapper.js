@@ -42,6 +42,15 @@ module.exports = (game, me, target) => {
         en.death(game, en.unitInPoint(game, target.x, target.y));
       }
     },
+    disappear: (x, y) => {
+      if (x != undefined && y != undefined) {
+        en.disappear(game, en.unitInPoint(game, x, y));
+      } else if (x != undefined && y == undefined) {
+        en.disappear(game, en.unitInPoint(game, x.x, x.y));
+      } else {
+        en.disappear(game, en.unitInPoint(game, target.x, target.y));
+      }
+    },
     noenergy: () => {
       me.energy = 0;
     },

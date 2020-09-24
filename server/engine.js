@@ -41,6 +41,12 @@ en.death = (game, unit) => {
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 }
+en.disappear = (game, unit) => {
+  if (unit) {
+    // game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
+    game.unit.splice(game.unit.indexOf(unit), 1);
+  }
+}
 
 en.addUnit = (game, tp, x, y, team) => {
   let u = en.makeUnit(tp, x, y, team)

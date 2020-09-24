@@ -141,7 +141,7 @@ exports.aerostat = {
       wd.me.sticker = false;
     }
     wd.me.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
-    wd.kill(wd.target.unit);
+    wd.disappear(wd.target.unit);
 
     // wd.target.unit.small = true;
     wd.flywalk();
@@ -367,7 +367,7 @@ exports.telepath = {
   name: 'Внушитель', description: 'Заставляет юнита соперника выполнить любой приказ',
   weight: 60,
   rank: 40,
-  class: 'spec',
+  class: 'archer',
   life: 3,
   img: 'telepath',
   akt: (akt) => {
