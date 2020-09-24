@@ -9,17 +9,22 @@ const rules = require('./rules');
 const _ = require('lodash');
 const bot = require('./bot');
 
-
+let games = []
+let lastid = 0;
+exports.games = () => {
+  return games
+}
 
 exports.new = (p1, p2) => {
-  let game = creategame(p1, p2)
-  p1.game = game;
-  p1.number = 1
-  p2.game = game;
-  p2.number = 2
-  return game;
+  let game = creategame(p1, p2, lastid++)
+  games.push(game);
+  return game
 }
-let creategame = (p1, p2) => {
+
+let creategame = (p1, p2, id) => {
+  let sandbox = false
+  if (p1 == p2)
+    sandbox = true
   let data = generator.new(Math.min(p1.rank, p2.rank));
   let game = {
     players: [p1, p2],
@@ -30,6 +35,7 @@ let creategame = (p1, p2) => {
     // bonus: [null, p2.rank, p1.rank],
     bonus: [null, null, null],
     unit: data.unit,
+    deadPool:[],
     field: data.field,
     turn: (() => {
       if (p1.rank > p2.rank)
@@ -43,8 +49,22 @@ let creategame = (p1, p2) => {
     spoil: [],
     finished: false,
     chooseteam: true,
-    // chooseteam: false,
+    id,
+    sandbox,
+    destroy: () => {
+      console.log('this')
+      console.log(this)
+      for (i = p1.game.length; i--; i > 0) {
+        if (p1.game.id == this.id)
+          p1.game.splice(i, 1);
+      }
+      for (i = p2.game.length; i--; i > 0) {
+        if (p2.game.id == this.id)
+          p2.game.splice(i, 1);
+      }
+    },
   }
+  // chooseteam: false,
   return game;
 }
 exports.order = (game, u, akt) => {
@@ -56,7 +76,7 @@ exports.order = (game, u, akt) => {
     // console.log(akt.img)
 
     if (akt.img == 'build') {
-      console.log('build')
+      // console.log('build')
       let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
       newu.isReady = false;
       game.gold[game.turn - 1] -= 5;
@@ -95,12 +115,15 @@ exports.order = (game, u, akt) => {
       }
     }
     //onOrder
+    rules.dead(game);
     rules.slime(game);
     rules.spill(game);
     rules.landmineexplosion(game);
     rules.eggcrack(game);
     rules.capture(game);
     rules.fireend(game);
+    rules.dead(game);
+
 
     send.data(game);
 
@@ -125,6 +148,8 @@ let endgame = (game, winner) => {
     send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
     send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }
+  player.clear(game.players[0], game.id)
+  player.clear(game.players[1], game.id)
 
 
 }
@@ -140,31 +165,31 @@ exports.surrender = (game, p) => {
   }
 }
 
-exports.rematch = (p) => {
-  // console.log('rematch')
-  let sandbox = p.game.sandbox;
-  let p1 = p.game.players[0];
-  let p2 = p.game.players[1];
-  let game = creategame(p1, p2)
-  game.sandbox = sandbox;
-  p1.game = game;
-  p1.number = 1
-  p2.game = game;
-  p2.number = 2
-  send.data(game);
-}
-
+// exports.rematch = (gm) => {
+//   // console.log('rematch')
+//   let sandbox = gm.sandbox;
+//   let p1 = gm.players[0];
+//   let p2 = gm.players[1];
+//   console.log(gm.id)
+//   gm = creategame(p1, p2, sandbox, gm.id)
+//   send.data(gm);
+// }
 
 exports.endturn = (game, p) => {
-
   function cnFlag() {
     let flag = [0, 0]
     for (let x = 0; x < 9; x++) {
       for (let y = 0; y < 9; y++) {
-        if (game.field[x][y] == 'team1')
+        if (game.field[x][y] == 'team1') {
+          if (game.turn - 1 == 0)
+            game.trail.push({ img: 'gold', x, y });
           flag[0]++
-        if (game.field[x][y] == 'team2')
+        }
+        if (game.field[x][y] == 'team2') {
+          if (game.turn - 1 == 1)
+            game.trail.push({ img: 'gold', x, y });
           flag[1]++
+        }
       }
     }
     game.gold[game.turn - 1] += flag[game.turn - 1];
@@ -219,11 +244,13 @@ exports.endturn = (game, p) => {
     fisher(game)
 
     //onEndTurn
+    rules.dead(game);
     rules.telepath(game);
     rules.frog(game);
     rules.aerostat(game);
     rules.landmine(game);
     rules.egg(game);
+    rules.rockettarget(game);
     rules.worm(game);
     rules.firestt(game);
     rules.splitOnEndturn(game)
@@ -234,6 +261,8 @@ exports.endturn = (game, p) => {
     rules.fireend(game);
     rules.landmineexplosion(game);
     rules.eggcrack(game);
+    rules.dead(game);
+
 
     send.data(game);
 
@@ -264,7 +293,6 @@ exports.setbonus = (game, p, bonus) => {
   send.data(game);
 }
 function addbonus(game, unit) {
-  // console.log(game.bonus[game.turn])
   if (unit.team !== game.turn) {
     game.unit.forEach(u => {
       if (u.team == 1) { u.team = 2; } else
@@ -297,47 +325,12 @@ let fisher = (game) => {
   game.fisher[game.turn - 1] -= time.clock() - game.lastturntime[game.turn - 1];
   game.lastturntime[game.turn - 1] = time.clock();
 
-  // console.log(game.fisher)
-
 }
 
-// let destraction = (game) => {
-//   let land = 'water'
-//   let des = game.destraction % 4
-//   // console.log('des', des)
-//   let d = 0
-//   if (game.destraction)
-//     d = (game.destraction - des) / 4;
-//   // console.log('d', d)
-
-//   if (des == 0) {
-//     for (let x = 0; x < 9; x++) {
-//       for (let y = 0 + d; y < 1 + d; y++) {
-//         game.field[x][y] = land;
-//       }
-//     }
-//   }
-//   else if (des == 1) {
-//     for (let x = 8 - d; x < 9 - d; x++) {
-//       for (let y = 0; y < 9; y++) {
-//         game.field[x][y] = land;
-//       }
-//     }
-//   }
-//   else if (des == 2) {
-//     for (let x = 0; x < 9; x++) {
-//       for (let y = 8 - d; y < 9 - d; y++) {
-//         game.field[x][y] = land;
-//       }
-//     }
-//   }
-//   else if (des == 3) {
-//     for (let x = 0 + d; x < 1 + d; x++) {
-//       for (let y = 0; y < 9; y++) {
-//         game.field[x][y] = land;
-//       }
-//     }
-//   }
-//   game.destraction++
-//   if (game.destraction > 15) game.finished = true;
-// }
+exports.byId = (id) => {
+  let g = games.find((e) => {
+    return e.id == id
+  });
+  if (g == undefined) g = false
+  return g
+}

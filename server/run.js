@@ -1,5 +1,4 @@
 const input = require('./input');
-const test = require('./test');
 const meta = require('./meta');
 
 exports.main = (io) => {
@@ -14,7 +13,7 @@ exports.main = (io) => {
     }
     return this;
   };
-  
+
   let i = 0;
   let arr = []
   Object.keys(meta).forEach(function (key) {
@@ -24,12 +23,11 @@ exports.main = (io) => {
   });
   arr = arr.sort((a, b) => { return a.rank - b.rank })
   arr.forEach((e) => {
-    if (meta[e.name].weight > 0) {
+    if (meta[e.name].weight > 0 && meta[e.name].class !='none') {
       i++
       console.log(i, e.name, e.rank)
     }
   });
-
   input.tick();
   input.socket(io);
   input.bot();

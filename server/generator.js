@@ -5,6 +5,7 @@ const en = require('./engine');
 const _ = require('lodash');
 
 exports.new = (rank) => {
+  rank =9999
   let barraks = [];
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank)
@@ -15,7 +16,6 @@ exports.new = (rank) => {
   let spec = [];
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank) {
-
       if (meta[key].class == 'warrior')
         warrior.push(key)
       if (meta[key].class == 'archer')
@@ -67,9 +67,9 @@ exports.new = (rank) => {
   points = _.sampleSize(points, 81);
 
   points.forEach(p => {
-    let ground = 1
-    let grass = 1
-    let n = 3
+    let ground = _.random(10)
+    let grass = _.random(70)
+    let n = _.random(500)
     if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += n;
     if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'ground') ground += n;
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'ground') ground += n;
@@ -194,7 +194,7 @@ exports.new = (rank) => {
       bluearr.push({ x, y });
     }
   }
-  bluearr = _.sampleSize(bluearr, 6);
+  bluearr = _.sampleSize(bluearr, 9);
 
   let orangearr = []
   for (let y = 1; y < 8; y++) {
@@ -202,7 +202,7 @@ exports.new = (rank) => {
       orangearr.push({ x, y });
     }
   }
-  orangearr = _.sampleSize(orangearr, 6);
+  orangearr = _.sampleSize(orangearr, 9);
 
 
   // let w = _.sample(warrior)
@@ -215,6 +215,9 @@ exports.new = (rank) => {
   bluearr[3].tp = _.sample(archer);
   bluearr[4].tp = _.sample(archer);
   bluearr[5].tp = _.sample(spec);
+  bluearr[6].tp = _.sample(archer);
+  bluearr[7].tp = _.sample(warrior);
+  bluearr[8].tp = _.sample(spec);
 
   // w = _.sample(warrior);
   // a = _.sample(archer);
@@ -226,6 +229,9 @@ exports.new = (rank) => {
   orangearr[3].tp = _.sample(archer);
   orangearr[4].tp = _.sample(archer);
   orangearr[5].tp = _.sample(spec);
+  orangearr[6].tp = _.sample(archer);
+  orangearr[7].tp = _.sample(warrior);
+  orangearr[8].tp = _.sample(spec);
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {

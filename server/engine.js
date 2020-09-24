@@ -37,13 +37,16 @@ en.fieldInPoint = (game, x, y) => {
 en.death = (game, unit) => {
   if (unit) {
     game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
+    game.deadPool.push(unit);
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 }
 
 en.addUnit = (game, tp, x, y, team) => {
   let u = en.makeUnit(tp, x, y, team)
+  game.trail.push({ img: 'addunit', x, y });
   game.unit.push(u); return u;
+  
 }
 en.addSpoil = (game, name, x, y, data, team) => {
   game.spoil.push({ name, data, x, y, team })

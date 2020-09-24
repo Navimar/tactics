@@ -59,7 +59,7 @@ module.exports = (game, me, target) => {
       me.isActive = false;
       // console.log(me,'tire wrapper');
     },
-    teleport: (game, xfrom, yfrom, xto, yto) => {
+    teleport: (xfrom, yfrom, xto, yto) => {
       let u = en.unitInPoint(game, xfrom, yfrom);
       en.move(game, u, xto, yto);
     },

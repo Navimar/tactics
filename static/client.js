@@ -9,6 +9,7 @@ let local = {
   sandclock: { x: 0, y: 0 },
   tip: { text: 'Подключение к серверу...', x: 3, y: 3, color: '#F00', font: "3vmax verdana", dur: 30 },
   turn: 1,
+  gameid: findGetParameter("game")
 };
 let data = {
   fisher: ['???', '!!!'],
@@ -140,8 +141,7 @@ let renderhtml = (login) => {
    А также заходите в <a href="http://t.me/unitcraft">наш чат в телеграме</a></span>
   `
   if (login == 'success')
-     html = `Ваш ID ` + findGetParameter("id");
-  document.getElementById('menu').innerHTML = html;
+    html = `Ваш ID ` + findGetParameter("id");
 }
 
 let render = () => {
@@ -295,7 +295,7 @@ let renderpanel = () => {
     c.forEach(e => e.reverse());
   }
   if (data.finished) {
-    drawSize('rematch', c[3][0], c[3][1], 2, 2)
+    // drawSize('rematch', c[3][0], c[3][1], 2, 2)
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
@@ -580,7 +580,7 @@ let onMouseDownRight = () => {
     let u = getUnit(mouseCell.x, mouseCell.y);
     if (u) {
       if (!blocked) {
-        socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y } });
+        socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid  });
         local.build = false
       }
       blocked = true;
@@ -619,33 +619,32 @@ let allakts = () => {
 
 let send = () => {
   if (!blocked)
-    socket.emit("order", { unit: local.unit, akt: local.order });
+    socket.emit("order", { unit: local.unit, akt: local.order, gameid: local.gameid });
   blocked = true;
 }
-let sendbonus = (b) => {
+let sendbonus = (bonus) => {
   if (!blocked)
-    socket.emit("bonus", b);
+    socket.emit("bonus", { bonus, gameid: local.gameid });
   blocked = true;
-
 }
 let surrender = () => {
   if (!blocked)
-    socket.emit("surrender");
+    socket.emit("surrender", { gameid: local.gameid });
   blocked = true;
 }
 let rematch = () => {
   if (!blocked)
-    socket.emit("rematch");
+    socket.emit("rematch", { gameid: local.gameid });
   blocked = true;
 }
 let endturn = () => {
   local.turn = false;
   // local.fisher[0] += 120;
   if (!blocked)
-    socket.emit("endturn");
+    socket.emit("endturn", { gameid: local.gameid });
   blocked = true;
 }
 
 let login = () => {
-  socket.emit("login", { id: findGetParameter("id"), pass: findGetParameter("key") });
+  socket.emit("login", { id: findGetParameter("id"), pass: findGetParameter("key"), gameid: local.gameid });
 }

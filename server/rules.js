@@ -1,5 +1,20 @@
 const en = require('./engine');
+const _ = require('lodash');
+const meta = require('./meta');
+const wrapper = require('./wrapper');
 
+exports.dead = (game) => {
+	while (game.deadPool.length > 0) {
+		for (let i = game.deadPool.length; i--; i > 0) {
+			console.log(meta[game.deadPool[i].tp])
+			if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
+				console.log('onDead')
+				meta[game.deadPool[i].tp].onDeath(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
+			}
+			game.deadPool.splice(i, 1)
+		}
+	}
+}
 exports.telepath = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('telepath')
@@ -49,13 +64,40 @@ exports.worm = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		if (game.spoil[i].name == 'worm' && game.spoil[i].team == game.turn) {
 			let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-			if (en.isAlive(game, game.spoil[i].data.unit )){
+			if (en.isAlive(game, game.spoil[i].data.unit)) {
 				if (game.spoil[i].data.unit != unit) {
 					en.death(game, unit);
 					en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
 				}
 			}
 			game.spoil.splice(i, 1)
+		}
+	}
+}
+exports.rockettarget = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		if (game.spoil[i].name == 'rockettarget') {
+			if (game.spoil[i].data.timer == 0) {
+				let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
+				if (en.isAlive(game, game.spoil[i].data.unit)) {
+					if (game.spoil[i].data.unit != unit) {
+						en.death(game, unit);
+						en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
+						en.death(game, game.spoil[i].data.unit);
+						for (let xx = -1; xx <= 1; xx++) {
+							for (let yy = -1; yy <= 1; yy++) {
+								if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == 'grass')
+									game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = 'ground'
+								en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
+								en.addSpoil(game, 'fire', game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
+							}
+						}
+					}
+				}
+				game.spoil.splice(i, 1)
+			} else {
+				game.spoil[i].data.timer--
+			}
 		}
 	}
 }

@@ -9,73 +9,92 @@ const config = require('./config');
 const sha = require('sha256');
 
 exports.socket = (socket, e, msg) => {
-  if (e == 'login') {
-    if (!msg.id) {
-      p = player.register(0);
-      p.rank = 999999;
-      p.socket = socket;
-      game.new(p, p);
-      p.game.sandbox = true;
-      send.data(p.game);
-    } else {
-      let p = player.byId(msg.id)
-      if (p) {
-        if (p.key == sha(msg.pass.slice(0, -1))) {
-          p.socket = socket;
-          send.successfulLogin(socket);
-          send.data(p.game);
+  if (msg) {
+    let gm = game.byId(msg.gameid);
+    if (!gm)
+      send.loginError(socket, 'Игра не найдена ' + msg.gameid);
+    else {
+      if (e == 'login') {
+        if (!msg.id) {
+          send.loginError(socket, 'не указан ID ползователя');
         } else {
-          send.wrongPass(socket, msg.pass);
+          let p = player.byId(msg.id)
+          if (p) {
+            if (p.key == sha(msg.pass.slice(0, -1))) {
+              player.addSocket(p, gm.id, socket)
+              send.successfulLogin(socket);
+              send.data(gm);
+            } else {
+              send.loginError(socket, 'Неверный ключ ' + msg.pass);
+            }
+
+          } else {
+            send.loginError(socket, 'Неверный ID пользователя ' + msg.id);
+          }
         }
-      } else {
-        send.wrongId(socket, msg.id);
+      }
+      if (e == 'connection') {
+        // stat.connection();
+      }
+      if (e == 'disconnect') {
+        // player.deleteSocket(p,socket, gm.id)
+        // stat.disconnect();
+      }
+      if (e == 'order') {
+        // console.log('order', gm)
+        let p = player.bySocket(socket, gm.id);
+        if (p) {
+          game.order(gm, msg.unit, msg.akt);
+        }
+      }
+      if (e == 'bonus') {
+        let p = player.bySocket(socket, gm.id);
+        if (p) {
+          let n = 1
+          if (gm.players[0].id != p.id)
+            n = 2
+          game.setbonus(gm, n, msg.bonus);
+        } else console.log('!p')
+      }
+      if (e == 'surrender') {
+        let p = player.bySocket(socket, gm.id);
+        if (p) {
+          let n = 1
+          if (gm.players[0].id != p.id)
+            n = 2
+          game.surrender(gm, n, msg);
+        }
+      }
+      if (e == 'rematch') {
+        console.log('rematch!!');
+        // // let p = player.bySocket(socket);
+        // gm = game.new(gm.id, gm.players[0], gm.players[1])
+        // send.data(gm);
+        // game.rematch(gm);
+      }
+      if (e == 'endturn') {
+        let p = player.bySocket(socket, gm.id);
+        if (p) {
+          let n = 1
+          if (gm.players[0].id != p.id)
+            n = 2
+          game.endturn(gm, n);
+        }
       }
     }
-  }
-  if (e == 'connection') {
-    // stat.connection();
-  }
-  if (e == 'disconnect') {
-    // stat.disconnect();
-  }
-  if (e == 'order') {
-    let p = player.bySocket(socket);
-    if (p) {
-      game.order(p.game, msg.unit, msg.akt);
-    }
-  }
-  if (e == 'bonus') {
-    let p = player.bySocket(socket);
-    if (p && p.number) {
-      game.setbonus(p.game, p.number, msg);
-    }
-  }
-  if (e == 'surrender') {
-    let p = player.bySocket(socket);
-    if (p && p.number) {
-      game.surrender(p.game, p.number, msg);
-    }
-  }
-  if (e == 'rematch') {
-    let p = player.bySocket(socket);
-    if (p && p.number) {
-      game.rematch(p, msg);
-    }
-  }
-  if (e == 'endturn') {
-    let p = player.bySocket(socket);
-    if (p && p.game) {
-      game.endturn(p.game, p.number);
-    }
+  } else {
+    //!msg
+
   }
 };
 
 exports.bot = (ctx, bot) => {
   let id = ctx.message.chat.id;
   let text = ctx.message.text;
+  let username = ctx.message.from.username;
   let p = player.byId(id);
   if (!p) {
-    p = player.register(id);
+    p = player.register(id, username);
   }
 
   let arr = []
@@ -91,19 +110,15 @@ exports.bot = (ctx, bot) => {
 
   }
   else if (text == '/play' || text == '/games') {
-    if (p.game) {
-      send.bot(id, `Список активных игр:\n${config.ip}:` + config.port + "/?id=" + id + "&key=" + player.setKey(p) + 'u', bot);
-    } else {
-      send.bot(id, 'Нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника', bot);
-    }
+    send.gamelist(id, p, bot);
   }
   else if (text == '/find') {
     queue.find(p, bot)
   }
   else if (text == '/sandbox') {
-    game.new(p, p)
-    p.game.sandbox = true;
-    send.bot(id, `Пройдите по ссылке, чтобы начать игру с самим собой:\n` + player.link(p), bot);
+    p.game.push(game.new(p, p))
+    send.bot(id, 'Игра успешно создана!', bot);
+    send.gamelist(id, p, bot);
   }
   else if (text == '/cancel') {
     queue.cancel(p)
@@ -113,8 +128,9 @@ exports.bot = (ctx, bot) => {
     let mes = 'Ваш ранг ' + p.rank
     mes += '\n\nВам доступны юниты:';
     arr.forEach((e) => {
-      if (meta[e.key].weight > 0) {
-        mes += '\n/' + e.key + ' ' + e.name
+      if (meta[e.key].class != 'none') {
+        if (meta[e.key].rank <= p.rank)
+          mes += '\n/' + e.key + ' ' + e.name
       }
     });
     send.bot(id, mes, bot);
@@ -127,7 +143,7 @@ exports.bot = (ctx, bot) => {
     let f = 1;
     arr.forEach((e) => {
       if (e.key == text.slice(1)) {
-        send.botPhoto(id, { source: __dirname + '/../img/' + e.key +'.png' }, bot )
+        send.botPhoto(id, { source: __dirname + '/../img/' + e.key + '.png' }, bot)
         send.bot(id, meta[e.key].description, bot)
         f = 0
       }

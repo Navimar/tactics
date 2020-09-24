@@ -2,6 +2,8 @@ const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akt');
 const onAkt = require('./onAkt');
+const config = require('./config');
+const player = require('./player');
 
 exports.web = (p, game) => {
   msg = game.data;
@@ -16,18 +18,29 @@ exports.botPhoto = (id, src, bot) => {
   bot.telegram.sendPhoto(id, src)
 };
 
-exports.wrongId = (socket, id) => {
-  socket.emit('login', 'wrong id ' + id);
+exports.gamelist = (id, p, bot) => {
+  let key = player.setKey(p)
+  let text = ''
+  p.game.forEach(e => {
+    if (e.sandbox)
+      text += 'Песочница: '
+    else
+      text += e.players[0].id + ' vs ' + e.players[1].id + ' ';
+    text += config.ip + ':' + config.port + "/?id=" + id + "&key=" + key + 'u' + '&game=' + e.id + '\n'
+  });
+  if (text == '')
+    text = 'Нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника'
+  else
+    text = `Список активных игр:\n` + text
+  bot.telegram.sendMessage(id, text)
+
+};
+
+exports.loginError = (socket, error) => {
+  socket.emit('login', error);
 }
+
 exports.successfulLogin = (socket) => {
-  socket.emit('login', 'success');
-
-}
-exports.wrongPass = (socket, pass) => {
-  socket.emit('login', 'wrong pass ' + pass);
-}
-
-exports.success = (socket) => {
   socket.emit('login', 'success');
 }
 
@@ -130,20 +143,24 @@ exports.data = (game) => {
     });
     return send;
   }
-  if (game.sandbox) {
-    game.players[0].socket.emit('update', getData(game, game.turn));
-  }
-  else {
-    if (game.players[0].socket && game.players[0].game == game)
-      game.players[0].socket.emit('update', getData(game, 1));
-    if (game.players[1].socket && game.players[1].game == game)
-      game.players[1].socket.emit('update', getData(game, 2));
+  if (game) {
+    let p0socket = game.players[0].socket.get(game.id)
+    if (game.sandbox) {
+      p0socket.emit('update', getData(game, game.turn));
+    }
+    else {
+      let p1socket = game.players[1].socket.get(game.id)
+      if (p0socket)
+        p0socket.emit('update', getData(game, 1));
+      if (p1socket)
+        p1socket.emit('update', getData(game, 2));
+    }
   }
 }
 
 exports.logicerror = (game, error) => {
-  game.players[0].socket.emit('logic', error);
-  game.players[1].socket.emit('logic', error);
+  game.players[0].socket.get(game.id).emit('logic', error);
+  game.players[1].socket.get(game.id).emit('logic', error);
 }
 
 // let send = (socket, event, msg, ctx) => {
