@@ -239,3 +239,16 @@ exports.slime = (game) => {
 		});
 	});
 }
+exports.lover = (game) => {
+	let lover = false;
+	game.unit.forEach(u => {
+		if (u.tp == 'lover')
+			lover = true;
+	});
+	if (!lover)
+		for (i = game.unit.length; i--; i > 0) {
+			if (game.unit[i].status.includes('love')) {
+				en.death(game, game.unit[i]);
+			}
+		}
+}

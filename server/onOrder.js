@@ -3,6 +3,7 @@ const rules = require('./rules');
 
 module.exports = (game) => {
   rules.dead(game);
+  rules.lover(game);
   rules.spill(game);
   rules.landmineexplosion(game);
   rules.slime(game);

@@ -131,20 +131,6 @@ exports.lover = {
     wd.addStatus('love');
     wd.tire();
   },
-  onDeath: (wd) => {
-    let lover = false;
-    wd.game.unit.forEach(u => {
-      if (u.tp == 'lover' && (u.x != wd.me.x || u.y != wd.me.y))
-        lover = true;
-    });
-    if (!lover)
-      wd.game.unit.forEach((u) => {
-        if (u.status.includes('love')) {
-          console.log(u.status, u.x, u.y)
-          wd.kill(u.x, u.y);
-        }
-      });
-  }
 }
 exports.aerostat = {
   description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
