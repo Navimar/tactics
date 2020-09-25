@@ -218,11 +218,10 @@ let render = () => {
     }
   }
   let renderspoil = (x, y) => {
-    let u = data.spoil.filter(u => u.x == x && u.y == y)[0];
-    if (u) {
-      drawSpoil(u.name, u.x, u.y);
-    };
-
+    let u = data.spoil.filter(u => u.x == x && u.y == y);
+    u.forEach((s) => {
+      drawSpoil(s.name, s.x, s.y);
+    });
   }
   let renderakt = () => {
     if (local.unit && local.unit.akt) {
@@ -580,7 +579,7 @@ let onMouseDownRight = () => {
     let u = getUnit(mouseCell.x, mouseCell.y);
     if (u) {
       if (!blocked) {
-        socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid  });
+        socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
         local.build = false
       }
       blocked = true;

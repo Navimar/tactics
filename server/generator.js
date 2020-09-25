@@ -98,96 +98,6 @@ exports.new = (rank) => {
   data.field[6][2] = 'team' + rndTeam();
 
   points = []
-
-  // let neutralarr = []
-  // let orangearr = []
-  // let bluearr = []
-  // let nq = _.random(9)
-  // let maxunit = 91;
-  // let maxpop = 2;
-
-  // for (let y = 0; y < 9; y++) {
-  //   for (let x = 0; x < 9; x++) {
-  //     points.push({ x, y, type: [0, 1, 2, 3], });
-  //   }
-  // }
-  // points = _.sampleSize(points, 81);
-  // points.forEach(p => {
-  //   let notblue, notorange, notneutral = false;
-  //   let pop = 0;
-
-  //   if (p.x < 1 || p.x > 2) notorange = true
-  //   if (p.x < 6 || p.x > 7) notblue = true
-  //   if (p.y == 0 || p.y == 8) {
-  //     notorange = true
-  //     notblue = true
-  //   }
-  //   bluearr.forEach(e => {
-  //     if (
-  //       // (e.x == p.x && e.y == p.y)
-  //       // || (Math.abs(e.x + e.y - (p.x + p.y)) > 15)
-  //       // || bluearr.length == maxunit
-  //       // ||
-  //       bluearr.length > orangearr.length
-  //     )
-  //       notblue = true;
-  //     // if (Math.abs(e.x + e.y - (p.x + p.y)) < 4)
-  //     //   // notorange = true
-  //     if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
-  //       pop++
-  //     }
-  //   });
-  //   if (pop > maxpop)
-  //     notblue = true;
-
-  //   pop = 0;
-  //   orangearr.forEach(e => {
-  //     if (
-  //       // (e.x == p.x && e.y == p.y) ||
-  //       //     (Math.abs(e.x + e.y - (p.x + p.y)) > 15) ||
-  //       //     orangearr.length == maxunit
-  //       //  ||
-  //       bluearr.length < orangearr.length
-  //     ) notorange = true;
-  //     //   if (Math.abs(e.x + e.y - (p.x + p.y)) < 4)
-  //     //     // notblue = true
-  //     if (Math.abs(e.x + e.y - (p.x + p.y)) < 3) {
-  //       pop++
-  //     }
-  //   });
-  //   if (pop > maxpop)
-  //     notorange = true;
-
-  //   if (neutralarr.length < nq)
-  //     neutralarr.forEach(e => {
-  //       if ((e.x == p.x && e.y == p.y)) {
-  //         notneutral = true;
-  //       }
-  //     }); else
-  //     notneutral = true;
-
-  //   if (notblue) p.type.remove(1);
-  //   if (notorange) p.type.remove(2);
-  //   if (notneutral) p.type.remove(3);
-
-  //   if (p.type.length > 1) p.type.remove(0);
-  //   p.type = _.sample(p.type);
-  //   if (p.type == 3) {
-  //     data.unit.push(makeUnit(rndNeutral(), p.x, p.y, p.type));
-  //     neutralarr.push({ x: p.x, y: p.y })
-  //   }
-  //   else if (p.type == 1) {
-  //     bluearr.push({ x: p.x, y: p.y })
-  //   }
-  //   else if (p.type == 2) {
-  //     orangearr.push({ x: p.x, y: p.y })
-  //   }
-
-  // });
-  // if (bluearr.length - orangearr.length > 0)
-  //   bluearr.pop()
-  // if (bluearr.length - orangearr.length < 0)
-  //   orangearr.pop()
   let bluearr = []
   for (let y = 1; y < 8; y++) {
     for (let x = 1; x < 3; x++) {
@@ -209,29 +119,45 @@ exports.new = (rank) => {
   // let a = _.sample(archer)
   // let s = _.sample(spec);
 
-  bluearr[0].tp = _.sample(warrior);
-  bluearr[1].tp = _.sample(warrior);
-  bluearr[2].tp = _.sample(warrior);
-  bluearr[3].tp = _.sample(archer);
-  bluearr[4].tp = _.sample(archer);
-  bluearr[5].tp = _.sample(spec);
-  bluearr[6].tp = _.sample(archer);
-  bluearr[7].tp = _.sample(warrior);
-  bluearr[8].tp = _.sample(spec);
+  // bluearr[0].tp = _.sample(warrior);
+  // bluearr[1].tp = _.sample(warrior);
+  // bluearr[2].tp = _.sample(warrior);
+  // bluearr[3].tp = _.sample(archer);
+  // bluearr[4].tp = _.sample(archer);
+  // bluearr[5].tp = _.sample(spec);
+  // bluearr[6].tp = _.sample(archer);
+  // bluearr[7].tp = _.sample(warrior);
+  // bluearr[8].tp = _.sample(spec);
 
-  // w = _.sample(warrior);
-  // a = _.sample(archer);
-  // s = _.sample(spec);
+  // orangearr[0].tp = _.sample(warrior);
+  // orangearr[1].tp = _.sample(warrior);
+  // orangearr[2].tp = _.sample(warrior);
+  // orangearr[3].tp = _.sample(archer);
+  // orangearr[4].tp = _.sample(archer);
+  // orangearr[5].tp = _.sample(spec);
+  // orangearr[6].tp = _.sample(archer);
+  // orangearr[7].tp = _.sample(warrior);
+  // orangearr[8].tp = _.sample(spec);
 
-  orangearr[0].tp = _.sample(warrior);
-  orangearr[1].tp = _.sample(warrior);
-  orangearr[2].tp = _.sample(warrior);
-  orangearr[3].tp = _.sample(archer);
-  orangearr[4].tp = _.sample(archer);
-  orangearr[5].tp = _.sample(spec);
-  orangearr[6].tp = _.sample(archer);
-  orangearr[7].tp = _.sample(warrior);
-  orangearr[8].tp = _.sample(spec);
+  bluearr[0].tp = _.sample(barraks);
+  bluearr[1].tp = _.sample(barraks);
+  bluearr[2].tp = _.sample(barraks);
+  bluearr[3].tp = _.sample(barraks);
+  bluearr[4].tp = _.sample(barraks);
+  bluearr[5].tp = _.sample(barraks);
+  bluearr[6].tp = _.sample(barraks);
+  bluearr[7].tp = _.sample(barraks);
+  bluearr[8].tp = _.sample(barraks);
+
+  orangearr[0].tp = _.sample(barraks);
+  orangearr[1].tp = _.sample(barraks);
+  orangearr[2].tp = _.sample(barraks);
+  orangearr[3].tp = _.sample(barraks);
+  orangearr[4].tp = _.sample(barraks);
+  orangearr[5].tp = _.sample(barraks);
+  orangearr[6].tp = _.sample(barraks);
+  orangearr[7].tp = _.sample(barraks);
+  orangearr[8].tp = _.sample(barraks);
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {

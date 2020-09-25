@@ -8,7 +8,6 @@ exports.dead = (game) => {
 		for (let i = game.deadPool.length; i--; i > 0) {
 			console.log(meta[game.deadPool[i].tp])
 			if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
-				console.log('onDead')
 				meta[game.deadPool[i].tp].onDeath(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
 			}
 			game.deadPool.splice(i, 1)
@@ -64,10 +63,11 @@ exports.worm = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		if (game.spoil[i].name == 'worm' && game.spoil[i].team == game.turn) {
 			let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-			if (en.isAlive(game, game.spoil[i].data.unit)) {
-				if (game.spoil[i].data.unit != unit) {
+			if (en.isAlive(game, game.spoil[i].data.worm)) {
+				if (game.spoil[i].data.worm != unit) {
 					en.death(game, unit);
-					en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
+					en.addSpoil(game, 'wormportal', game.spoil[i].data.worm.x, game.spoil[i].data.worm.y, {worm: game.spoil[i].data.worm}, 3);
+					en.move(game, game.spoil[i].data.worm, game.spoil[i].x, game.spoil[i].y);
 				}
 			}
 			game.spoil.splice(i, 1)

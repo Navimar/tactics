@@ -5,6 +5,9 @@ module.exports = (game, me) => {
   return {
     me,
     game,
+    near: () => {
+      return en.near(me.x, me.y)
+    },
     freemove: () => {
       let akts = []
       let points = [{ x: me.x, y: me.y }];
@@ -40,7 +43,7 @@ module.exports = (game, me) => {
           near = near.filter(np => {
             let nf = en.fieldInPoint(game, np.x, np.y)
             let pf = en.fieldInPoint(game, pt.x, pt.y)
-            return !en.isOccupied(game, np.x, np.y) && (nf == pf || _.includes(['team1','team2', 'water'], nf) || _.includes(['team1','team2', 'water'], pf))
+            return !en.isOccupied(game, np.x, np.y) && (nf == pf || _.includes(['team1', 'team2', 'water'], nf) || _.includes(['team1', 'team2', 'water'], pf))
           });
           points = points.concat(near)
         });

@@ -21,7 +21,7 @@ exports.warrior = {
 }
 exports.chiken = {
   name: 'Уменьшитель', description: 'Превращает юнита в яйцо. В конце хода юнит благополучно вылупится обратно, если конечно никто его не раздавит раньше.',
-  weight: 100,
+  weight: 0,
   rank: 0,
   class: 'warrior',
   life: 3,
@@ -71,11 +71,85 @@ exports.firebat = {
   }
 }
 
-
+exports.staziser = {
+  description: 'стазис',
+  name: 'Поджигатель',
+  weight: 100,
+  rank: 80,
+  class: 'archer',
+  life: 3,
+  img: 'staziser',
+  akt: (akt) => {
+    let arr = akt.move()
+    let far = akt.hand('stazis')
+    if (far) {
+      far = far.filter(e => {
+        if (en.unitInPoint(akt.game, e.x, e.y).status == 'stazis')
+          return false
+        return true
+      });
+      arr = arr.concat(far)
+    }
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  stazis: (wd) => {
+    wd.addStatus('stazis');
+    wd.tire();
+  },
+  onDeath: (wd) => {
+    wd.game.unit.forEach(u => u.status.remove('stazis'));
+  }
+}
+exports.lover = {
+  description: 'стазис',
+  name: 'Влюбленный',
+  weight: 100,
+  rank: 80,
+  class: 'archer',
+  life: 3,
+  img: 'lover',
+  akt: (akt) => {
+    let arr = akt.move()
+    let far = akt.hand('love')
+    if (far) {
+      far = far.filter(e => {
+        if (en.unitInPoint(akt.game, e.x, e.y).status == 'love')
+          return false
+        return true
+      });
+      arr = arr.concat(far)
+    }
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  love: (wd) => {
+    wd.addStatus('love');
+    wd.tire();
+  },
+  onDeath: (wd) => {
+    let lover = false;
+    wd.game.unit.forEach(u => {
+      if (u.tp == 'lover' && (u.x != wd.me.x || u.y != wd.me.y))
+        lover = true;
+    });
+    if (!lover)
+      wd.game.unit.forEach((u) => {
+        if (u.status.includes('love')) {
+          console.log(u.status, u.x, u.y)
+          wd.kill(u.x, u.y);
+        }
+      });
+  }
+}
 exports.aerostat = {
   description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
   name: 'Дерижабль',
-  weight: 50,
+  weight: 100,
   rank: 100,
   class: 'spec',
   life: 3,
@@ -118,6 +192,12 @@ exports.aerostat = {
     }
     return akts;
   },
+  onDeath: (wd) => {
+    if (wd.me.sticker) {
+      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+      wd.me.sticker = false
+    }
+  },
   fly: (wd) => {
     if (wd.me.data.drop) {
       if (wd.me.sticker) {
@@ -147,10 +227,76 @@ exports.aerostat = {
     wd.flywalk();
     wd.me.data.drop = false;
   },
-  warrior: (wd) => {
-    wd.damage();
-    wd.tire();
-  }
+}
+exports.caterbody = {
+  name: 'незаполнено', description: 'пока не придумал',
+  weight: 0,
+  rank: 0,
+  class: 'none',
+  life: 3,
+  img: 'caterbody',
+  akt: (akt) => {
+    return []
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+}
+exports.caterhead = {
+  description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
+  name: 'Гусеница',
+  weight: 0,
+  rank: 100,
+  class: 'none',
+  life: 3,
+  img: 'caterhead',
+  akt: (akt) => {
+    let akts = []
+    if (akt.me.energy > 0) {
+      akt.near().forEach((p) => {
+        let img = 'move';
+        if (en.unitInPoint(akt.game, p.x, p.y)) {
+          img = "eat";
+        } else
+          img = 'move'
+        akts.push({ x: p.x, y: p.y, img });
+      });
+    }
+    return akts
+  },
+  move: (wd) => {
+    let lx = wd.me.x
+    let ly = wd.me.y
+    // wd.go(wd.target.x, wd.target.y);
+    wd.flywalk();
+    if (wd.me.body)
+      wd.me.body.forEach((b) => {
+        let nx = b.x;
+        let ny = b.y;
+        wd.teleport(b.x, b.y, lx, ly)
+        lx = nx
+        ly = ny
+      });
+
+  },
+  onDeath: (wd) => {
+    if (wd.me.sticker) {
+      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+      wd.me.sticker = false
+    }
+  },
+  eat: (wd) => {
+    let u = en.addUnit(wd.game, 'caterbody', wd.me.x, wd.me.y, wd.me.team, 3)
+    u.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
+    u.head = wd.me
+    if (!wd.me.body)
+      wd.me.body = [];
+    wd.me.body.unshift(u);
+    wd.disappear(wd.target.unit);
+    wd.flywalk();
+    // wd.tire();
+
+  },
 }
 
 exports.zombie = {
@@ -183,7 +329,7 @@ exports.diger = {
   name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
   // life: 3,
   rank: 80,
-  weight: 25,
+  weight: 0,
   class: 'spec',
   img: 'diger',
   akt: (akt) => {
@@ -266,7 +412,7 @@ exports.bush = {
   description: '...',
   neutral: true,
   rank: 0,
-  weight: 10,
+  weight: 20,
   class: 'warrior',
   life: 3,
   img: 'bush',
@@ -321,7 +467,7 @@ exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
   rank: 70,
-  weight: 80,
+  weight: 0,
   class: 'none',
   life: 3,
   img: 'pusher',
@@ -365,7 +511,7 @@ exports.fountain = {
 }
 exports.telepath = {
   name: 'Внушитель', description: 'Заставляет юнита соперника выполнить любой приказ',
-  weight: 60,
+  weight: 100,
   rank: 40,
   class: 'archer',
   life: 3,
@@ -385,7 +531,7 @@ exports.telepath = {
 }
 exports.spliter = {
   name: 'Расщипитель', description: 'Разделяет юнита на три. Все три копии нестабильны и погибают после первого своего действия',
-  weight: 10,
+  weight: 100,
   rank: 145,
   class: 'spec',
   life: 3,
@@ -433,7 +579,7 @@ exports.hatchery = {
 }
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
-  weight: 50,
+  weight: 100,
   rank: 10,
   life: 3,
   class: 'spec',
@@ -449,27 +595,28 @@ exports.bird = {
         img: 'move',
       })
     });
-    akts.push({
-      x: akt.me.x,
-      y: akt.me.y,
-      img: 'bird',
-    });
+    // akts.push({
+    //   x: akt.me.x,
+    //   y: akt.me.y,
+    //   img: 'bird',
+    // });
     return akts;
   },
   move: (wd) => {
     wd.go(wd.target.x, wd.target.y);
     wd.tire();
   },
-  bird: (wd) => {
-    wd.kill();
-  },
   onDeath: (wd) => {
+    this.bird.boom(wd);
+  },
+  boom: (wd) => {
     for (let xx = -1; xx <= 1; xx++) {
       for (let yy = -1; yy <= 1; yy++) {
-        if (wd.game.field[wd.target.x + xx][wd.target.y + yy] == 'grass')
+        if (en.inField(wd.target.x + xx, wd.target.y + yy) && wd.game.field[wd.target.x + xx][wd.target.y + yy] == 'grass')
           wd.game.field[wd.target.x + xx][wd.target.y + yy] = 'ground'
       }
     }
+    wd.disappear();
     wd.kill(wd.me.x - 1, wd.me.y - 1);
     wd.spoil('fire', wd.me.x - 1, wd.me.y - 1, false, 3);
     wd.kill(wd.me.x, wd.me.y - 1);
@@ -486,10 +633,12 @@ exports.bird = {
     wd.spoil('fire', wd.me.x, wd.me.y + 1, false, 3);
     wd.kill(wd.me.x + 1, wd.me.y + 1)
     wd.spoil('fire', wd.me.x + 1, wd.me.y + 1, false, 3);
-    wd.kill();
     wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
     wd.tire();
-  }
+  },
+  bird: (wd) => {
+    this.bird.boom(wd);
+  },
 }
 
 exports.plant = {
@@ -527,10 +676,10 @@ exports.plant = {
 }
 exports.worm = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 50,
+  weight: 100,
   life: 3,
   rank: 100,
-  class: 'archer',
+  class: 'spec',
   img: 'worm',
   akt: (akt) => {
     let akts = [];
@@ -556,8 +705,15 @@ exports.worm = {
     //     wd.game.spoil.splice(i, 1)
     //   }
     // }
-    wd.spoil('worm', wd.target.x, wd.target.y, { unit: wd.me }, wd.game.turn)
+    wd.spoil('worm', wd.target.x, wd.target.y, { worm: wd.me }, wd.game.turn)
     wd.tire();
+  },
+  onDeath: (wd) => {
+    for (i = wd.game.spoil.length; i--; i > 0) {
+      if (wd.game.spoil[i].data.worm == wd.me) {
+        wd.game.spoil.splice(i, 1)
+      }
+    }
   }
 }
 
@@ -566,7 +722,7 @@ exports.rocket = {
   weight: 1,
   life: 3,
   rank: 100,
-  neutral:true,
+  neutral: true,
   class: 'warrior',
   img: 'rocket',
   akt: (akt) => {
@@ -583,14 +739,14 @@ exports.rocket = {
     return akts;
   },
   rocket: (wd) => {
-    wd.spoil('rockettarget', wd.target.x, wd.target.y, { unit: wd.me, timer:3 }, wd.game.turn)
+    wd.spoil('rockettarget', wd.target.x, wd.target.y, { unit: wd.me, timer: 3 }, wd.game.turn)
     wd.tire();
   }
 }
 
 exports.landmine = {
   name: 'Мина', description: 'Выкапывается и уничтожает юнита, если он на нее наступил. Закапывается после каждого передвижения',
-  weight: 30,
+  weight: 100,
   rank: 115,
   class: 'archer',
   life: 3,
@@ -610,7 +766,7 @@ exports.landmine = {
   },
   landmine: (wd) => {
     wd.spoil('landmine', wd.target.x, wd.target.y, false, wd.me.team)
-    wd.kill(wd.me.x, wd.me.y);
+    wd.disappear(wd.me.x, wd.me.y);
   }
 }
 
@@ -632,7 +788,7 @@ exports.plantik = {
   },
 }
 exports.kicker = {
-  weight: 100,
+  weight: 0,
   rank: 50,
   name: 'Пинатель',
   description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
@@ -659,9 +815,33 @@ exports.kicker = {
   }
 }
 
+exports.teleporter = {
+  weight: 100,
+  rank: 50,
+  name: 'Телепортер',
+  description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
+  class: 'spec',
+  life: 3,
+  img: 'teleporter',
+  akt: (akt) => {
+    // return [{ x: 5, y: 5, img: 'move' }]
+    return akt.move().concat(akt.hand('teleport'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  teleport: (wd) => {
+    wd.tire();
+    let points = en.allPoints();
+    points = points.filter(pt => !en.isOccupied(wd.game, pt.x, pt.y))
+    let p = _.sample(points)
+    wd.teleport(wd.target.x, wd.target.y, p.x, p.y)
+  }
+}
+
 exports.slime = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 25,
+  weight: 0,
   rank: 130,
   class: 'spec',
   img: 'slime',
@@ -705,7 +885,7 @@ exports.slime = {
 exports.bear = {
   name: 'незаполнено', description: 'пока не придумал',
   rank: 20,
-  weight: 100,
+  weight: 0,
   class: 'none',
   img: 'bear',
   akt: (akt) => {
@@ -740,7 +920,7 @@ exports.bear = {
 
 exports.frog = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 50,
+  weight: 0,
   rank: 30,
   class: 'warrior',
   life: 3,
@@ -772,8 +952,8 @@ exports.frog = {
       y: wd.target.y,
     }
     wd.noenergy();
-    let x = (wd.target.x - wd.me.x) * 2
-    let y = (wd.target.y - wd.me.y) * 2
+    let x = (wd.target.x - wd.me.x) * 2;
+    let y = (wd.target.y - wd.me.y) * 2;
     wd.go(x + wd.me.x, y + wd.me.y);
     if (wd.target.unit.status.includes('frog')) {
       wd.target.unit.status.remove('frog')
@@ -785,5 +965,3 @@ exports.frog = {
       wd.addStatus('frog');
   }
 }
-
-

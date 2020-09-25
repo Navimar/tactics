@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const meta = require('./meta');
-const akter = require('./akt');
+const akter = require('./akter');
 const onAkt = require('./onAkt');
 const config = require('./config');
 const player = require('./player');
@@ -110,8 +110,10 @@ exports.data = (game) => {
       if (u.isReady) {
         u.akt = meta[u.tp].akt(akter(game, u));
       }
-      onAkt.telepath(game);
-      onAkt.slime(game);
+      onAkt.telepath(game,u);
+      onAkt.worm(game,u)
+      onAkt.slime(game, u);
+      onAkt.stazis(game, u);
     });
 
     game.unit.forEach(u => {

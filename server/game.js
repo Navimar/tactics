@@ -5,6 +5,7 @@ const send = require('./send');
 const en = require('./engine');
 const player = require('./player');
 const generator = require('./generator');
+const onOrder = require('./onOrder');
 const rules = require('./rules');
 const _ = require('lodash');
 const bot = require('./bot');
@@ -35,7 +36,7 @@ let creategame = (p1, p2, id) => {
     // bonus: [null, p2.rank, p1.rank],
     bonus: [null, null, null],
     unit: data.unit,
-    deadPool:[],
+    deadPool: [],
     field: data.field,
     turn: (() => {
       if (p1.rank > p2.rank)
@@ -52,8 +53,6 @@ let creategame = (p1, p2, id) => {
     id,
     sandbox,
     destroy: () => {
-      console.log('this')
-      console.log(this)
       for (i = p1.game.length; i--; i > 0) {
         if (p1.game.id == this.id)
           p1.game.splice(i, 1);
@@ -95,7 +94,6 @@ exports.order = (game, u, akt) => {
         if (game.chooseteam) addbonus(game, unit)
 
         game.unit.forEach(u => {
-          // console.log(u.energy,u.isReady)
           u.isActive = false;
           if (u.energy < 3 && u != unit && u.isReady) {
             wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
@@ -115,15 +113,7 @@ exports.order = (game, u, akt) => {
       }
     }
     //onOrder
-    rules.dead(game);
-    rules.spill(game);
-    rules.landmineexplosion(game);
-    rules.slime(game);
-    rules.eggcrack(game);
-    rules.capture(game);
-    rules.fireend(game);
-    rules.dead(game);
-
+    onOrder(game);
 
     send.data(game);
 
@@ -255,14 +245,7 @@ exports.endturn = (game, p) => {
     rules.firestt(game);
     rules.splitOnEndturn(game)
 
-    rules.slime(game);
-    rules.capture(game);
-    rules.spill(game);
-    rules.fireend(game);
-    rules.landmineexplosion(game);
-    rules.eggcrack(game);
-    rules.dead(game);
-
+    onOrder(game);
 
     send.data(game);
 

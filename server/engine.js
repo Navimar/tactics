@@ -43,7 +43,7 @@ en.death = (game, unit) => {
 }
 en.disappear = (game, unit) => {
   if (unit) {
-    // game.trail.push({ img: 'damage', x: unit.x, y: unit.y });
+    game.trail.push({ img: 'disappear', x: unit.x, y: unit.y });
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 }
@@ -96,7 +96,7 @@ en.move = (game, unit, x, y) => {
         unit.x = x
         unit.y = y
       } else {
-        require('./send').logicerror(game, 'move cell is busy')
+        require('./send').logicerror(game, 'move cell is busy ' + unit.x +' ' +unit.y)
       }
     } else {
       en.death(game, unit);
