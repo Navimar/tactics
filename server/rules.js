@@ -169,7 +169,7 @@ exports.splitOnEndturn = (game) => {
 	for (i = game.unit.length; i--; i > 0) {
 		let u = game.unit[i];
 		if (u.status.includes('spliter2')) {
-			en.death(game, u);
+			en.disappear(game, u);
 		}
 	}
 }
