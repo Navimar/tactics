@@ -110,7 +110,5 @@ en.addStatus = (unit, st) => {
     unit.status.push(st)
   }
 }
-// en.makemark = (game, img, x, y) => {
-//   game.mark.push({ img, x, y })
-// }
+
 module.exports = en;
