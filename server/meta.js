@@ -35,8 +35,10 @@ exports.merchant = {
   trade: (wd) => {
     wd.kill();
     if (wd.target.unit.team != 3) {
+      console.log('before', wd.game.gold, wd.target.unit.team)
       wd.game.trail.push({ img: 'gold', x: wd.target.x, y: wd.target.y });
-      wd.game.gold[3-wd.target.unit.team] += 5;
+      wd.game.gold[wd.target.unit.team-1] += 5;
+      console.log('after',wd.game.gold)
     }
     wd.tire();
   }
