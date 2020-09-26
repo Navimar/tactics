@@ -234,7 +234,6 @@ exports.endturn = (game, p) => {
     fisher(game)
 
     //onEndTurn
-    rules.dead(game);
     rules.telepath(game);
     rules.frog(game);
     rules.aerostat(game);
@@ -244,6 +243,7 @@ exports.endturn = (game, p) => {
     rules.worm(game);
     rules.firestt(game);
     rules.splitOnEndturn(game)
+    rules.drill(game)
 
     onOrder(game);
 

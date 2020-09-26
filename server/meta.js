@@ -1,13 +1,13 @@
 const en = require('./engine');
 const _ = require('lodash');
 
-exports.warrior = {
+exports.simple = {
   name: 'незаполнено', description: 'пока не придумал',
   weight: 0,
   rank: 0,
   class: 'none',
   life: 3,
-  img: 'warrior',
+  img: 'simple',
   akt: (akt) => {
     return akt.move().concat(akt.hand('warrior'))
   },
@@ -398,7 +398,7 @@ exports.bush = {
   description: '...',
   neutral: true,
   rank: 0,
-  weight: 20,
+  weight: 100,
   class: 'warrior',
   life: 3,
   img: 'bush',
@@ -432,7 +432,7 @@ exports.mashroom = {
   description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
   neutral: true,
   rank: 0,
-  weight: 10,
+  weight: 50,
   class: 'warrior',
   life: 3,
   img: 'mashroom',
@@ -485,7 +485,7 @@ exports.fountain = {
   neutral: true,
   rank: 70,
   class: 'none',
-  weight: 3,
+  weight: 20,
   life: 3,
   img: 'fountain',
   akt: (akt) => {
@@ -629,7 +629,7 @@ exports.bird = {
 
 exports.plant = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 2,
+  weight: 50,
   life: 3,
   rank: 60,
   class: 'none',
@@ -694,18 +694,11 @@ exports.worm = {
     wd.spoil('worm', wd.target.x, wd.target.y, { worm: wd.me }, wd.game.turn)
     wd.tire();
   },
-  onDeath: (wd) => {
-    for (i = wd.game.spoil.length; i--; i > 0) {
-      if (wd.game.spoil[i].data.worm == wd.me) {
-        wd.game.spoil.splice(i, 1)
-      }
-    }
-  }
 }
 
 exports.rocket = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 1,
+  weight: 10,
   life: 3,
   rank: 100,
   neutral: true,
@@ -949,5 +942,60 @@ exports.frog = {
     }
     else
       wd.addStatus('frog');
+  }
+}
+exports.drill = {
+  name: 'Крот',
+  description: '',
+  weight: 0,
+  rank: 30,
+  class: 'warrior',
+  life: 3,
+  img: 'drill',
+  akt: (akter) => {
+    let akts = []
+    akter.near().forEach(pt =>
+      akts.push({ img: 'dir', x: pt.x, y: pt.y }));
+    return akts
+  },
+  dir: (wd) => {
+    let x = wd.target.x - wd.me.x
+    let y = wd.target.y - wd.me.y
+    wd.me.data.dir = { x, y };
+    wd.tire();
+  }
+}
+exports.drillgun = {
+  name: 'незаполнено', description: 'пока не придумал',
+  weight: 100,
+  rank: 0,
+  class: 'none',
+  life: 3,
+  img: 'drillgun',
+  akt: (akter) => {
+    let akts = []
+    if (!akter.me.data.summoned)
+      akter.near().forEach(pt =>
+        akts.push({ img: 'newdrill', x: pt.x, y: pt.y }));
+    else
+      akts = akter.move();
+    return akts
+  },
+  move: (wd) => {
+    wd.walk();
+    wd.me.data.summoned = false;
+    wd.tire();
+  },
+  newdrill: (wd) => {
+    wd.kill(wd.target.x, wd.target.y)
+    let u = wd.addUnit('drill', wd.target.x, wd.target.y, 3)
+    if (u) {
+      u.isReady = false;
+      u.data.dir = {
+        x: wd.target.x - wd.me.x,
+        y: wd.target.y - wd.me.y,
+      }
+    }
+    wd.me.data.summoned = true;
   }
 }

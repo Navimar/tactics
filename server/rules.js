@@ -6,7 +6,6 @@ const wrapper = require('./wrapper');
 exports.dead = (game) => {
 	while (game.deadPool.length > 0) {
 		for (let i = game.deadPool.length; i--; i > 0) {
-			console.log(meta[game.deadPool[i].tp])
 			if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
 				meta[game.deadPool[i].tp].onDeath(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
 			}
@@ -66,7 +65,7 @@ exports.worm = (game) => {
 			if (en.isAlive(game, game.spoil[i].data.worm)) {
 				if (game.spoil[i].data.worm != unit) {
 					en.death(game, unit);
-					en.addSpoil(game, 'wormportal', game.spoil[i].data.worm.x, game.spoil[i].data.worm.y, {worm: game.spoil[i].data.worm}, 3);
+					en.addSpoil(game, 'wormportal', game.spoil[i].data.worm.x, game.spoil[i].data.worm.y, { worm: game.spoil[i].data.worm }, 3);
 					en.move(game, game.spoil[i].data.worm, game.spoil[i].x, game.spoil[i].y);
 				}
 			}
@@ -74,6 +73,13 @@ exports.worm = (game) => {
 		}
 	}
 }
+exports.wormportal = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		if (game.spoil[i].name == 'wormportal' && !en.isAlive(game, game.spoil[i].data.worm))
+			game.spoil.splice(i, 1)
+	}
+}
+
 exports.rockettarget = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		if (game.spoil[i].name == 'rockettarget') {
@@ -251,4 +257,17 @@ exports.lover = (game) => {
 				en.death(game, game.unit[i]);
 			}
 		}
+}
+
+exports.drill = (game) => {
+	game.unit.forEach(u => {
+		if (u.tp == 'drill' && u.data.dir) {
+			let tu = en.unitInPoint(game, u.x + u.data.dir.x, u.y + u.data.dir.y)
+			if (tu)
+				en.death(game, tu);
+			console.log(u.data.dir.x,  u.data.dir.y)
+			en.move(game, u, u.x+u.data.dir.x, u.y + u.data.dir.y);
+		}
+	});
+
 }
