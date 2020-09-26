@@ -238,10 +238,10 @@ let render = () => {
   let rendertrail = () => {
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        let u = data.trail.filter(u => u.x == x && u.y == y)[0];
-        if (u) {
-          drawTrail(u.img, u.x, u.y);
-        }
+        let u = data.trail.filter(u => u.x == x && u.y == y);
+        u.forEach((t) => {
+          drawTrail(t.img, t.x, t.y);
+        });
       }
     }
   }

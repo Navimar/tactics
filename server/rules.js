@@ -39,7 +39,7 @@ exports.fireend = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		let sp = game.spoil[i];
 		if (sp.name == 'fire') {
-			if (game.field[sp.x][sp.y] == 'water')
+			if (en.inField(sp.x, sp.y) && game.field[sp.x][sp.y] == 'water')
 				game.spoil.splice(i, 1)
 			else {
 				let unit = en.unitInPoint(game, sp.x, sp.y)
@@ -265,8 +265,7 @@ exports.drill = (game) => {
 			let tu = en.unitInPoint(game, u.x + u.data.dir.x, u.y + u.data.dir.y)
 			if (tu)
 				en.death(game, tu);
-			console.log(u.data.dir.x,  u.data.dir.y)
-			en.move(game, u, u.x+u.data.dir.x, u.y + u.data.dir.y);
+			en.move(game, u, u.x + u.data.dir.x, u.y + u.data.dir.y);
 		}
 	});
 

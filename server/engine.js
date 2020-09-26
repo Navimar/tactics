@@ -99,7 +99,7 @@ en.move = (game, unit, x, y) => {
         require('./send').logicerror(game, 'move cell is busy ' + unit.x +' ' +unit.y)
       }
     } else {
-      en.death(game, unit);
+      en.disappear(game, unit);
     }
   } else {
     require('./send').logicerror(game, 'move cant find the unit')

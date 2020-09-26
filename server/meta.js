@@ -15,7 +15,29 @@ exports.simple = {
     wd.walk();
   },
   warrior: (wd) => {
-    wd.damage();
+    wd.kill();
+    wd.tire();
+  }
+}
+exports.merchant = {
+  name: 'Продавец', description: 'пока не придумал',
+  weight: 100,
+  rank: 0,
+  class: 'none',
+  life: 3,
+  img: 'merchant',
+  akt: (akt) => {
+    return akt.move().concat(akt.hand('trade'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  trade: (wd) => {
+    wd.kill();
+    if (wd.target.unit.team != 3) {
+      wd.game.trail.push({ img: 'gold', x: wd.target.x, y: wd.target.y });
+      wd.game.gold[3-wd.target.unit.team] += 5;
+    }
     wd.tire();
   }
 }
@@ -820,7 +842,7 @@ exports.teleporter = {
 
 exports.slime = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
+  weight: 100,
   rank: 130,
   class: 'spec',
   img: 'slime',
