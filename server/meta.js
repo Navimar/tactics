@@ -35,10 +35,8 @@ exports.merchant = {
   trade: (wd) => {
     wd.kill();
     if (wd.target.unit.team != 3) {
-      console.log('before', wd.game.gold, wd.target.unit.team)
       wd.game.trail.push({ img: 'gold', x: wd.target.x, y: wd.target.y });
-      wd.game.gold[wd.target.unit.team-1] += 5;
-      console.log('after',wd.game.gold)
+      wd.game.gold[wd.target.unit.team - 1] += 5;
     }
     wd.tire();
   }
@@ -91,6 +89,51 @@ exports.firebat = {
   },
   firebat: (wd) => {
     wd.addStatus('fire');
+    wd.tire();
+  }
+}
+
+exports.bomber = {
+  description: 'Жжот огоньком. У горящего юнита всего один ход, чтобы прыгнуть в воду, а иначе от него останется один только костер. Кто на костер встанет, тот и сам сгорит.',
+  name: 'Бомбер',
+  weight: 100,
+  rank: 80,
+  class: 'warrior',
+  life: 3,
+  img: 'bomber',
+  akt: (akt) => {
+    let arr = akt.move()
+     arr = arr.concat(akt.hand('bomber'))
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  bomber: (wd) => {
+    wd.addStatus('bomber');
+    wd.kill(wd.me);
+    // wd.tire();
+  }
+}
+
+exports.teleporter = {
+  description: 'Оглушает',
+  name: 'Телепортер',
+  weight: 100,
+  rank: 80,
+  class: 'warrior',
+  life: 3,
+  img: 'teleporter',
+  akt: (akt) => {
+    let arr = akt.move()
+    arr = arr.concat(akt.hand('teleporter'))
+    return arr
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  teleporter: (wd) => {
+    wd.addStatus('teleporter');
     wd.tire();
   }
 }
@@ -509,7 +552,7 @@ exports.fountain = {
   neutral: true,
   rank: 70,
   class: 'none',
-  weight: 20,
+  weight: 40,
   life: 3,
   img: 'fountain',
   akt: (akt) => {
@@ -589,7 +632,7 @@ exports.hatchery = {
 }
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
-  weight: 100,
+  weight: 0,
   rank: 10,
   life: 3,
   class: 'spec',
@@ -818,29 +861,30 @@ exports.kicker = {
   }
 }
 
-exports.teleporter = {
-  weight: 100,
-  rank: 50,
-  name: 'Телепортер',
-  description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
-  class: 'spec',
-  life: 3,
-  img: 'teleporter',
-  akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
-    return akt.move().concat(akt.hand('teleport'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  teleport: (wd) => {
-    wd.tire();
-    let points = en.allPoints();
-    points = points.filter(pt => !en.isOccupied(wd.game, pt.x, pt.y))
-    let p = _.sample(points)
-    wd.teleport(wd.target.x, wd.target.y, p.x, p.y)
-  }
-}
+// exports.teleporter = {
+//   weight: 30,
+//   rank: 50,
+//   name: 'Телепортер',
+//   description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
+//   class: 'spec',
+//   life: 3,
+//   neutral: true,
+//   img: 'teleporter',
+//   akt: (akt) => {
+//     // return [{ x: 5, y: 5, img: 'move' }]
+//     return akt.move().concat(akt.hand('teleport'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   teleport: (wd) => {
+//     wd.tire();
+//     let points = en.allPoints();
+//     points = points.filter(pt => !en.isOccupied(wd.game, pt.x, pt.y))
+//     let p = _.sample(points)
+//     wd.teleport(wd.target.x, wd.target.y, p.x, p.y)
+//   }
+// }
 
 exports.slime = {
   name: 'незаполнено', description: 'пока не придумал',
@@ -923,7 +967,7 @@ exports.bear = {
 
 exports.frog = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
+  weight: 100,
   rank: 30,
   class: 'warrior',
   life: 3,
@@ -942,6 +986,10 @@ exports.frog = {
         x: pt.x,
         y: pt.y,
         img: 'frog',
+        data: {
+          tx: (pt.x - akt.me.x) * 2 + akt.me.x,
+          ty: (pt.y - akt.me.y) * 2 + akt.me.y,
+        }
       })
     });
     return akts
@@ -949,23 +997,26 @@ exports.frog = {
   move: (wd) => {
     wd.walk();
   },
-  frog: (wd) => {
+  frog: (wd, data) => {
     wd.me.data.lastjump = {
       x: wd.target.x,
       y: wd.target.y,
     }
     wd.noenergy();
-    let x = (wd.target.x - wd.me.x) * 2;
-    let y = (wd.target.y - wd.me.y) * 2;
-    wd.go(x + wd.me.x, y + wd.me.y);
+    // let x = (wd.target.x - wd.me.x) * 2;
+    // let y = (wd.target.y - wd.me.y) * 2;
+    wd.go(data.tx , data.ty );
     if (wd.target.unit.status.includes('frog')) {
       wd.target.unit.status.remove('frog')
       wd.target.unit.tp = 'frog';
       wd.changeTeam(wd.target.unit);
       wd.target.unit.isReady = false;
     }
-    else
-      wd.addStatus('frog');
+    else {
+      wd.me.status = wd.me.status.concat(wd.target.unit.status);
+      wd.me.status.forEach((status) =>
+        wd.addStatus(status))
+    }
   }
 }
 exports.drill = {

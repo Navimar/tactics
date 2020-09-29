@@ -37,7 +37,7 @@ module.exports = (game, me, target) => {
       if (x != undefined && y != undefined) {
         en.death(game, en.unitInPoint(game, x, y));
       } else if (x != undefined && y == undefined) {
-        en.death(game, en.unitInPoint(game, x.x, x.y));
+        en.death(game, x);
       } else {
         en.death(game, en.unitInPoint(game, target.x, target.y));
       }

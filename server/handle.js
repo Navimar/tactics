@@ -2,7 +2,6 @@
 const player = require('./player');
 const game = require('./game');
 const meta = require('./meta');
-
 const queue = require('./queue');
 const send = require('./send.js');
 const config = require('./config');
@@ -66,11 +65,7 @@ exports.socket = (socket, e, msg) => {
         }
       }
       if (e == 'rematch') {
-        console.log('rematch!!');
-        // // let p = player.bySocket(socket);
-        // gm = game.new(gm.id, gm.players[0], gm.players[1])
-        // send.data(gm);
-        // game.rematch(gm);
+        game.rematch(gm);
       }
       if (e == 'endturn') {
         let p = player.bySocket(socket, gm.id);

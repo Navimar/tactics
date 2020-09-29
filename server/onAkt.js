@@ -27,24 +27,35 @@ exports.telepath = (game, u) => {
   });
   // });
 }
-
-exports.worm = (game, u) => {
-  if (u.tp != 'frog')
-    for (i = game.spoil.length; i--; i > 0) {
-      if (game.spoil[i].name == 'wormportal' && game.spoil[i].x == u.x && game.spoil[i].y == u.y) {
-
-        let oldx = u.x
-        let oldy = u.y
-        u.x = game.spoil[i].data.worm.x;
-        u.y = game.spoil[i].data.worm.y;
-        u.akt = u.akt.concat(meta[u.tp].akt(akter(game, u)))
-        // u.akt = meta[u.tp].akt(akter(game, u));
-        u.x = oldx;
-        u.y = oldy;
-      }
-    }
+exports.teleporter = (game, u) => {
+  if (u.status.includes('teleporter')) {
+    let akts = []
+    let points = en.allPoints();
+    points = points.filter(pt => !en.isOccupied(game, pt.x, pt.y))
+    points.forEach((pt) => {
+      akts.push({
+        x: pt.x,
+        y: pt.y,
+        img: 'teleport',
+      })
+    });
+    u.akt = akts;
+  }
 }
-
+exports.worm = (game, u) => {
+  for (i = game.spoil.length; i--; i > 0) {
+    if (game.spoil[i].name == 'wormportal' && game.spoil[i].x == u.x && game.spoil[i].y == u.y) {
+      let oldx = u.x
+      let oldy = u.y
+      u.x = game.spoil[i].data.worm.x;
+      u.y = game.spoil[i].data.worm.y;
+      u.akt = u.akt.concat(meta[u.tp].akt(akter(game, u)))
+      // u.akt = meta[u.tp].akt(akter(game, u));
+      u.x = oldx;
+      u.y = oldy;
+    }
+  }
+}
 exports.stazis = (game, u) => {
   if (u.status.includes('stazis'))
     u.akt = [];

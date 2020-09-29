@@ -5,11 +5,13 @@ const en = require('./engine');
 const _ = require('lodash');
 
 exports.new = (rank) => {
-  rank =9999
+  rank = 9999
   let barraks = [];
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank)
-      _.times(meta[key].weight, () => barraks.push(key));
+      if (meta[key].weight)
+      barraks.push(key)
+      // _.times(meta[key].weight, () => barraks.push(key));
   });
   let warrior = [];
   let archer = [];
@@ -66,10 +68,21 @@ exports.new = (rank) => {
   }
   points = _.sampleSize(points, 81);
 
+
+  // let defground = _.random(10)
+  // let defgrass = _.random(70)
+  // let defsky =  _.random(15)
+  // let n = _.random(500)
+  let defground = 5
+  let defgrass = 5
+  let defsky = 0
+  let defmountain = 0
+  let n = 999999
   points.forEach(p => {
-    let ground = _.random(10)
-    let grass = _.random(70)
-    let n = _.random(500)
+    let ground = defground
+    let grass = defgrass
+    let mountain = defmountain
+    let sky = defsky
     if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += n;
     if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'ground') ground += n;
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'ground') ground += n;
@@ -80,10 +93,26 @@ exports.new = (rank) => {
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'grass') grass += n;
     if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'grass') grass += n;
 
-    if (_.random(ground + grass - 1) < ground)
+    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'sky') sky += n;
+    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'sky') sky += n;
+    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'sky') sky += n;
+    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'sky') sky += n;
+
+    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'mountain') mountain += n;
+    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'mountain') mountain += n;
+    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
+    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
+
+    let r = _.random(ground + grass + sky + mountain)
+    if (r <= ground)
       data.field[p.x][p.y] = 'ground'
-    else
+    else if (r > ground && r <= ground + grass)
       data.field[p.x][p.y] = 'grass'
+    else if (r > ground + grass && r <= ground + grass + sky)
+      data.field[p.x][p.y] = 'sky'
+    else if (r > ground + grass + sky && r <= ground + grass + sky+mountain)
+      data.field[p.x][p.y] = 'mountain'
+
   });
 
   // data.field[1][1] = 'team' + rndTeam();
@@ -139,25 +168,48 @@ exports.new = (rank) => {
   // orangearr[7].tp = _.sample(warrior);
   // orangearr[8].tp = _.sample(spec);
 
-  bluearr[0].tp = _.sample(barraks);
-  bluearr[1].tp = _.sample(barraks);
-  bluearr[2].tp = _.sample(barraks);
-  bluearr[3].tp = _.sample(barraks);
-  bluearr[4].tp = _.sample(barraks);
-  bluearr[5].tp = _.sample(barraks);
-  bluearr[6].tp = _.sample(barraks);
-  bluearr[7].tp = _.sample(barraks);
-  bluearr[8].tp = _.sample(barraks);
+  barraks = _.shuffle(barraks);
+  bluearr[0].tp = barraks[0]
+  bluearr[1].tp = barraks[1]
+  bluearr[2].tp = barraks[2]
+  bluearr[3].tp = barraks[3]
+  bluearr[4].tp = barraks[4]
+  bluearr[5].tp = barraks[5]
+  bluearr[6].tp = barraks[6]
+  bluearr[7].tp = barraks[7]
+  bluearr[8].tp = barraks[8]
 
-  orangearr[0].tp = _.sample(barraks);
-  orangearr[1].tp = _.sample(barraks);
-  orangearr[2].tp = _.sample(barraks);
-  orangearr[3].tp = _.sample(barraks);
-  orangearr[4].tp = _.sample(barraks);
-  orangearr[5].tp = _.sample(barraks);
-  orangearr[6].tp = _.sample(barraks);
-  orangearr[7].tp = _.sample(barraks);
-  orangearr[8].tp = _.sample(barraks);
+  barraks = _.shuffle(barraks);
+
+  orangearr[1].tp = barraks[0]
+  orangearr[2].tp = barraks[1]
+  orangearr[3].tp = barraks[2]
+  orangearr[0].tp = barraks[3]
+  orangearr[4].tp = barraks[4]
+  orangearr[5].tp = barraks[5]
+  orangearr[6].tp = barraks[6]
+  orangearr[7].tp = barraks[7]
+  orangearr[8].tp = barraks[8]
+
+  // bluearr[0].tp = _.sample(barraks);
+  // bluearr[1].tp = _.sample(barraks);
+  // bluearr[2].tp = _.sample(barraks);
+  // bluearr[3].tp = _.sample(barraks);
+  // bluearr[4].tp = _.sample(barraks);
+  // bluearr[5].tp = _.sample(barraks);
+  // bluearr[6].tp = _.sample(barraks);
+  // bluearr[7].tp = _.sample(barraks);
+  // bluearr[8].tp = _.sample(barraks);
+
+  // orangearr[0].tp = _.sample(barraks);
+  // orangearr[1].tp = _.sample(barraks);
+  // orangearr[2].tp = _.sample(barraks);
+  // orangearr[3].tp = _.sample(barraks);
+  // orangearr[4].tp = _.sample(barraks);
+  // orangearr[5].tp = _.sample(barraks);
+  // orangearr[6].tp = _.sample(barraks);
+  // orangearr[7].tp = _.sample(barraks);
+  // orangearr[8].tp = _.sample(barraks);
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {

@@ -43,8 +43,10 @@ exports.fireend = (game) => {
 				game.spoil.splice(i, 1)
 			else {
 				let unit = en.unitInPoint(game, sp.x, sp.y)
-				if (unit)
+				if (unit) {
 					en.addStatus(unit, 'fire');
+					game.spoil.splice(i, 1)
+				}
 			}
 		}
 	}
@@ -159,6 +161,13 @@ exports.frog = (game) => {
 			u.data.lastjump = false;
 	});
 }
+exports.drillgun = (game) => {
+	game.unit.forEach((u) => {
+		// u.status.remove('frog')
+		if (u.tp == 'drillgun')
+			u.data.summoned = false;
+	});
+}
 exports.aerostat = (game) => {
 	game.unit.forEach((u) => {
 		if (u.tp == 'aerostat')
@@ -213,6 +222,35 @@ exports.capture = (game) => {
 		if (game.field[unit.x][unit.y] == 'team2' && unit.team == 1) game.field[unit.x][unit.y] = 'team1';
 	});
 }
+
+exports.bomber = (wd) => {
+	if (wd.me.status.includes('bomber')) {
+		for (let xx = -1; xx <= 1; xx++) {
+			for (let yy = -1; yy <= 1; yy++) {
+				if (en.inField(wd.target.x + xx, wd.target.y + yy) && wd.game.field[wd.target.x + xx][wd.target.y + yy] == 'grass')
+					wd.game.field[wd.target.x + xx][wd.target.y + yy] = 'ground'
+			}
+		}
+		wd.kill(wd.me.x - 1, wd.me.y - 1);
+		wd.spoil('fire', wd.me.x - 1, wd.me.y - 1, false, 3);
+		wd.kill(wd.me.x, wd.me.y - 1);
+		wd.spoil('fire', wd.me.x, wd.me.y - 1, false, 3);
+		wd.kill(wd.me.x + 1, wd.me.y - 1);
+		wd.spoil('fire', wd.me.x + 1, wd.me.y - 1, false, 3);
+		wd.kill(wd.me.x + 1, wd.me.y);
+		wd.spoil('fire', wd.me.x + 1, wd.me.y, false, 3);
+		wd.kill(wd.me.x - 1, wd.me.y);
+		wd.spoil('fire', wd.me.x - 1, wd.me.y, false, 3);
+		wd.kill(wd.me.x - 1, wd.me.y + 1);
+		wd.spoil('fire', wd.me.x - 1, wd.me.y + 1, false, 3);
+		wd.kill(wd.me.x, wd.me.y + 1);
+		wd.spoil('fire', wd.me.x, wd.me.y + 1, false, 3);
+		wd.kill(wd.me.x + 1, wd.me.y + 1)
+		wd.spoil('fire', wd.me.x + 1, wd.me.y + 1, false, 3);
+		wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
+	}
+}
+
 exports.slime = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('slime')

@@ -294,7 +294,7 @@ let renderpanel = () => {
     c.forEach(e => e.reverse());
   }
   if (data.finished) {
-    // drawSize('rematch', c[3][0], c[3][1], 2, 2)
+    drawSize('rematch', c[3][0], c[3][1], 2, 2)
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)

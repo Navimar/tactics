@@ -1,11 +1,14 @@
 const meta = require('./meta');
+const action = require('./action');
 const time = require('./time');
 const wrapper = require('./wrapper');
+const akter = require('./akter');
 const send = require('./send');
 const en = require('./engine');
 const player = require('./player');
 const generator = require('./generator');
 const onOrder = require('./onOrder');
+const onAkt = require('./onAkt');
 const rules = require('./rules');
 const _ = require('lodash');
 const bot = require('./bot');
@@ -71,9 +74,7 @@ exports.order = (game, u, akt) => {
   if (game && !game.finished) {
     fisher(game);
     game.trail = [];
-
-    // console.log(akt.img)
-
+    let unit = en.unitInPoint(game, u.x, u.y);
     if (akt.img == 'build') {
       // console.log('build')
       let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
@@ -88,9 +89,7 @@ exports.order = (game, u, akt) => {
         }
       });
     } else {
-      let unit = en.unitInPoint(game, u.x, u.y);
       if (unit) {
-
         if (game.chooseteam) addbonus(game, unit)
 
         game.unit.forEach(u => {
@@ -108,16 +107,37 @@ exports.order = (game, u, akt) => {
         } else if (unit.x - akt.x < 0) {
           unit.m = false;
         }
-        meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }));
-        rules.split(game, unit, akt)
+        if (_.isFunction(meta[unit.tp][akt.img])) {
+          meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }), akt.data);
+      }
+        else
+          action[akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }), akt.data);
       }
     }
     //onOrder
-    onOrder(game);
+    onOrder(game, unit,akt);
 
+    updateAkts(game);
     send.data(game);
 
   }
+}
+let updateAkts = (game) => {
+  let id = 0;
+  game.unit.forEach(u => {
+    u.akt = [];
+    if (u.isReady) {
+      u.akt = meta[u.tp].akt(akter(game, u));
+      u.akt.forEach(uakt => {
+        uakt.id = id++;
+      });
+    }
+    onAkt.telepath(game, u);
+    onAkt.worm(game, u)
+    onAkt.slime(game, u);
+    onAkt.stazis(game, u);
+    onAkt.teleporter(game, u);
+  });
 }
 let endgame = (game, winner) => {
   game.finished = true;
@@ -151,19 +171,18 @@ exports.surrender = (game, p) => {
     else {
       endgame(game, 1);
     }
+    updateAkts(game);
     send.data(game);
   }
 }
 
-// exports.rematch = (gm) => {
-//   // console.log('rematch')
-//   let sandbox = gm.sandbox;
-//   let p1 = gm.players[0];
-//   let p2 = gm.players[1];
-//   console.log(gm.id)
-//   gm = creategame(p1, p2, sandbox, gm.id)
-//   send.data(gm);
-// }
+exports.rematch = (gm) => {
+  ng = creategame(gm.players[0], gm.players[1], gm.id)
+  for (i in games)
+    if (games[i] == gm)
+      games[i] = ng
+  send.data(ng);
+}
 
 exports.endturn = (game, p) => {
   function cnFlag() {
@@ -236,6 +255,7 @@ exports.endturn = (game, p) => {
     //onEndTurn
     rules.telepath(game);
     rules.frog(game);
+    rules.drillgun(game);
     rules.aerostat(game);
     rules.landmine(game);
     rules.egg(game);
@@ -247,6 +267,7 @@ exports.endturn = (game, p) => {
 
     onOrder(game);
 
+    updateAkts(game);
     send.data(game);
 
     if (!game.sandbox)
@@ -273,6 +294,7 @@ exports.setbonus = (game, p, bonus) => {
   // else {
   //   game.turn = game.turn == 1 ? 2 : 1;
   // }
+  updateAkts(game);
   send.data(game);
 }
 function addbonus(game, unit) {

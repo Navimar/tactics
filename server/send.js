@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akter');
-const onAkt = require('./onAkt');
 const config = require('./config');
 const player = require('./player');
 
@@ -105,16 +104,21 @@ exports.data = (game) => {
       })(),
     };
 
-    game.unit.forEach(u => {
-      u.akt = [];
-      if (u.isReady) {
-        u.akt = meta[u.tp].akt(akter(game, u));
-      }
-      onAkt.telepath(game,u);
-      onAkt.worm(game,u)
-      onAkt.slime(game, u);
-      onAkt.stazis(game, u);
-    });
+    let id = 0;
+
+    // game.unit.forEach(u => {
+    //   u.akt = [];
+    //   if (u.isReady) {
+    //     u.akt = meta[u.tp].akt(akter(game, u));
+    //     u.akt.forEach(uakt => { 
+    //       uakt.id = id++;
+    //     });
+    //   }
+    //   onAkt.telepath(game,u);
+    //   onAkt.worm(game,u)
+    //   onAkt.slime(game, u);
+    //   onAkt.stazis(game, u);
+    // });
 
     game.unit.forEach(u => {
       send.unit.push({
