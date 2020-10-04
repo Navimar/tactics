@@ -23,7 +23,7 @@ exports.main = (io) => {
   });
   arr = arr.sort((a, b) => { return a.rank - b.rank })
   arr.forEach((e) => {
-    if (meta[e.name].weight > 0 && meta[e.name].class !='none') {
+    if (meta[e.name].weight > 0) {
       i++
       console.log(i, e.name, e.rank)
     }

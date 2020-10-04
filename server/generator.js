@@ -4,7 +4,7 @@ const en = require('./engine');
 // const barraks = require('./barraks');
 const _ = require('lodash');
 
-exports.new = (rank) => {
+exports.new = (rank,ai) => {
   rank = 9999
   let barraks = [];
   Object.keys(meta).forEach(function (key) {
@@ -181,15 +181,28 @@ exports.new = (rank) => {
 
   barraks = _.shuffle(barraks);
 
-  orangearr[1].tp = barraks[0]
-  orangearr[2].tp = barraks[1]
-  orangearr[3].tp = barraks[2]
-  orangearr[0].tp = barraks[3]
-  orangearr[4].tp = barraks[4]
-  orangearr[5].tp = barraks[5]
-  orangearr[6].tp = barraks[6]
-  orangearr[7].tp = barraks[7]
-  orangearr[8].tp = barraks[8]
+  if (!ai) {
+    orangearr[1].tp = barraks[0]
+    orangearr[2].tp = barraks[1]
+    orangearr[3].tp = barraks[2]
+    orangearr[0].tp = barraks[3]
+    orangearr[4].tp = barraks[4]
+    orangearr[5].tp = barraks[5]
+    orangearr[6].tp = barraks[6]
+    orangearr[7].tp = barraks[7]
+    orangearr[8].tp = barraks[8]
+  }
+  else {
+    orangearr[1].tp = 'zombie'
+    orangearr[2].tp = 'zombie'
+    orangearr[3].tp = 'zombie'
+    orangearr[0].tp = 'zombie'
+    orangearr[4].tp = 'zombie'
+    orangearr[5].tp = 'zombie'
+    orangearr[6].tp = 'zombie'
+    orangearr[7].tp = 'zombie'
+    orangearr[8].tp = 'zombie'
+  }
 
   // bluearr[0].tp = _.sample(barraks);
   // bluearr[1].tp = _.sample(barraks);

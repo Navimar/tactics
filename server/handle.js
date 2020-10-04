@@ -32,6 +32,11 @@ exports.socket = (socket, e, msg) => {
           }
         }
       }
+      if (e == 'frame') {
+        let p = player.bySocket(socket, gm.id);
+        if(p)
+        send.frame(gm, p, msg.frame);
+      }
       if (e == 'connection') {
         // stat.connection();
       }
@@ -48,12 +53,8 @@ exports.socket = (socket, e, msg) => {
       }
       if (e == 'bonus') {
         let p = player.bySocket(socket, gm.id);
-        if (p) {
-          let n = 1
-          if (gm.players[0].id != p.id)
-            n = 2
-          game.setbonus(gm, n, msg.bonus);
-        } else console.log('!p')
+        n = player.number(gm, p)
+        game.setbonus(gm, n, msg.bonus);
       }
       if (e == 'surrender') {
         let p = player.bySocket(socket, gm.id);
@@ -115,6 +116,11 @@ exports.bot = (ctx, bot) => {
     send.bot(id, 'Игра успешно создана!', bot);
     send.gamelist(id, p, bot);
   }
+  else if (text == '/mission') {
+    p.game.push(game.new(p, p, 'ai'))
+    send.bot(id, 'Игра успешно создана!', bot);
+    send.gamelist(id, p, bot);
+  }
   else if (text == '/cancel') {
     queue.cancel(p)
     send.bot(id, 'поиск отменен', bot);
@@ -144,7 +150,7 @@ exports.bot = (ctx, bot) => {
       }
     });
     if (f) {
-      send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
+      send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/mission чтобы играть с AI\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
     }
   }
 };

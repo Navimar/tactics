@@ -21,7 +21,9 @@ exports.gamelist = (id, p, bot) => {
   let key = player.setKey(p)
   let text = ''
   p.game.forEach(e => {
-    if (e.sandbox)
+    if (e.ai)
+      text += 'Миссия: '
+    else if (e.sandbox)
       text += 'Песочница: '
     else
       text += e.players[0].id + ' vs ' + e.players[1].id + ' ';
@@ -46,6 +48,8 @@ exports.successfulLogin = (socket) => {
 exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
+      frame: game.frame.length,
+      keyframe: game.keyframe,
       sticker: game.sticker,
       spoil: (() => {
         let arr = []
@@ -104,7 +108,7 @@ exports.data = (game) => {
       })(),
     };
 
-    let id = 0;
+    // let id = 0;
 
     // game.unit.forEach(u => {
     //   u.akt = [];
@@ -123,7 +127,7 @@ exports.data = (game) => {
     game.unit.forEach(u => {
       send.unit.push({
         img: _.isFunction(meta[u.tp].img) ? meta[u.tp].img(u.data) : meta[u.tp].img,
-        status: u.status,
+        status: u.status.slice(),
         isActive: u.isActive,
         isReady: u.isReady,
         life: u.life,
@@ -147,11 +151,15 @@ exports.data = (game) => {
         })(),
       });
     });
+    game.frame.push(send)
     return send;
   }
   if (game) {
     let p0socket = game.players[0].socket.get(game.id)
-    if (game.sandbox) {
+    if (game.ai) {
+      p0socket.emit('update', getData(game, 1));
+    }
+    else if (game.sandbox) {
       p0socket.emit('update', getData(game, game.turn));
     }
     else {
@@ -162,6 +170,14 @@ exports.data = (game) => {
         p1socket.emit('update', getData(game, 2));
     }
   }
+}
+exports.frame = (game, p, f) => {
+  let n = player.number(game, p)
+  let p0socket = game.players[n].socket.get(game.id)
+  if(game.frame[f])
+    p0socket.emit('update', game.frame[f]);
+  else
+    p0socket.emit('update', game.frame[game.frame.length-1]);
 }
 
 exports.logicerror = (game, error) => {

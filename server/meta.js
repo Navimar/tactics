@@ -1,24 +1,32 @@
 const en = require('./engine');
 const _ = require('lodash');
 
-exports.simple = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  rank: 0,
-  class: 'none',
-  life: 3,
-  img: 'simple',
-  akt: (akt) => {
-    return akt.move().concat(akt.hand('warrior'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  warrior: (wd) => {
-    wd.kill();
-    wd.tire();
-  }
-}
+// exports.warrior = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 100,
+//   rank: 0,
+//   class: 'none',
+//   life: 3,
+//   img: 'warrior',
+//   akt: (akt) => {
+//     return akt.move().concat(akt.hand('warrior'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   warrior: (wd) => {
+//     if (wd.target.unit.status.includes('warrior')) {
+//       wd.target.unit.status.remove('warrior')
+//       wd.target.unit.tp = 'warrior';
+//       // wd.changeTeam(wd.target.unit);
+//       // wd.target.unit.isReady = false;
+//       wd.kill();
+//     }
+//     else
+//       wd.addStatus('warrior');
+//     wd.tire();
+//   }
+// }
 exports.merchant = {
   name: 'Продавец', description: 'пока не придумал',
   weight: 100,
@@ -111,7 +119,7 @@ exports.bomber = {
   },
   bomber: (wd) => {
     wd.addStatus('bomber');
-    wd.kill(wd.me);
+    wd.disappear(wd.me);
     // wd.tire();
   }
 }
@@ -171,7 +179,7 @@ exports.staziser = {
   }
 }
 exports.lover = {
-  description: 'стазис',
+  description: 'любовь',
   name: 'Влюбленный',
   weight: 100,
   rank: 80,
@@ -195,7 +203,28 @@ exports.lover = {
     wd.walk();
   },
   love: (wd) => {
-    wd.addStatus('love');
+    let marks = new Map();
+    marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
+    let nw = true;
+    while (nw) {
+      nw = false;
+      wd.game.unit.forEach((u) => {
+        if (u != wd.me) {
+          let npt = en.near(u.x, u.y)
+          npt.forEach((n) => {
+            if (marks.get(n.x + '_' + n.y)) {
+              if (!marks.get(u.x + '_' + u.y)) {
+                marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
+                nw = true;
+              }
+            }
+          });
+        }
+      });
+    }
+    marks.forEach((v, k, m) => {
+      wd.addStatus('love', v.x, v.y);
+    });
     wd.tire();
   },
 }
@@ -281,76 +310,76 @@ exports.aerostat = {
     wd.me.data.drop = false;
   },
 }
-exports.caterbody = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  rank: 0,
-  class: 'none',
-  life: 3,
-  img: 'caterbody',
-  akt: (akt) => {
-    return []
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
-exports.caterhead = {
-  description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
-  name: 'Гусеница',
-  weight: 0,
-  rank: 100,
-  class: 'none',
-  life: 3,
-  img: 'caterhead',
-  akt: (akt) => {
-    let akts = []
-    if (akt.me.energy > 0) {
-      akt.near().forEach((p) => {
-        let img = 'move';
-        if (en.unitInPoint(akt.game, p.x, p.y)) {
-          img = "eat";
-        } else
-          img = 'move'
-        akts.push({ x: p.x, y: p.y, img });
-      });
-    }
-    return akts
-  },
-  move: (wd) => {
-    let lx = wd.me.x
-    let ly = wd.me.y
-    // wd.go(wd.target.x, wd.target.y);
-    wd.flywalk();
-    if (wd.me.body)
-      wd.me.body.forEach((b) => {
-        let nx = b.x;
-        let ny = b.y;
-        wd.teleport(b.x, b.y, lx, ly)
-        lx = nx
-        ly = ny
-      });
+// exports.caterbody = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 0,
+//   rank: 0,
+//   class: 'none',
+//   life: 3,
+//   img: 'caterbody',
+//   akt: (akt) => {
+//     return []
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
+// exports.caterhead = {
+//   description: 'Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят',
+//   name: 'Гусеница',
+//   weight: 0,
+//   rank: 100,
+//   class: 'none',
+//   life: 3,
+//   img: 'caterhead',
+//   akt: (akt) => {
+//     let akts = []
+//     if (akt.me.energy > 0) {
+//       akt.near().forEach((p) => {
+//         let img = 'move';
+//         if (en.unitInPoint(akt.game, p.x, p.y)) {
+//           img = "eat";
+//         } else
+//           img = 'move'
+//         akts.push({ x: p.x, y: p.y, img });
+//       });
+//     }
+//     return akts
+//   },
+//   move: (wd) => {
+//     let lx = wd.me.x
+//     let ly = wd.me.y
+//     // wd.go(wd.target.x, wd.target.y);
+//     wd.flywalk();
+//     if (wd.me.body)
+//       wd.me.body.forEach((b) => {
+//         let nx = b.x;
+//         let ny = b.y;
+//         wd.teleport(b.x, b.y, lx, ly)
+//         lx = nx
+//         ly = ny
+//       });
 
-  },
-  onDeath: (wd) => {
-    if (wd.me.sticker) {
-      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
-      wd.me.sticker = false
-    }
-  },
-  eat: (wd) => {
-    let u = en.addUnit(wd.game, 'caterbody', wd.me.x, wd.me.y, wd.me.team, 3)
-    u.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
-    u.head = wd.me
-    if (!wd.me.body)
-      wd.me.body = [];
-    wd.me.body.unshift(u);
-    wd.disappear(wd.target.unit);
-    wd.flywalk();
-    // wd.tire();
+//   },
+//   onDeath: (wd) => {
+//     if (wd.me.sticker) {
+//       en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+//       wd.me.sticker = false
+//     }
+//   },
+//   eat: (wd) => {
+//     let u = en.addUnit(wd.game, 'caterbody', wd.me.x, wd.me.y, wd.me.team, 3)
+//     u.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
+//     u.head = wd.me
+//     if (!wd.me.body)
+//       wd.me.body = [];
+//     wd.me.body.unshift(u);
+//     wd.disappear(wd.target.unit);
+//     wd.flywalk();
+//     // wd.tire();
 
-  },
-}
+//   },
+// }
 
 exports.zombie = {
   name: 'незаполнено', description: 'пока не придумал',
@@ -378,88 +407,88 @@ exports.zombie = {
   }
 }
 
-exports.diger = {
-  name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
-  // life: 3,
-  rank: 80,
-  weight: 0,
-  class: 'spec',
-  img: 'diger',
-  akt: (akt) => {
-    let akts = akt.freemove()
-    akts.forEach(e => e.img = 'diger');
-    akts.concat(akt.hand('diger'))
-    // akts.push({
-    //   x: akt.me.x,
-    //   y: akt.me.y,
-    //   img: 'diger',
-    // });
-    akts = akts.filter(a => {
-      if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
-        return false
-      else
-        return true
-    });
-    return akts
-  },
-  fly: (wd) => {
-    wd.flywalk();
-  },
-  diger: (wd) => {
-    wd.flywalk();
-    if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
-      wd.game.field[wd.target.x][wd.target.y] = 'ground'
-    else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
-      wd.game.field[wd.target.x][wd.target.y] = 'grass'
-    else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
-      wd.game.field[wd.target.x][wd.target.y] = 'grass'
-    // wd.tire();
-  }
-}
-exports.glider = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  life: 3,
-  class: 'spec',
-  img: 'glider',
-  akt: (akt) => {
-    let akts = akt.hand('glider')
-    akts = akts.filter(a => {
-      let dx = a.x - akt.me.x
-      let dy = a.y - akt.me.y
-      let tx = akt.me.x + dx
-      let ty = akt.me.y + dy
-      do {
-        tx += dx
-        ty += dy
-      } while (en.isOccupied(akt.game, tx, ty) == 1);
-      if (en.isOccupied(akt.game, tx, ty) == -1) {
-        // console.log(tx,ty)
-        return false
-      }
-      else return true;
-    })
-    akts = akts.concat(akt.move());
-    return akts
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  glider: (wd) => {
-    let dx = wd.target.x - wd.me.x
-    let dy = wd.target.y - wd.me.y
-    let tx = wd.me.x + dx
-    let ty = wd.me.y + dy
-    do {
-      wd.damage(tx, ty)
-      tx += dx
-      ty += dy
-    }
-    while (wd.unitInPoint(tx, ty));
-    wd.go(tx, ty)
-    wd.tire();
-  }
-}
+// exports.diger = {
+//   name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
+//   // life: 3,
+//   rank: 80,
+//   weight: 0,
+//   class: 'spec',
+//   img: 'diger',
+//   akt: (akt) => {
+//     let akts = akt.freemove()
+//     akts.forEach(e => e.img = 'diger');
+//     akts.concat(akt.hand('diger'))
+//     // akts.push({
+//     //   x: akt.me.x,
+//     //   y: akt.me.y,
+//     //   img: 'diger',
+//     // });
+//     akts = akts.filter(a => {
+//       if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
+//         return false
+//       else
+//         return true
+//     });
+//     return akts
+//   },
+//   fly: (wd) => {
+//     wd.flywalk();
+//   },
+//   diger: (wd) => {
+//     wd.flywalk();
+//     if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+//       wd.game.field[wd.target.x][wd.target.y] = 'ground'
+//     else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
+//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
+//     else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
+//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
+//     // wd.tire();
+//   }
+// }
+// exports.glider = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 0,
+//   life: 3,
+//   class: 'spec',
+//   img: 'glider',
+//   akt: (akt) => {
+//     let akts = akt.hand('glider')
+//     akts = akts.filter(a => {
+//       let dx = a.x - akt.me.x
+//       let dy = a.y - akt.me.y
+//       let tx = akt.me.x + dx
+//       let ty = akt.me.y + dy
+//       do {
+//         tx += dx
+//         ty += dy
+//       } while (en.isOccupied(akt.game, tx, ty) == 1);
+//       if (en.isOccupied(akt.game, tx, ty) == -1) {
+//         // console.log(tx,ty)
+//         return false
+//       }
+//       else return true;
+//     })
+//     akts = akts.concat(akt.move());
+//     return akts
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   glider: (wd) => {
+//     let dx = wd.target.x - wd.me.x
+//     let dy = wd.target.y - wd.me.y
+//     let tx = wd.me.x + dx
+//     let ty = wd.me.y + dy
+//     do {
+//       wd.damage(tx, ty)
+//       tx += dx
+//       ty += dy
+//     }
+//     while (wd.unitInPoint(tx, ty));
+//     wd.go(tx, ty)
+//     wd.tire();
+//   }
+// }
 exports.bush = {
   name: 'Куст',
   description: '...',
@@ -888,7 +917,7 @@ exports.kicker = {
 
 exports.slime = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 100,
+  weight: 0,
   rank: 130,
   class: 'spec',
   img: 'slime',
@@ -1019,58 +1048,58 @@ exports.frog = {
     }
   }
 }
-exports.drill = {
-  name: 'Крот',
-  description: '',
-  weight: 0,
-  rank: 30,
-  class: 'warrior',
-  life: 3,
-  img: 'drill',
-  akt: (akter) => {
-    let akts = []
-    akter.near().forEach(pt =>
-      akts.push({ img: 'dir', x: pt.x, y: pt.y }));
-    return akts
-  },
-  dir: (wd) => {
-    let x = wd.target.x - wd.me.x
-    let y = wd.target.y - wd.me.y
-    wd.me.data.dir = { x, y };
-    wd.tire();
-  }
-}
-exports.drillgun = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 100,
-  rank: 0,
-  class: 'none',
-  life: 3,
-  img: 'drillgun',
-  akt: (akter) => {
-    let akts = []
-    if (!akter.me.data.summoned)
-      akter.near().forEach(pt =>
-        akts.push({ img: 'newdrill', x: pt.x, y: pt.y }));
-    else
-      akts = akter.move();
-    return akts
-  },
-  move: (wd) => {
-    wd.walk();
-    wd.me.data.summoned = false;
-    wd.tire();
-  },
-  newdrill: (wd) => {
-    wd.kill(wd.target.x, wd.target.y)
-    let u = wd.addUnit('drill', wd.target.x, wd.target.y, 3)
-    if (u) {
-      u.isReady = false;
-      u.data.dir = {
-        x: wd.target.x - wd.me.x,
-        y: wd.target.y - wd.me.y,
-      }
-    }
-    wd.me.data.summoned = true;
-  }
-}
+// exports.drill = {
+//   name: 'Крот',
+//   description: '',
+//   weight: 0,
+//   rank: 30,
+//   class: 'warrior',
+//   life: 3,
+//   img: 'drill',
+//   akt: (akter) => {
+//     let akts = []
+//     akter.near().forEach(pt =>
+//       akts.push({ img: 'dir', x: pt.x, y: pt.y }));
+//     return akts
+//   },
+//   dir: (wd) => {
+//     let x = wd.target.x - wd.me.x
+//     let y = wd.target.y - wd.me.y
+//     wd.me.data.dir = { x, y };
+//     wd.tire();
+//   }
+// }
+// exports.drillgun = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 100,
+//   rank: 0,
+//   class: 'none',
+//   life: 3,
+//   img: 'drillgun',
+//   akt: (akter) => {
+//     let akts = []
+//     if (!akter.me.data.summoned)
+//       akter.near().forEach(pt =>
+//         akts.push({ img: 'newdrill', x: pt.x, y: pt.y }));
+//     else
+//       akts = akter.move();
+//     return akts
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//     wd.me.data.summoned = false;
+//     wd.tire();
+//   },
+//   newdrill: (wd) => {
+//     wd.kill(wd.target.x, wd.target.y)
+//     let u = wd.addUnit('drill', wd.target.x, wd.target.y, 3)
+//     if (u) {
+//       u.isReady = false;
+//       u.data.dir = {
+//         x: wd.target.x - wd.me.x,
+//         y: wd.target.y - wd.me.y,
+//       }
+//     }
+//     wd.me.data.summoned = true;
+//   }
+// }

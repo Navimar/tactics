@@ -12,6 +12,7 @@ const onAkt = require('./onAkt');
 const rules = require('./rules');
 const _ = require('lodash');
 const bot = require('./bot');
+const ai = require('./ai');
 
 let games = []
 let lastid = 0;
@@ -19,42 +20,52 @@ exports.games = () => {
   return games
 }
 
-exports.new = (p1, p2) => {
-  let game = creategame(p1, p2, lastid++)
+exports.new = (p1, p2, ai) => {
+  let game = creategame(p1, p2, lastid++, ai)
   games.push(game);
   return game
 }
 
-let creategame = (p1, p2, id) => {
+let creategame = (p1, p2, id, ai) => {
+  let leftturns = 14
+  let chooseteam = true;
+  let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
-  if (p1 == p2)
+  let bonus = [null, null, null]
+  if (p1 == p2) {
     sandbox = true
-  let data = generator.new(Math.min(p1.rank, p2.rank));
+  }
+  if (ai) {
+    ai = true
+    bonus = [null, 0, 0]
+    leftturns = 50;
+    turn = 1;
+    chooseteam = false;
+  }
+  let data = generator.new(Math.min(p1.rank, p2.rank), ai);
   let game = {
     players: [p1, p2],
     fisher: [120, 120],
     gold: [0, 0],
     trail: [],
     lastturntime: [],
-    // bonus: [null, p2.rank, p1.rank],
-    bonus: [null, null, null],
+    bonus,
     unit: data.unit,
     deadPool: [],
     field: data.field,
-    turn: (() => {
-      if (p1.rank > p2.rank)
-        return 2
-      else return 1
-    })(),
+    turn,
     winner: 0,
-    leftturns: 14,
+    leftturns,
     started: time.clock(),
     sticker: [],
     spoil: [],
     finished: false,
-    chooseteam: true,
+    chooseteam,
     id,
     sandbox,
+    ai,
+    frame: [],
+    keyframe:0,
     destroy: () => {
       for (i = p1.game.length; i--; i > 0) {
         if (p1.game.id == this.id)
@@ -66,7 +77,7 @@ let creategame = (p1, p2, id) => {
       }
     },
   }
-  // chooseteam: false,
+  updateAkts(game);
   return game;
 }
 exports.order = (game, u, akt) => {
@@ -89,7 +100,7 @@ exports.order = (game, u, akt) => {
         }
       });
     } else {
-      if (unit) {
+      if (unit && unit.isReady) {
         if (game.chooseteam) addbonus(game, unit)
 
         game.unit.forEach(u => {
@@ -109,13 +120,15 @@ exports.order = (game, u, akt) => {
         }
         if (_.isFunction(meta[unit.tp][akt.img])) {
           meta[unit.tp][akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }), akt.data);
-      }
+        }
         else
-          action[akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }), akt.data);
+          if (_.isFunction(action[akt.img]))
+            action[akt.img](wrapper(game, unit, { x: akt.x, y: akt.y, unit: en.unitInPoint(game, akt.x, akt.y) }), akt.data);
+          else console.log('unkonwn akt', akt.img);
       }
     }
     //onOrder
-    onOrder(game, unit,akt);
+    onOrder(game, unit, akt);
 
     updateAkts(game);
     send.data(game);
@@ -183,6 +196,8 @@ exports.rematch = (gm) => {
       games[i] = ng
   send.data(ng);
 }
+
+
 
 exports.endturn = (game, p) => {
   function cnFlag() {
@@ -270,10 +285,16 @@ exports.endturn = (game, p) => {
     updateAkts(game);
     send.data(game);
 
+    game.keyframe = game.frame.length-1;
+    if (game.ai && game.turn == 2)
+      ai.go(game, 2);
+
     if (!game.sandbox)
       send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
   }
 }
+
+
 
 exports.setbonus = (game, p, bonus) => {
   game.bonus[3 - p] = bonus;

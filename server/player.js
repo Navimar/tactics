@@ -23,6 +23,12 @@ player.byId = (id) => {
   }
   return false;
 }
+player.number = (gm, p) => {
+  let n = 1
+  if (gm.players[0].id != p.id)
+    n = 2
+  return n
+}
 
 player.addSocket = (p, gameid, socket) => {
   p.socket.set(gameid, socket);

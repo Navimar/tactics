@@ -79,6 +79,9 @@ input.socket = (io) => {
         socket.on('login', function (msg) {
             handle.socket(socket, 'login', msg);
         });
+        socket.on('frame', function (msg) {
+            handle.socket(socket, 'frame', msg);
+        });
     });
 };
 

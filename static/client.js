@@ -146,7 +146,9 @@ let renderhtml = (login) => {
 
 let render = () => {
   resize();
+  let renderhistory = () => {
 
+  }
   let renderfield = (x, y) => {
     // for (let y = 8; y >= 0; y--) {
     //   for (let x = 8; x >= 0; x--) {
@@ -249,10 +251,14 @@ let render = () => {
     if (local.tip && local.tip.dur > 0)
       drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
   }
-  if (data.turn == 1) {
-    drawBackground('edgeTurn');
-  } else {
-    drawBackground('edgeWait');
+  if (local.history)
+    drawBackground('history');
+  else {
+    if (data.turn == 1) {
+      drawBackground('edgeTurn');
+    } else {
+      drawBackground('edgeWait');
+    }
   }
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
@@ -271,6 +277,7 @@ let render = () => {
   if (local.sandclock) {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)
   }
+
   renderpanel();
   rendertrail();
   renderakt();
@@ -294,12 +301,14 @@ let renderpanel = () => {
     c.forEach(e => e.reverse());
   }
   if (data.finished) {
-    drawSize('rematch', c[3][0], c[3][1], 2, 2)
+    // drawSize('frame', c[3][0], c[3][1], 2, 2)
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
   }
-
+  
+  if (local.frame > 0)
+  drawSize('frame', c[3][0], c[3][1], 2, 2)
 
   if (data.bonus == 'choose') {
     drawSize('choose', c[0][0], c[0][1], 2, 2)
@@ -431,11 +440,13 @@ let onUpdate = (val) => {
       local.unit = u
     }
   });
-  // let unit = getUnit(mouseCell.x, mouseCell.y);
-  // if (unit && unit.color == 1 && unit.isReady) local.unit = unit;
+  if (local.frame == data.frame)
+    local.history = false;
+  else
+    local.frame = data.frame
   render();
   if (allakts() == 0 && data.gold[0] < 5) {
-    endturn();
+    // endturn();
   }
 }
 
@@ -452,6 +463,18 @@ let onMouseDown = () => {
     tip('Подключение к серверу...', 3, 3, '#FF0', 5, '2vmax verdana');
     login();
   }
+  else if (local.history) {
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
+      // if (data.finished) {
+      // rematch();
+      if (local.frame > 0)
+        showframe(data.keyframe);
+      // }
+    } else {
+      console.log(data.frame);
+      showframe(data.frame + 1);
+    }
+  }
   else {
     local.tip = false;
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7))) {
@@ -460,9 +483,11 @@ let onMouseDown = () => {
       }
     }
     else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
-      if (data.finished) {
-        rematch();
-      }
+      // if (data.finished) {
+      // rematch();
+      if (local.frame > 0)
+        showframe(data.keyframe);
+      // }
     }
     else if (data.bonus == 'ready' && data.win != 'win' && data.win != 'defeat') {
       if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
@@ -625,6 +650,10 @@ let sendbonus = (bonus) => {
   if (!blocked)
     socket.emit("bonus", { bonus, gameid: local.gameid });
   blocked = true;
+}
+let showframe = (frame) => {
+  local.history = true;
+  socket.emit("frame", { gameid: local.gameid, frame });
 }
 let surrender = () => {
   if (!blocked)
