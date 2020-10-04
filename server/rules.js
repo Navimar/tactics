@@ -296,6 +296,17 @@ exports.lover = (game) => {
 			}
 		}
 }
+exports.staziser = (game) => {
+	let staziser = false;
+	game.unit.forEach(u => {
+		if (u.tp == 'staziser')
+			staziser = true;
+	});
+	if (!staziser)
+		for (i = game.unit.length; i--; i > 0) {
+				game.unit[i].status.remove('stazis')
+		}
+}
 
 exports.drill = (game) => {
 	game.unit.forEach(u => {

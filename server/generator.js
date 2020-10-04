@@ -74,7 +74,7 @@ exports.new = (rank,ai) => {
   // let defsky =  _.random(15)
   // let n = _.random(500)
   let defground = 5
-  let defgrass = 5
+  let defgrass = 50
   let defsky = 0
   let defmountain = 0
   let n = 999999

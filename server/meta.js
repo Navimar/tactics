@@ -134,7 +134,15 @@ exports.teleporter = {
   img: 'teleporter',
   akt: (akt) => {
     let arr = akt.move()
-    arr = arr.concat(akt.hand('teleporter'))
+    let far = akt.hand('teleporter')
+    if (far) {
+      far = far.filter(e => {
+        if (en.unitInPoint(akt.game, e.x, e.y).status == 'teleporter')
+          return false
+        return true
+      });
+      arr = arr.concat(far)
+    }
     return arr
   },
   move: (wd) => {

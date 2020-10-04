@@ -1,4 +1,3 @@
-
 const rules = require('./rules');
 const meta = require('./meta');
 const wrapper = require('./wrapper');
@@ -16,6 +15,7 @@ module.exports = (game,unit,akt) => {
     }
     rules.split(game, unit)
     rules.lover(game);
+    rules.staziser(game);
     rules.spill(game);
     rules.landmineexplosion(game);
     rules.slime(game);
