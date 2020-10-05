@@ -193,15 +193,16 @@ exports.new = (rank,ai) => {
     orangearr[8].tp = barraks[8]
   }
   else {
-    orangearr[1].tp = 'zombie'
-    orangearr[2].tp = 'zombie'
-    orangearr[3].tp = 'zombie'
-    orangearr[0].tp = 'zombie'
-    orangearr[4].tp = 'zombie'
-    orangearr[5].tp = 'zombie'
-    orangearr[6].tp = 'zombie'
-    orangearr[7].tp = 'zombie'
-    orangearr[8].tp = 'zombie'
+    let e = 'firebat'
+    orangearr[1].tp = 'firebat'
+    orangearr[2].tp = 'firebat'
+    orangearr[3].tp = 'firebat'
+    orangearr[0].tp = 'firebat'
+    orangearr[4].tp = 'firebat'
+    orangearr[5].tp = 'firebat'
+    orangearr[6].tp = 'lover'
+    orangearr[7].tp = 'firebat'
+    orangearr[8].tp = 'firebat'
   }
 
   // bluearr[0].tp = _.sample(barraks);

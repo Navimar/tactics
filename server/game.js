@@ -38,7 +38,7 @@ let creategame = (p1, p2, id, ai) => {
   if (ai) {
     ai = true
     bonus = [null, 0, 0]
-    leftturns = 50;
+    leftturns = 20;
     turn = 1;
     chooseteam = false;
   }

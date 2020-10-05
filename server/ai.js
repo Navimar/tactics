@@ -27,12 +27,12 @@ exports.go = (gm, number) => {
     let zcn = 0;
     gm.unit.forEach(u => {
       if (u.team == number) {
-        if (u.tp == 'zombie') {
+        if (u.tp == 'firebat') {
           zcn++;
           if (u.akt.length > 0) {
             let zakt = () => {
               let arr = u.akt.filter((a) => {
-                return a.img == 'zombie' && en.unitInPoint(gm, a.x, a.y).team != number && en.unitInPoint(gm, a.x, a.y).team != 3
+                return a.img == 'firebat' && en.unitInPoint(gm, a.x, a.y).team != number && en.unitInPoint(gm, a.x, a.y).team != 3
               });
               return arr
             }
@@ -70,9 +70,9 @@ exports.go = (gm, number) => {
         }
       }
     });
-    gm.gold[number - 1] += 5;
+    gm.gold[number - 1] += 10;
     let tries = 0
-    let tp = 'zombie'
+    let tp = 'firebat'
     if (zcn > 15)
       tp = 'teleporter';
     while (gm.gold[number - 1] >= 5 && tries < 10) {
