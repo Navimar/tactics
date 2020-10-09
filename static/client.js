@@ -446,7 +446,7 @@ let onUpdate = (val) => {
     local.frame = data.frame
   render();
   if (allakts() == 0 && data.gold[0] < 5) {
-    // endturn();
+    endturn();
   }
 }
 

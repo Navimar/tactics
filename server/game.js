@@ -27,7 +27,7 @@ exports.new = (p1, p2, ai) => {
 }
 
 let creategame = (p1, p2, id, ai) => {
-  let leftturns = 14
+  let leftturns = 20
   let chooseteam = true;
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
@@ -65,7 +65,7 @@ let creategame = (p1, p2, id, ai) => {
     sandbox,
     ai,
     frame: [],
-    keyframe:0,
+    keyframe: 0,
     destroy: () => {
       for (i = p1.game.length; i--; i > 0) {
         if (p1.game.id == this.id)
@@ -285,7 +285,7 @@ exports.endturn = (game, p) => {
     updateAkts(game);
     send.data(game);
 
-    game.keyframe = game.frame.length-1;
+    game.keyframe = game.frame.length - 1;
     if (game.ai && game.turn == 2)
       ai.go(game, 2);
 
@@ -324,6 +324,16 @@ function addbonus(game, unit) {
       if (u.team == 1) { u.team = 2; } else
         if (u.team == 2) u.team = 1;
     });
+    for (let x = 0; x < 9; x++) {
+      for (let y = 0; y < 9; y++) {
+        if (game.field[x][y] == 'team1') {
+          game.field[x][y] = 'team2'
+        }
+        if (game.field[x][y] == 'team2') {
+          game.field[x][y] = 'team1'
+        }
+      }
+    }
   }
   game.gold[0] = game.bonus[1]
   game.gold[1] = game.bonus[2]

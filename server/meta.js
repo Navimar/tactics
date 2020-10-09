@@ -27,6 +27,25 @@ const _ = require('lodash');
 //     wd.tire();
 //   }
 // }
+
+exports.base = {
+  name: 'незаполнено', description: 'пока не придумал',
+  weight: 100,
+  rank: 0,
+  class: 'base',
+  life: 3,
+  img: 'base',
+  akt: (akt) => {
+    return akt.move().concat(akt.hand('capture', 'neutral'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  capture: (wd) => {
+    wd.target.unit.team = wd.me.team;
+    wd.tire();
+  }
+}
 exports.merchant = {
   name: 'Продавец', description: 'пока не придумал',
   weight: 100,
@@ -51,7 +70,7 @@ exports.merchant = {
 }
 exports.chiken = {
   name: 'Уменьшитель', description: 'Превращает юнита в яйцо. В конце хода юнит благополучно вылупится обратно, если конечно никто его не раздавит раньше.',
-  weight: 0,
+  weight: 100,
   rank: 0,
   class: 'warrior',
   life: 3,
@@ -391,7 +410,7 @@ exports.aerostat = {
 
 exports.zombie = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
+  weight: 100,
   rank: 50,
   class: 'none',
   life: 3,
@@ -415,44 +434,44 @@ exports.zombie = {
   }
 }
 
-// exports.diger = {
-//   name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
-//   // life: 3,
-//   rank: 80,
-//   weight: 0,
-//   class: 'spec',
-//   img: 'diger',
-//   akt: (akt) => {
-//     let akts = akt.freemove()
-//     akts.forEach(e => e.img = 'diger');
-//     akts.concat(akt.hand('diger'))
-//     // akts.push({
-//     //   x: akt.me.x,
-//     //   y: akt.me.y,
-//     //   img: 'diger',
-//     // });
-//     akts = akts.filter(a => {
-//       if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
-//         return false
-//       else
-//         return true
-//     });
-//     return akts
-//   },
-//   fly: (wd) => {
-//     wd.flywalk();
-//   },
-//   diger: (wd) => {
-//     wd.flywalk();
-//     if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
-//       wd.game.field[wd.target.x][wd.target.y] = 'ground'
-//     else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
-//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
-//     else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
-//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
-//     // wd.tire();
-//   }
-// }
+exports.diger = {
+  name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
+  // life: 3,
+  rank: 80,
+  weight: 100,
+  class: 'spec',
+  img: 'diger',
+  akt: (akt) => {
+    let akts = akt.freemove()
+    akts.forEach(e => e.img = 'fly');
+    akts = akts.concat(akt.hand('diger'))
+    // akts.push({
+    //   x: akt.me.x,
+    //   y: akt.me.y,
+    //   img: 'diger',
+    // });
+    akts = akts.filter(a => {
+      if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
+        return false
+      else
+        return true
+    });
+    return akts
+  },
+  fly: (wd) => {
+    wd.flywalk();
+  },
+  diger: (wd) => {
+    // wd.flywalk();
+    if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+      wd.game.field[wd.target.x][wd.target.y] = 'ground'
+    else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
+      wd.game.field[wd.target.x][wd.target.y] = 'grass'
+    else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
+      wd.game.field[wd.target.x][wd.target.y] = 'grass'
+    wd.tire();
+  }
+}
 // exports.glider = {
 //   name: 'незаполнено', description: 'пока не придумал',
 //   weight: 0,
@@ -500,7 +519,7 @@ exports.zombie = {
 exports.bush = {
   name: 'Куст',
   description: '...',
-  neutral: true,
+  // neutral: true,
   rank: 0,
   weight: 100,
   class: 'warrior',
@@ -534,7 +553,7 @@ exports.bush = {
 exports.mashroom = {
   name: 'Гриб',
   description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
-  neutral: true,
+  // neutral: true,
   rank: 0,
   weight: 50,
   class: 'warrior',
@@ -557,7 +576,7 @@ exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
   rank: 70,
-  weight: 0,
+  weight: 100,
   class: 'none',
   life: 3,
   img: 'pusher',
@@ -586,7 +605,7 @@ exports.pusher = {
 }
 exports.fountain = {
   name: 'Фонтан', description: 'Разливает воду по низине в которой находится. Когда стоит на траве, то просто ждет случая оказаться в низине.',
-  neutral: true,
+  // neutral: true,
   rank: 70,
   class: 'none',
   weight: 40,
@@ -646,27 +665,27 @@ exports.spliter = {
     wd.tire();
   }
 }
-exports.hatchery = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  life: 3,
-  rank: 160,
-  class: 'none',
-  img: 'hatchery',
-  akt: (akt) => {
-    let akts = akt.move()
-    akts.forEach(e => e.img = 'hatchery');
-    return akts;
-  },
-  hatchery: (wd) => {
-    let u = wd.addUnit('mashroom')
-    // console.log(u)
-    wd.tire()
-    // console.log('zerg',u)
-    if (u)
-      u.isReady = false;
-  }
-}
+// exports.hatchery = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 0,
+//   life: 3,
+//   rank: 160,
+//   class: 'none',
+//   img: 'hatchery',
+//   akt: (akt) => {
+//     let akts = akt.move()
+//     akts.forEach(e => e.img = 'hatchery');
+//     return akts;
+//   },
+//   hatchery: (wd) => {
+//     let u = wd.addUnit('mashroom')
+//     // console.log(u)
+//     wd.tire()
+//     // console.log('zerg',u)
+//     if (u)
+//       u.isReady = false;
+//   }
+// }
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты или взрывается квадратром 3на3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
   weight: 0,
@@ -738,7 +757,7 @@ exports.plant = {
   rank: 60,
   class: 'none',
 
-  neutral: true,
+  // neutral: true,
   img: 'plant',
   akt: (akt) => {
     let akts = [];
@@ -805,7 +824,7 @@ exports.rocket = {
   weight: 10,
   life: 3,
   rank: 100,
-  neutral: true,
+  // neutral: true,
   class: 'warrior',
   img: 'rocket',
   akt: (akt) => {
@@ -871,7 +890,7 @@ exports.plantik = {
   },
 }
 exports.kicker = {
-  weight: 0,
+  weight: 100,
   rank: 50,
   name: 'Пинатель',
   description: 'Пинает юнита и тот летит до ближайшего препятствия по прямой. Если жертва пинка улетит за пределы поля, то уже никогда не вернется, потому что земля плоская.',
@@ -894,7 +913,7 @@ exports.kicker = {
     }
     if (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == -1)
       wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
-    wd.damage(wd.target.unit);
+    // wd.damage(wd.target.unit);
   }
 }
 
@@ -936,7 +955,6 @@ exports.slime = {
   },
   move: (wd) => {
     wd.walk();
-
   },
 
   // electric: (wd) => {
@@ -969,7 +987,7 @@ exports.slime = {
 exports.bear = {
   name: 'незаполнено', description: 'пока не придумал',
   rank: 20,
-  weight: 0,
+  weight: 100,
   class: 'none',
   img: 'bear',
   akt: (akt) => {

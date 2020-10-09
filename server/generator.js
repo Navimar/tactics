@@ -4,7 +4,7 @@ const en = require('./engine');
 // const barraks = require('./barraks');
 const _ = require('lodash');
 
-exports.new = (rank,ai) => {
+exports.new = (rank, ai) => {
   rank = 9999
   let barraks = [];
   Object.keys(meta).forEach(function (key) {
@@ -43,7 +43,13 @@ exports.new = (rank,ai) => {
     return en.makeUnit(tp, x, y, team)
   }
   let rndUnit = () => {
-    return _.sample(barraks);
+    let i = _.random(barraks.length - 1)
+    let r = barraks[i];
+    barraks.splice(i, 1)
+    if (r)
+      return r
+    else
+      throw 'no more unit'
   }
   let rndNeutral = () => {
     return _.sample(neutrals);
@@ -73,7 +79,7 @@ exports.new = (rank,ai) => {
   // let defgrass = _.random(70)
   // let defsky =  _.random(15)
   // let n = _.random(500)
-  let defground = 5
+  let defground = 0
   let defgrass = 50
   let defsky = 0
   let defmountain = 0
@@ -103,14 +109,14 @@ exports.new = (rank,ai) => {
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
     if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
 
-    let r = _.random(ground + grass + sky + mountain)
-    if (r <= ground)
+    let r = _.random(ground + grass + sky + mountain-1)
+    if (r < ground)
       data.field[p.x][p.y] = 'ground'
-    else if (r > ground && r <= ground + grass)
+    else if (r >= ground && r < ground + grass)
       data.field[p.x][p.y] = 'grass'
-    else if (r > ground + grass && r <= ground + grass + sky)
+    else if (r >= ground + grass && r < ground + grass + sky)
       data.field[p.x][p.y] = 'sky'
-    else if (r > ground + grass + sky && r <= ground + grass + sky+mountain)
+    else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
       data.field[p.x][p.y] = 'mountain'
 
   });
@@ -129,68 +135,45 @@ exports.new = (rank,ai) => {
   points = []
   let bluearr = []
   for (let y = 1; y < 8; y++) {
-    for (let x = 1; x < 3; x++) {
+    for (let x = 0; x < 2; x++) {
       bluearr.push({ x, y });
     }
   }
-  bluearr = _.sampleSize(bluearr, 9);
+  bluearr = _.sampleSize(bluearr, 1);
 
   let orangearr = []
   for (let y = 1; y < 8; y++) {
-    for (let x = 6; x < 8; x++) {
+    for (let x = 7; x < 9; x++) {
       orangearr.push({ x, y });
     }
   }
-  orangearr = _.sampleSize(orangearr, 9);
+  orangearr = _.sampleSize(orangearr, 1);
 
 
-  // let w = _.sample(warrior)
-  // let a = _.sample(archer)
-  // let s = _.sample(spec);
-
-  // bluearr[0].tp = _.sample(warrior);
-  // bluearr[1].tp = _.sample(warrior);
-  // bluearr[2].tp = _.sample(warrior);
-  // bluearr[3].tp = _.sample(archer);
-  // bluearr[4].tp = _.sample(archer);
-  // bluearr[5].tp = _.sample(spec);
-  // bluearr[6].tp = _.sample(archer);
-  // bluearr[7].tp = _.sample(warrior);
-  // bluearr[8].tp = _.sample(spec);
-
-  // orangearr[0].tp = _.sample(warrior);
-  // orangearr[1].tp = _.sample(warrior);
-  // orangearr[2].tp = _.sample(warrior);
-  // orangearr[3].tp = _.sample(archer);
-  // orangearr[4].tp = _.sample(archer);
-  // orangearr[5].tp = _.sample(spec);
-  // orangearr[6].tp = _.sample(archer);
-  // orangearr[7].tp = _.sample(warrior);
-  // orangearr[8].tp = _.sample(spec);
 
   barraks = _.shuffle(barraks);
-  bluearr[0].tp = barraks[0]
-  bluearr[1].tp = barraks[1]
-  bluearr[2].tp = barraks[2]
-  bluearr[3].tp = barraks[3]
-  bluearr[4].tp = barraks[4]
-  bluearr[5].tp = barraks[5]
-  bluearr[6].tp = barraks[6]
-  bluearr[7].tp = barraks[7]
-  bluearr[8].tp = barraks[8]
+  bluearr[0].tp = 'base'
+  // bluearr[1].tp = barraks[1]
+  // bluearr[2].tp = barraks[2]
+  // bluearr[3].tp = barraks[3]
+  // bluearr[4].tp = barraks[4]
+  // bluearr[5].tp = barraks[5]
+  // bluearr[6].tp = barraks[6]
+  // bluearr[7].tp = barraks[7]
+  // bluearr[8].tp = barraks[8]
 
   barraks = _.shuffle(barraks);
 
   if (!ai) {
-    orangearr[1].tp = barraks[0]
-    orangearr[2].tp = barraks[1]
-    orangearr[3].tp = barraks[2]
-    orangearr[0].tp = barraks[3]
-    orangearr[4].tp = barraks[4]
-    orangearr[5].tp = barraks[5]
-    orangearr[6].tp = barraks[6]
-    orangearr[7].tp = barraks[7]
-    orangearr[8].tp = barraks[8]
+    // orangearr[1].tp = barraks[0]
+    // orangearr[2].tp = barraks[1]
+    // orangearr[3].tp = barraks[2]
+    orangearr[0].tp = 'base'
+    // orangearr[4].tp = barraks[4]
+    // orangearr[5].tp = barraks[5]
+    // orangearr[6].tp = barraks[6]
+    // orangearr[7].tp = barraks[7]
+    // orangearr[8].tp = barraks[8]
   }
   else {
     let e = 'firebat'
@@ -205,33 +188,14 @@ exports.new = (rank,ai) => {
     orangearr[8].tp = 'firebat'
   }
 
-  // bluearr[0].tp = _.sample(barraks);
-  // bluearr[1].tp = _.sample(barraks);
-  // bluearr[2].tp = _.sample(barraks);
-  // bluearr[3].tp = _.sample(barraks);
-  // bluearr[4].tp = _.sample(barraks);
-  // bluearr[5].tp = _.sample(barraks);
-  // bluearr[6].tp = _.sample(barraks);
-  // bluearr[7].tp = _.sample(barraks);
-  // bluearr[8].tp = _.sample(barraks);
-
-  // orangearr[0].tp = _.sample(barraks);
-  // orangearr[1].tp = _.sample(barraks);
-  // orangearr[2].tp = _.sample(barraks);
-  // orangearr[3].tp = _.sample(barraks);
-  // orangearr[4].tp = _.sample(barraks);
-  // orangearr[5].tp = _.sample(barraks);
-  // orangearr[6].tp = _.sample(barraks);
-  // orangearr[7].tp = _.sample(barraks);
-  // orangearr[8].tp = _.sample(barraks);
-
+  // let market = [];
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      if ((x < 1 || x > 2) && (x < 6 || x > 7) || y < 1 || y > 7)
-        points.push({ x, y, tp: rndNeutral() });
+      if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 1 || y > 7)
+        points.push({ x, y });
     }
   }
-  points = _.sampleSize(points, _.random(9));
+  points = _.sampleSize(points, 14);
 
   bluearr.forEach(e => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 1));
@@ -240,7 +204,10 @@ exports.new = (rank,ai) => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 2));
   });
   points.forEach(e => {
-    data.unit.push(makeUnit(e.tp, e.x, e.y, 3));
+    let tp = e.tp
+    if (!tp)
+      tp = rndUnit()
+    data.unit.push(makeUnit(tp, e.x, e.y, 3));
   });
 
   return data
