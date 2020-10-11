@@ -328,10 +328,10 @@ function addbonus(game, unit) {
       for (let y = 0; y < 9; y++) {
         if (game.field[x][y] == 'team1') {
           game.field[x][y] = 'team2'
-        }
-        if (game.field[x][y] == 'team2') {
-          game.field[x][y] = 'team1'
-        }
+        } else
+          if (game.field[x][y] == 'team2') {
+            game.field[x][y] = 'team1'
+          }
       }
     }
   }

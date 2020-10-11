@@ -151,33 +151,52 @@ exports.data = (game) => {
         })(),
       });
     });
-    game.frame.push(send)
+    if (game.sandbox)
+      game.frame.push(send)
+    else if (player == 1)
+      game.frame.push([send, null])
+    else if (player == 2)
+      game.frame[game.frame.length - 1][1] = send
+    console.log(game.frame.length - 1)
     return send;
   }
   if (game) {
     let p0socket = game.players[0].socket.get(game.id)
     if (game.ai) {
-      p0socket.emit('update', getData(game, 1));
+      p0socket.emit('update', { data: getData(game, 1), history: false });
     }
     else if (game.sandbox) {
-      p0socket.emit('update', getData(game, game.turn));
+      p0socket.emit('update', { data: getData(game, game.turn), history: false });
     }
     else {
       let p1socket = game.players[1].socket.get(game.id)
+      let d1 = getData(game, 1)
+      let d2 = getData(game, 2);
       if (p0socket)
-        p0socket.emit('update', getData(game, 1));
+        p0socket.emit('update', { data: d1, history: false });
       if (p1socket)
-        p1socket.emit('update', getData(game, 2));
+        p1socket.emit('update', { data: d2, history: false });
     }
   }
 }
 exports.frame = (game, p, f) => {
   let n = player.number(game, p)
-  let p0socket = game.players[n].socket.get(game.id)
-  if(game.frame[f])
-    p0socket.emit('update', game.frame[f]);
-  else
-    p0socket.emit('update', game.frame[game.frame.length-1]);
+  let p0socket = game.players[n - 1].socket.get(game.id)
+  if (game.sandbox) {
+    if (game.frame[f])
+      p0socket.emit('update', { data: game.frame[f], history: true });
+    else
+      p0socket.emit('update', { data: game.frame[game.frame.length - 1], history: false });
+  } else {
+    if (game.frame[f]) {
+      if (game.frame[f][n - 1])
+        p0socket.emit('update', { data: game.frame[f][n - 1], history: true });
+    }
+    else if (game.frame[game.frame.length - 1][n - 1])
+      p0socket.emit('update', { data: game.frame[game.frame.length - 1][n - 1], history: false });
+    else
+      p0socket.emit('update', { data: game.frame[game.frame.length - 2][n - 1], history: false });
+  }
 }
 
 exports.logicerror = (game, error) => {

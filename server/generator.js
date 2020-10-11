@@ -10,8 +10,8 @@ exports.new = (rank, ai) => {
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank)
       if (meta[key].weight)
-      barraks.push(key)
-      // _.times(meta[key].weight, () => barraks.push(key));
+        barraks.push(key)
+    // _.times(meta[key].weight, () => barraks.push(key));
   });
   let warrior = [];
   let archer = [];
@@ -109,7 +109,7 @@ exports.new = (rank, ai) => {
     if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
     if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
 
-    let r = _.random(ground + grass + sky + mountain-1)
+    let r = _.random(ground + grass + sky + mountain - 1)
     if (r < ground)
       data.field[p.x][p.y] = 'ground'
     else if (r >= ground && r < ground + grass)
@@ -126,11 +126,11 @@ exports.new = (rank, ai) => {
   // data.field[4][4] = 'team' + rndTeam();
   // data.field[7][7] = 'team' + rndTeam();
   // data.field[7][1] = 'team' + rndTeam();
-  data.field[2][2] = 'team' + rndTeam();
-  data.field[2][6] = 'team' + rndTeam();
-  data.field[4][4] = 'team' + rndTeam();
-  data.field[6][6] = 'team' + rndTeam();
-  data.field[6][2] = 'team' + rndTeam();
+  data.field[2][2] = 'team' + 1;
+  data.field[2][6] = 'team' + 1;
+  data.field[4][4] = 'team' + 1;
+  data.field[6][6] = 'team' + 2;
+  data.field[6][2] = 'team' + 2;
 
   points = []
   let bluearr = []
@@ -139,7 +139,6 @@ exports.new = (rank, ai) => {
       bluearr.push({ x, y });
     }
   }
-  bluearr = _.sampleSize(bluearr, 1);
 
   let orangearr = []
   for (let y = 1; y < 8; y++) {
@@ -147,36 +146,42 @@ exports.new = (rank, ai) => {
       orangearr.push({ x, y });
     }
   }
-  orangearr = _.sampleSize(orangearr, 1);
 
-
-
-  barraks = _.shuffle(barraks);
-  bluearr[0].tp = 'base'
-  // bluearr[1].tp = barraks[1]
-  // bluearr[2].tp = barraks[2]
-  // bluearr[3].tp = barraks[3]
-  // bluearr[4].tp = barraks[4]
-  // bluearr[5].tp = barraks[5]
-  // bluearr[6].tp = barraks[6]
-  // bluearr[7].tp = barraks[7]
-  // bluearr[8].tp = barraks[8]
-
-  barraks = _.shuffle(barraks);
 
   if (!ai) {
-    // orangearr[1].tp = barraks[0]
-    // orangearr[2].tp = barraks[1]
-    // orangearr[3].tp = barraks[2]
+    bluearr = _.sampleSize(bluearr, 1);
+    orangearr = _.sampleSize(orangearr, 1);
+    bluearr[0].tp = 'base'
     orangearr[0].tp = 'base'
-    // orangearr[4].tp = barraks[4]
-    // orangearr[5].tp = barraks[5]
-    // orangearr[6].tp = barraks[6]
-    // orangearr[7].tp = barraks[7]
-    // orangearr[8].tp = barraks[8]
+    points=[]
+    for (let y = 0; y < 9; y++) {
+      for (let x = 0; x < 9; x++) {
+        if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 1 || y > 7)
+          points.push({ x, y });
+      }
+    }
+    points = _.sampleSize(points, 13);
+    points.forEach(e => {
+      let tp = e.tp
+      if (!tp)
+        tp = rndUnit()
+      data.unit.push(makeUnit(tp, e.x, e.y, 3));
+    });
   }
   else {
+    barraks = _.shuffle(barraks);
+    bluearr = _.sampleSize(bluearr, 9);
+    orangearr = _.sampleSize(orangearr, 9);
     let e = 'firebat'
+    bluearr[0].tp = barraks[0]
+    bluearr[1].tp = barraks[1]
+    bluearr[2].tp = barraks[2]
+    bluearr[3].tp = barraks[3]
+    bluearr[4].tp = barraks[4]
+    bluearr[5].tp = barraks[5]
+    bluearr[6].tp = barraks[6]
+    bluearr[7].tp = barraks[7]
+    bluearr[8].tp = barraks[8]
     orangearr[1].tp = 'firebat'
     orangearr[2].tp = 'firebat'
     orangearr[3].tp = 'firebat'
@@ -189,13 +194,7 @@ exports.new = (rank, ai) => {
   }
 
   // let market = [];
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 1 || y > 7)
-        points.push({ x, y });
-    }
-  }
-  points = _.sampleSize(points, 14);
+  
 
   bluearr.forEach(e => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 1));
@@ -203,12 +202,7 @@ exports.new = (rank, ai) => {
   orangearr.forEach(e => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 2));
   });
-  points.forEach(e => {
-    let tp = e.tp
-    if (!tp)
-      tp = rndUnit()
-    data.unit.push(makeUnit(tp, e.x, e.y, 3));
-  });
+ 
 
   return data
 

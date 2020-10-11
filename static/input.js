@@ -7,12 +7,13 @@ function inputServer() {
         render()
     });
     socket.on('update', function (val) {
-        onUpdate(val);
-    });
-    socket.on('login', (val) => {
-        onLogin(val);
-    });
-    socket.on('logic', (val) => {
-        alert(val);
-    });
+        val.data.history = val.history
+        onUpdate(val.data);
+});
+socket.on('login', (val) => {
+    onLogin(val);
+});
+socket.on('logic', (val) => {
+    alert(val);
+});
 }

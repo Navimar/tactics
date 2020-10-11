@@ -9,7 +9,8 @@ let local = {
   sandclock: { x: 0, y: 0 },
   tip: { text: 'Подключение к серверу...', x: 3, y: 3, color: '#F00', font: "3vmax verdana", dur: 30 },
   turn: 1,
-  gameid: findGetParameter("game")
+  gameid: findGetParameter("game"),
+  frame: 0,
 };
 let data = {
   fisher: ['???', '!!!'],
@@ -251,7 +252,7 @@ let render = () => {
     if (local.tip && local.tip.dur > 0)
       drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.font);
   }
-  if (local.history)
+  if (data.history)
     drawBackground('history');
   else {
     if (data.turn == 1) {
@@ -306,9 +307,9 @@ let renderpanel = () => {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
     drawSize('surrender', c[2][0], c[2][1], 2, 2)
   }
-  
+
   if (local.frame > 0)
-  drawSize('frame', c[3][0], c[3][1], 2, 2)
+    drawSize('frame', c[3][0], c[3][1], 2, 2)
 
   if (data.bonus == 'choose') {
     drawSize('choose', c[0][0], c[0][1], 2, 2)
@@ -440,12 +441,13 @@ let onUpdate = (val) => {
       local.unit = u
     }
   });
-  if (local.frame == data.frame)
-    local.history = false;
-  else
+  // console.log(data.history,local.frame, data.frame,data.keyframe);
+
+  if (local.frame != data.frame) {
     local.frame = data.frame
+  }
   render();
-  if (allakts() == 0 && data.gold[0] < 5) {
+  if (!data.history && allakts() == 0 && data.gold[0] < 5) {
     endturn();
   }
 }
@@ -463,7 +465,7 @@ let onMouseDown = () => {
     tip('Подключение к серверу...', 3, 3, '#FF0', 5, '2vmax verdana');
     login();
   }
-  else if (local.history) {
+  else if (data.history) {
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
       // if (data.finished) {
       // rematch();
@@ -471,7 +473,6 @@ let onMouseDown = () => {
         showframe(data.keyframe);
       // }
     } else {
-      console.log(data.frame);
       showframe(data.frame + 1);
     }
   }
@@ -505,8 +506,8 @@ let onMouseDown = () => {
           nextunit++;
         } else {
           nextunit = 0;
-          local.unit = arr[nextunit];
-          nextunit++;
+          local.unit = false;
+          // nextunit++;
         }
       }
       else if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
@@ -652,7 +653,7 @@ let sendbonus = (bonus) => {
   blocked = true;
 }
 let showframe = (frame) => {
-  local.history = true;
+  local.frame = frame;
   socket.emit("frame", { gameid: local.gameid, frame });
 }
 let surrender = () => {
