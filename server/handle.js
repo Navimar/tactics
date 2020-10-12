@@ -34,8 +34,8 @@ exports.socket = (socket, e, msg) => {
       }
       if (e == 'frame') {
         let p = player.bySocket(socket, gm.id);
-        if(p)
-        send.frame(gm, p, msg.frame);
+        if (p)
+          send.frame(gm, p, msg.frame);
       }
       if (e == 'connection') {
         // stat.connection();
@@ -48,6 +48,9 @@ exports.socket = (socket, e, msg) => {
         // console.log('order', gm)
         let p = player.bySocket(socket, gm.id);
         if (p) {
+          if (msg.akt && msg.akt.img == 'build')
+            if (msg.unit == 'rocket3' || msg.unit == 'rocket2' || msg.unit == 'rocket1' || msg.unit == 'rocket0')
+              msg.unit = 'rocket';
           game.order(gm, msg.unit, msg.akt);
         }
       }

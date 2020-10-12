@@ -130,7 +130,7 @@ exports.bomber = {
   img: 'bomber',
   akt: (akt) => {
     let arr = akt.move()
-     arr = arr.concat(akt.hand('bomber'))
+    arr = arr.concat(akt.hand('bomber'))
     return arr
   },
   move: (wd) => {
@@ -308,13 +308,15 @@ exports.aerostat = {
     }
   },
   fly: (wd) => {
+    let x = wd.me.x
+    let y = wd.me.y
+    wd.flywalk();
     if (wd.me.data.drop) {
       if (wd.me.sticker) {
-        en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+        en.addUnit(wd.game, wd.me.sticker.tp, x, y, wd.me.sticker.team, 3)
         wd.me.sticker = false
       }
     }
-    wd.flywalk();
     wd.me.data.drop = false;
   },
   drop: (wd) => {
@@ -325,15 +327,17 @@ exports.aerostat = {
   },
   take: (wd) => {
     // let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
-    if (wd.me.sticker) {
-      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
-      wd.me.sticker = false;
-    }
+    let x = wd.me.x
+    let y = wd.me.y
     wd.me.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
     wd.disappear(wd.target.unit);
 
     // wd.target.unit.small = true;
     wd.flywalk();
+    if (wd.me.sticker) {
+      en.addUnit(wd.game, wd.me.sticker.tp, x, y, wd.me.sticker.team, 3)
+      wd.me.sticker = false;
+    }
     wd.me.data.drop = false;
   },
 }
@@ -826,18 +830,41 @@ exports.rocket = {
   rank: 100,
   // neutral: true,
   class: 'warrior',
-  img: 'rocket',
+  img: (wd) => {
+    let img = 'rocket'
+    for (i = wd.game.spoil.length; i--; i > 0) {
+      if (wd.game.spoil[i].name == 'rockettarget' && wd.game.spoil[i].data.unit == wd.me) {
+        if (wd.game.spoil[i].data.timer == 3)
+          img = 'rocket3'
+        if (wd.game.spoil[i].data.timer == 2)
+          img = 'rocket2'
+        if (wd.game.spoil[i].data.timer == 1)
+          img = 'rocket1'
+        if (wd.game.spoil[i].data.timer == 0)
+          img = 'rocket0'
+      }
+    }
+    wd.me.m = false;
+    return img
+  },
   akt: (akt) => {
     let akts = [];
     let points = en.allPoints();
     // points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
-    points.forEach((pt) => {
-      akts.push({
-        x: pt.x,
-        y: pt.y,
-        img: 'rocket',
-      })
-    });
+    let f = true
+    for (i = akt.game.spoil.length; i--; i > 0) {
+      if (akt.game.spoil[i].name == 'rockettarget' && akt.game.spoil[i].data.unit == akt.me) {
+        f = false;
+      }
+    }
+    if (f)
+      points.forEach((pt) => {
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'rocket',
+        })
+      });
     return akts;
   },
   rocket: (wd) => {
@@ -1060,7 +1087,7 @@ exports.frog = {
     wd.noenergy();
     // let x = (wd.target.x - wd.me.x) * 2;
     // let y = (wd.target.y - wd.me.y) * 2;
-    wd.go(data.tx , data.ty );
+    wd.go(data.tx, data.ty);
     if (wd.target.unit.status.includes('frog')) {
       wd.target.unit.status.remove('frog')
       wd.target.unit.tp = 'frog';

@@ -134,14 +134,14 @@ exports.new = (rank, ai) => {
 
   points = []
   let bluearr = []
-  for (let y = 1; y < 8; y++) {
+  for (let y = 2; y < 7; y++) {
     for (let x = 0; x < 2; x++) {
       bluearr.push({ x, y });
     }
   }
 
   let orangearr = []
-  for (let y = 1; y < 8; y++) {
+  for (let y = 2; y < 7; y++) {
     for (let x = 7; x < 9; x++) {
       orangearr.push({ x, y });
     }
@@ -156,7 +156,7 @@ exports.new = (rank, ai) => {
     points=[]
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 1 || y > 7)
+        if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 2 || y > 6)
           points.push({ x, y });
       }
     }

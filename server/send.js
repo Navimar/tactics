@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const meta = require('./meta');
 const akter = require('./akter');
+const wrapper = require('./wrapper');
+
 const config = require('./config');
 const player = require('./player');
 
@@ -126,7 +128,7 @@ exports.data = (game) => {
 
     game.unit.forEach(u => {
       send.unit.push({
-        img: _.isFunction(meta[u.tp].img) ? meta[u.tp].img(u.data) : meta[u.tp].img,
+        img: _.isFunction(meta[u.tp].img) ? meta[u.tp].img(wrapper(game,u,u)) : meta[u.tp].img,
         status: u.status.slice(),
         isActive: u.isActive,
         isReady: u.isReady,

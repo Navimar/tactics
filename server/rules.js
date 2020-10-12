@@ -94,10 +94,12 @@ exports.rockettarget = (game) => {
 						en.death(game, game.spoil[i].data.unit);
 						for (let xx = -1; xx <= 1; xx++) {
 							for (let yy = -1; yy <= 1; yy++) {
-								if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == 'grass')
-									game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = 'ground'
-								en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
-								en.addSpoil(game, 'fire', game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
+								if (en.inField(game.spoil[i].x + xx, game.spoil[i].y + yy)) {
+									if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == 'grass')
+										game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = 'ground'
+									en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
+									en.addSpoil(game, 'fire', game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
+								}
 							}
 						}
 					}
@@ -304,7 +306,7 @@ exports.staziser = (game) => {
 	});
 	if (!staziser)
 		for (i = game.unit.length; i--; i > 0) {
-				game.unit[i].status.remove('stazis')
+			game.unit[i].status.remove('stazis')
 		}
 }
 

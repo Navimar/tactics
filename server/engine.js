@@ -49,10 +49,12 @@ en.disappear = (game, unit) => {
 }
 
 en.addUnit = (game, tp, x, y, team) => {
-  let u = en.makeUnit(tp, x, y, team)
-  game.trail.push({ img: 'addunit', x, y });
-  game.unit.push(u); return u;
-  
+  if (!en.isOccupied(game, x, y)) {
+    let u = en.makeUnit(tp, x, y, team)
+    game.trail.push({ img: 'addunit', x, y });
+    game.unit.push(u);
+    return u;
+  }
 }
 en.addSpoil = (game, name, x, y, data, team) => {
   game.spoil.push({ name, data, x, y, team })

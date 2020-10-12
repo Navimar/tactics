@@ -355,10 +355,10 @@ let renderpanel = () => {
   });
   drawSize('next', c[1][0], c[1][1], 2, 2)
 
-  drawTxt(arr.length + '', c[1][0] + 1, c[1][1] + 1.5, '#222')
+  drawTxt(arr.length + '', c[1][0] + 0.15, c[1][1] + 1.6, '#222')
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
   drawTxt(data.gold[0] + '', c[1][0] + 0.15, c[1][1] + 0.3, '#090')
-  drawTxt(data.gold[1] + '', c[1][0] + 1 + 0.15, c[1][1] + 0.3, '#f00')
+  drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
 
 
 
