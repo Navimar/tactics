@@ -10,6 +10,7 @@ exports.new = (rank, ai) => {
   Object.keys(meta).forEach(function (key) {
     if (!meta[key].neutral && meta[key].rank <= rank)
       if (meta[key].weight)
+        if (meta[key].class != 'base')
         barraks.push(key)
     // _.times(meta[key].weight, () => barraks.push(key));
   });

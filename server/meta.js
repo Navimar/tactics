@@ -201,9 +201,9 @@ exports.staziser = {
     wd.addStatus('stazis');
     wd.tire();
   },
-  onDeath: (wd) => {
-    wd.game.unit.forEach(u => u.status.remove('stazis'));
-  }
+  //  onDeath: (wd) => {
+  //    wd.game.unit.forEach(u => u.status.remove('stazis'));
+  //  }
 }
 exports.lover = {
   description: 'любовь',
@@ -329,7 +329,7 @@ exports.aerostat = {
     // let mark = wd.game.sticker.filter(m => m.x == wd.me.x && m.y == wd.me.y)
     let x = wd.me.x
     let y = wd.me.y
-    wd.me.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
+    let sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team }
     wd.disappear(wd.target.unit);
 
     // wd.target.unit.small = true;
@@ -338,6 +338,8 @@ exports.aerostat = {
       en.addUnit(wd.game, wd.me.sticker.tp, x, y, wd.me.sticker.team, 3)
       wd.me.sticker = false;
     }
+    wd.me.sticker = sticker
+
     wd.me.data.drop = false;
   },
 }
@@ -570,7 +572,10 @@ exports.mashroom = {
     wd.walk();
   },
   polymorph: (wd) => {
-    let tp = _.sample(Object.keys(module.exports));
+    let tp
+    do {
+      tp = _.sample(Object.keys(module.exports));
+    } while (tp == wd.target.unit.tp)
     wd.target.unit.tp = tp;
     wd.tire();
   }

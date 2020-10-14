@@ -299,15 +299,22 @@ exports.lover = (game) => {
 		}
 }
 exports.staziser = (game) => {
-	let staziser = false;
+	let olddata;
+	let staziser = 0;
 	game.unit.forEach(u => {
-		if (u.tp == 'staziser')
-			staziser = true;
+		if (u.tp == 'staziser') {
+			staziser++;
+			olddata = u.data.staziser;
+		}
 	});
-	if (!staziser)
+	if (olddata && olddata > staziser)
 		for (i = game.unit.length; i--; i > 0) {
 			game.unit[i].status.remove('stazis')
 		}
+	game.unit.forEach(u => {
+		if (u.tp == 'staziser')
+			u.data.staziser = staziser;
+	});
 }
 
 exports.drill = (game) => {
