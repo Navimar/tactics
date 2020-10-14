@@ -95,7 +95,7 @@ exports.data = (game) => {
       })(),
       unit: [],
       gold: (() => {
-        if (player == 1) return game.gold;
+        if (player == 1) return game.gold.slice();
         if (player == 2) return game.gold.slice().reverse();
       })(),
       fisher: (() => {
@@ -159,7 +159,6 @@ exports.data = (game) => {
       game.frame.push([send, null])
     else if (player == 2)
       game.frame[game.frame.length - 1][1] = send
-    console.log(game.frame.length - 1)
     return send;
   }
   if (game) {
