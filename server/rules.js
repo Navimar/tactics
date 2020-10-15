@@ -307,7 +307,7 @@ exports.staziser = (game) => {
 			olddata = u.data.staziser;
 		}
 	});
-	if (olddata && olddata > staziser)
+	if (staziser == 0 || (olddata && olddata > staziser))
 		for (i = game.unit.length; i--; i > 0) {
 			game.unit[i].status.remove('stazis')
 		}
