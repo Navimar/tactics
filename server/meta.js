@@ -440,44 +440,44 @@ exports.zombie = {
   }
 }
 
-exports.diger = {
-  name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
-  // life: 3,
-  rank: 80,
-  weight: 100,
-  class: 'spec',
-  img: 'diger',
-  akt: (akt) => {
-    let akts = akt.freemove()
-    akts.forEach(e => e.img = 'fly');
-    akts = akts.concat(akt.hand('diger'))
-    // akts.push({
-    //   x: akt.me.x,
-    //   y: akt.me.y,
-    //   img: 'diger',
-    // });
-    akts = akts.filter(a => {
-      if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
-        return false
-      else
-        return true
-    });
-    return akts
-  },
-  fly: (wd) => {
-    wd.flywalk();
-  },
-  diger: (wd) => {
-    // wd.flywalk();
-    if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
-      wd.game.field[wd.target.x][wd.target.y] = 'ground'
-    else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
-      wd.game.field[wd.target.x][wd.target.y] = 'grass'
-    else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
-      wd.game.field[wd.target.x][wd.target.y] = 'grass'
-    wd.tire();
-  }
-}
+// exports.diger = {
+//   name: 'Копатель', description: 'Меняет ландшафт, роет и закапывает ямы.',
+//   // life: 3,
+//   rank: 80,
+//   weight: 100,
+//   class: 'spec',
+//   img: 'diger',
+//   akt: (akt) => {
+//     let akts = akt.freemove()
+//     akts.forEach(e => e.img = 'fly');
+//     akts = akts.concat(akt.hand('diger'))
+//     // akts.push({
+//     //   x: akt.me.x,
+//     //   y: akt.me.y,
+//     //   img: 'diger',
+//     // });
+//     akts = akts.filter(a => {
+//       if (a.img == 'diger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
+//         return false
+//       else
+//         return true
+//     });
+//     return akts
+//   },
+//   fly: (wd) => {
+//     wd.flywalk();
+//   },
+//   diger: (wd) => {
+//     // wd.flywalk();
+//     if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+//       wd.game.field[wd.target.x][wd.target.y] = 'ground'
+//     else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
+//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
+//     else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
+//       wd.game.field[wd.target.x][wd.target.y] = 'grass'
+//     wd.tire();
+//   }
+// }
 // exports.glider = {
 //   name: 'незаполнено', description: 'пока не придумал',
 //   weight: 0,
@@ -621,10 +621,20 @@ exports.fountain = {
   life: 3,
   img: 'fountain',
   akt: (akt) => {
-    return akt.move()
+    let akts = akt.move().concat(akt.hand('diger').concat(akt.hand('kill')));
+    akts = akts.filter(a => {
+      let f = akt.game.field[a.x][a.y]
+      if ((a.img == 'diger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water')) || f != 'water' && a.img == 'kill')
+        return false
+      else
+        return true
+    });
+    return akts
   },
   move: (wd) => {
-    wd.walk();
+    if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+      wd.game.field[wd.target.x][wd.target.y] = 'ground'
+    wd.flywalk();
   },
 }
 exports.telepath = {

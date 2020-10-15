@@ -6,3 +6,18 @@ exports.teleport = (wd) => {
   wd.me.status.remove('teleporter');
   wd.tire();
 }
+exports.diger = (wd) => {
+  // wd.flywalk();
+  
+  if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
+    wd.game.field[wd.target.x][wd.target.y] = 'ground'
+  // else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
+  //   wd.game.field[wd.target.x][wd.target.y] = 'grass'
+  // else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
+  //   wd.game.field[wd.target.x][wd.target.y] = 'grass'
+  wd.tire();
+}
+exports.kill = (wd) => {
+  wd.kill();
+  wd.tire();
+}
