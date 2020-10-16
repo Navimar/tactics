@@ -50,7 +50,12 @@ exports.successfulLogin = (socket) => {
 exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
-      frame: game.frame.length,
+      frame: (() => {
+        if (!game.sandbox && player == 2)
+          return game.frame.length-1
+        else
+          return game.frame.length
+      })(),
       keyframe: game.keyframe,
       sticker: game.sticker,
       spoil: (() => {
@@ -133,6 +138,7 @@ exports.data = (game) => {
         isActive: u.isActive,
         isReady: u.isReady,
         life: u.life,
+        description: meta[u.tp].description,
         m: u.m,
         x: u.x,
         y: u.y,

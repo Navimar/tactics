@@ -295,17 +295,20 @@ let renderpanel = () => {
   let c = [
     [-2, 0],
     [-2, 2],
-    [-2, 7],
-    [-2, 5]
-  ]
+    [-2, 8],
+    [-2, 6],
+    [-2, 4]
+  ] 
   if (orientation == 'h') {
     c.forEach(e => e.reverse());
   }
+  drawSize('help', c[4][0], c[4][1], 2, 2)
+
   if (data.finished) {
     // drawSize('frame', c[3][0], c[3][1], 2, 2)
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
-    drawSize('surrender', c[2][0], c[2][1], 2, 2)
+    drawSize('surrender', c[2][0], c[2][1], 2, 1)
   }
 
   if (local.frame > 0)
@@ -466,24 +469,32 @@ let onMouseDown = () => {
     login();
   }
   else if (data.history) {
-    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <=7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
       // if (data.finished) {
       // rematch();
       if (local.frame > 0)
         showframe(data.keyframe);
       // }
     } else {
-      showframe(local.frame);
+      showframe(data.frame+1);
     }
   }
   else {
     local.tip = false;
-    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 7))) {
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 8) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 8))) {
       if (!data.finished) {
         surrender();
       }
     }
-    else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 5 && mouseCell.x < 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 5 && mouseCell.y < 7))) {
+    else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 4 && mouseCell.x <= 5) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 4 && mouseCell.y <= 5))) {
+      if(local.unit)
+        tip(local.unit.description, 3, 3, '#000', 5, '2vmax verdana');
+      else if (local.build)
+        tip('Контрольная точка. Приносит 1 золото в конце хода. Позволяет строить юнитов', 3, 3, '#000', 5, '2vmax verdana');
+      else
+        tip('Выдели юнита и нажми на эту кнопку, чтобы узнать его способность', 3, 3, '#000', 5, '2vmax verdana');
+    }
+    else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
       // if (data.finished) {
       // rematch();
       if (local.frame > 0)
@@ -554,7 +565,7 @@ let onMouseDown = () => {
       // local.focus = false;
       // local.akt = [];
       if (local.unit && local.unit.color == 3 && !local.unit.canMove) {
-        local.unit = false;
+        // local.unit = false;
         tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
       }
       if (local.unit && !local.unit.isReady) {
