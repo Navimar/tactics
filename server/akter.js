@@ -75,10 +75,15 @@ module.exports = (game, me) => {
           let u = en.unitInPoint(game, pt.x, pt.y)
           if (u && u.team == me.team) return true;
         });
-      } else if (who == 'enemy') {
+      } else if (who == 'notally') {
         points = points.filter(pt => {
           let u = en.unitInPoint(game, pt.x, pt.y)
           if (u && u.team != game.turn) return true;
+        });
+      } else if (who == 'notneutral') {
+        points = points.filter(pt => {
+          let u = en.unitInPoint(game, pt.x, pt.y)
+          if (u && u.team != 3) return true;
         });
       } else if (who == 'neutral') {
         points = points.filter(pt => {

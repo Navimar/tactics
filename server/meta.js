@@ -36,13 +36,21 @@ exports.base = {
   life: 3,
   img: 'base',
   akt: (akt) => {
-    return akt.move().concat(akt.hand('capture', 'neutral'))
+    let akts =
+      akt.move()
+        .concat(akt.hand('capture'))
+    // .concat(akt.hand('capture', 'neutral'))
+    // .concat(akt.hand('polymorph', 'notneutral'))
+    return akts
   },
   move: (wd) => {
     wd.walk();
   },
   capture: (wd) => {
-    wd.target.unit.team = wd.me.team;
+    if (wd.target.unit.team == 3)
+      wd.target.unit.team = wd.me.team;
+    else
+    wd.addStatus('teleporter');
     wd.tire();
   }
 }
@@ -83,7 +91,7 @@ exports.chiken = {
   },
   chiken: (wd) => {
     wd.spoil('egg', wd.target.x, wd.target.y, { tp: wd.target.unit.tp, team: wd.target.unit.team }, 3)
-    wd.kill(wd.target.unit);
+    wd.disappear(wd.target.unit);
     wd.tire();
   }
 }
@@ -143,35 +151,35 @@ exports.bomber = {
   }
 }
 
-exports.teleporter = {
-  description: 'Оглушает',
-  name: 'Телепортер',
-  weight: 100,
-  rank: 80,
-  class: 'warrior',
-  life: 3,
-  img: 'teleporter',
-  akt: (akt) => {
-    let arr = akt.move()
-    let far = akt.hand('teleporter')
-    if (far) {
-      far = far.filter(e => {
-        if (en.unitInPoint(akt.game, e.x, e.y).status == 'teleporter')
-          return false
-        return true
-      });
-      arr = arr.concat(far)
-    }
-    return arr
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  teleporter: (wd) => {
-    wd.addStatus('teleporter');
-    wd.tire();
-  }
-}
+// exports.teleporter = {
+//   description: 'Оглушает',
+//   name: 'Телепортер',
+//   weight: 100,
+//   rank: 80,
+//   class: 'warrior',
+//   life: 3,
+//   img: 'teleporter',
+//   akt: (akt) => {
+//     let arr = akt.move()
+//     let far = akt.hand('teleporter')
+//     if (far) {
+//       far = far.filter(e => {
+//         if (en.unitInPoint(akt.game, e.x, e.y).status == 'teleporter')
+//           return false
+//         return true
+//       });
+//       arr = arr.concat(far)
+//     }
+//     return arr
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   teleporter: (wd) => {
+//     wd.addStatus('teleporter');
+//     wd.tire();
+//   }
+// }
 
 exports.staziser = {
   description: 'стазис',
@@ -182,23 +190,16 @@ exports.staziser = {
   life: 3,
   img: 'staziser',
   akt: (akt) => {
-    let arr = akt.move()
-    let far = akt.hand('stazis')
-    if (far) {
-      far = far.filter(e => {
-        if (en.unitInPoint(akt.game, e.x, e.y).status == 'stazis')
-          return false
-        return true
-      });
-      arr = arr.concat(far)
-    }
-    return arr
+    return akt.move().concat(akt.hand('stazis'))
   },
   move: (wd) => {
     wd.walk();
   },
   stazis: (wd) => {
-    wd.addStatus('stazis');
+    if (wd.target.unit.status.includes('stazis'))
+      wd.target.unit.status.remove('stazis')
+    else
+      wd.addStatus('stazis');
     wd.tire();
   },
   //  onDeath: (wd) => {
@@ -556,31 +557,23 @@ exports.bush = {
     wd.teleport(wd.target.x, wd.target.y, x, y)
   }
 }
-exports.mashroom = {
-  name: 'Гриб',
-  description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
-  // neutral: true,
-  rank: 0,
-  weight: 50,
-  class: 'warrior',
-  life: 3,
-  img: 'mashroom',
-  akt: (akt) => {
-    return akt.move().concat(akt.hand('polymorph'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  polymorph: (wd) => {
-    let tp
-    do {
-      tp = _.sample(Object.keys(module.exports));
-    } while (tp == wd.target.unit.tp)
-    wd.target.unit.tp = tp;
-    wd.tire();
-  }
 
-}
+// exports.mashroom = {
+//   name: 'Гриб',
+//   description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
+//   // neutral: true,
+//   rank: 0,
+//   weight: 50,
+//   class: 'warrior',
+//   life: 3,
+//   img: 'mashroom',
+//   akt: (akt) => {
+//     return akt.move().concat(akt.hand('polymorph'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
@@ -645,7 +638,7 @@ exports.telepath = {
   life: 3,
   img: 'telepath',
   akt: (akt) => {
-    let akts = akt.move().concat(akt.hand('telepath', 'enemy'))
+    let akts = akt.move().concat(akt.hand('telepath', 'notally'))
     // akts.forEach(e => e.img = 'hatchery');
     return akts;
   },
@@ -914,23 +907,23 @@ exports.landmine = {
   }
 }
 
-exports.plantik = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  life: 3,
-  img: 'plantik',
-  class: 'none',
-  akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
-    // return akt.move()
-    // .concat(akt.hand('electric'))
-    return []
-  },
-  move: (wd) => {
-    wd.walk();
+// exports.plantik = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 0,
+//   life: 3,
+//   img: 'plantik',
+//   class: 'none',
+//   akt: (akt) => {
+//     // return [{ x: 5, y: 5, img: 'move' }]
+//     // return akt.move()
+//     // .concat(akt.hand('electric'))
+//     return []
+//   },
+//   move: (wd) => {
+//     wd.walk();
 
-  },
-}
+//   },
+// }
 exports.kicker = {
   weight: 100,
   rank: 50,
@@ -1064,7 +1057,7 @@ exports.bear = {
 
 exports.frog = {
   name: 'незаполнено', description: 'пока не придумал',
-  weight: 100,
+  weight: 0,
   rank: 30,
   class: 'warrior',
   life: 3,

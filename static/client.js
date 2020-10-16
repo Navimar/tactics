@@ -473,7 +473,7 @@ let onMouseDown = () => {
         showframe(data.keyframe);
       // }
     } else {
-      showframe(data.frame + 1);
+      showframe(local.frame);
     }
   }
   else {

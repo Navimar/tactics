@@ -1,5 +1,7 @@
 const en = require('./engine');
 const _ = require('lodash');
+const meta = require('./meta');
+
 
 exports.teleport = (wd) => {
   wd.go(wd.target.x, wd.target.y);
@@ -8,7 +10,7 @@ exports.teleport = (wd) => {
 }
 exports.diger = (wd) => {
   // wd.flywalk();
-  
+
   if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
     wd.game.field[wd.target.x][wd.target.y] = 'ground'
   // else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
@@ -19,5 +21,13 @@ exports.diger = (wd) => {
 }
 exports.kill = (wd) => {
   wd.kill();
+  wd.tire();
+}
+exports.polymorph = (wd) => {
+  let tp
+  do {
+    tp = _.sample(Object.keys(meta));
+  } while (tp == wd.target.unit.tp)
+  wd.target.unit.tp = tp;
   wd.tire();
 }

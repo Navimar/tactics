@@ -82,7 +82,7 @@ module.exports = (game, me, target) => {
       en.addSpoil(game, name, x, y, data, team)
     },
     addStatus: (st, x, y) => {
-      if (x && y)
+      if (_.isFinite(x) && _.isFinite(y))
         en.addStatus(en.unitInPoint(game, x, y), st);
       else
         en.addStatus(target.unit, st);

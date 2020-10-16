@@ -60,7 +60,7 @@ exports.stazis = (game, u) => {
   if (u.status.includes('stazis'))
     u.akt = [];
   u.akt = u.akt.filter(a => {
-    if (en.unitInPoint(game, a.x, a.y) && en.unitInPoint(game, a.x, a.y).status.includes('stazis'))
+    if (en.unitInPoint(game, a.x, a.y) && en.unitInPoint(game, a.x, a.y).status.includes('stazis') && a.img != 'stazis')
       return false
     else
       return true

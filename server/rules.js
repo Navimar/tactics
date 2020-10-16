@@ -123,7 +123,11 @@ exports.landmine = (game) => {
 exports.egg = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		if (game.spoil[i].name == 'egg') {
-			en.addUnit(game, game.spoil[i].data.tp, game.spoil[i].x, game.spoil[i].y, game.spoil[i].data.team);
+			let tp
+			do {
+				tp = _.sample(Object.keys(meta));
+			} while (tp == game.spoil[i].data.tp)
+			en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, game.spoil[i].data.team);
 			game.spoil.splice(i, 1)
 		}
 	}

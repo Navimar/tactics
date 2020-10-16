@@ -119,7 +119,6 @@ exports.new = (rank, ai) => {
       data.field[p.x][p.y] = 'sky'
     else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
       data.field[p.x][p.y] = 'mountain'
-
   });
 
   // data.field[1][1] = 'team' + rndTeam();
