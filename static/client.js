@@ -600,47 +600,48 @@ let onMouseDown = () => {
 }
 
 let onMouseDownRight = () => {
-  local.tip = false;
-  nextunit = 0;
-  if (blocked)
-    tip('Секундочку...', mouseCell.x, mouseCell.y, '#005500')
-  if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
-    local.order = getAkt(mouseCell.x, mouseCell.y);
-    if (local.order) {
-      send();
-      local.sandclock = { x: local.order.x, y: local.order.y }
-      leftclickcn -= 5;
-    }
-  }
-  if (local.build && data.turn) {
-    let u = getUnit(mouseCell.x, mouseCell.y);
-    if (u) {
-      if (!blocked) {
-        socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
-        local.build = false
+  if (!data.history) {
+    local.tip = false;
+    nextunit = 0;
+    if (blocked)
+      tip('Секундочку...', mouseCell.x, mouseCell.y, '#005500')
+    if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
+      local.order = getAkt(mouseCell.x, mouseCell.y);
+      if (local.order) {
+        send();
+        local.sandclock = { x: local.order.x, y: local.order.y }
+        leftclickcn -= 5;
       }
-      blocked = true;
-      local.sandclock = { x: local.build.x, y: local.build.y }
-      leftclickcn -= 5;
-    } else {
-      tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
     }
+    if (local.build && data.turn) {
+      let u = getUnit(mouseCell.x, mouseCell.y);
+      if (u) {
+        if (!blocked) {
+          socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
+          local.build = false
+        }
+        blocked = true;
+        local.sandclock = { x: local.build.x, y: local.build.y }
+        leftclickcn -= 5;
+      } else {
+        tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
+      }
+    }
+    // console.log(data.turn)
+    if (!data.turn) {
+      tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
+    }
+    else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
+      tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
+    }
+    else if (local.unit && local.unit.color != 1) {
+      if (data.chooseteam) {
+        tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
+      } else
+        tip('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
+    }
+    render();
   }
-  // console.log(data.turn)
-  if (!data.turn) {
-    tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
-  }
-  else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
-    tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
-  }
-  else if (local.unit && local.unit.color != 1) {
-    if (data.chooseteam) {
-      tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
-    } else
-      tip('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
-  }
-  render();
-
 }
 
 let allakts = () => {
