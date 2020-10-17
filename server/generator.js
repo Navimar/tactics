@@ -9,7 +9,7 @@ exports.new = (rank, ai) => {
   Object.keys(meta).forEach(function (key) {
     if (meta[key].rank <= rank)
       if (meta[key].weight)
-        if (meta[key].class != 'base')
+        if (meta[key].class != 'nope')
           barraks.push(key)
   });
 
@@ -121,10 +121,18 @@ exports.new = (rank, ai) => {
 
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 1);
-    orangearr = _.sampleSize(orangearr, 1);
+    bluearr = _.sampleSize(bluearr, 5);
+    orangearr = _.sampleSize(orangearr, 5);
     bluearr[0].tp = 'base'
     orangearr[0].tp = 'base'
+    bluearr[1].tp = 'warrior'
+    orangearr[1].tp = 'warrior'
+    bluearr[2].tp = 'warrior'
+    orangearr[2].tp = 'warrior'
+    bluearr[3].tp = 'warrior'
+    orangearr[3].tp = 'warrior'
+    bluearr[4].tp = 'warrior'
+    orangearr[4].tp = 'warrior'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -132,8 +140,8 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, 13);
-    let wc = 6;
+    points = _.sampleSize(points, 10);
+    let wc = 0;
     points.forEach(e => {
       let tp = e.tp
       if (!tp)
