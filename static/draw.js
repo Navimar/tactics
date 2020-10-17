@@ -55,9 +55,13 @@ function drawBoard() {
   ctx.restore();
 }
 
-function drawTxt(txt, x, y, color, font) {
+function drawTxt(txt, x, y, color, size, font) {
   color = color || '#222';
-  font = font || '1.5vmax/1.2 Verdana'
+  size = size || 100
+  size = dh * 0.24 * size * 0.01
+  font = font || 'Verdana'
+  font = size + 'px ' + font
+  console.log(font);
   ctx.font = font;
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
@@ -319,7 +323,7 @@ function drawLife(quantity, x, y) {
 
   // let img = getImg('life' + quantity, x, y);
   // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, dh / 3 + 2 * p, dh / 3 + 2 * p);
-  drawTxt(quantity + '', x, y, '#328094', '2.3vmax monospace');
+  drawTxt(quantity + '', x, y, '#328094', '2.3vmin monospace');
   // ctx.drawImage(img, x * dh - p*0.5  + shiftX, y * dh- p*0.5, dh/4 + 2 * p, dh/4 + 2 * p);
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }

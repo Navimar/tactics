@@ -1,42 +1,16 @@
 const meta = require('./meta');
 const en = require('./engine');
 
-// const barraks = require('./barraks');
 const _ = require('lodash');
 
 exports.new = (rank, ai) => {
   rank = 9999
   let barraks = [];
   Object.keys(meta).forEach(function (key) {
-    if (!meta[key].neutral && meta[key].rank <= rank)
+    if (meta[key].rank <= rank)
       if (meta[key].weight)
         if (meta[key].class != 'base')
-        barraks.push(key)
-    // _.times(meta[key].weight, () => barraks.push(key));
-  });
-  let warrior = [];
-  let archer = [];
-  let spec = [];
-  Object.keys(meta).forEach(function (key) {
-    if (!meta[key].neutral && meta[key].rank <= rank) {
-      if (meta[key].class == 'warrior')
-        warrior.push(key)
-      if (meta[key].class == 'archer')
-        archer.push(key)
-      if (meta[key].class == 'spec')
-        spec.push(key)
-    }
-  });
-
-  // barraks = barraks.sort(function () {
-  //   return Math.random() - 0.5;
-  // });
-  // barraks=barraks.slice(0, 3);
-
-  let neutrals = [];
-  Object.keys(meta).forEach(function (key) {
-    if (meta[key].neutral && meta[key].rank <= rank)
-      _.times(meta[key].weight, () => neutrals.push(key));
+          barraks.push(key)
   });
 
   let makeUnit = (tp, x, y, team) => {
@@ -50,11 +24,9 @@ exports.new = (rank, ai) => {
     if (r)
       return r
     else
-      throw 'no more unit'
+      return 'warrior'
   }
-  let rndNeutral = () => {
-    return _.sample(neutrals);
-  }
+
   let c = 0;
   let data = {
     unit: [],
@@ -153,7 +125,7 @@ exports.new = (rank, ai) => {
     orangearr = _.sampleSize(orangearr, 1);
     bluearr[0].tp = 'base'
     orangearr[0].tp = 'base'
-    points=[]
+    points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
         if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 2 || y > 6)
@@ -161,10 +133,17 @@ exports.new = (rank, ai) => {
       }
     }
     points = _.sampleSize(points, 13);
+    let wc = 6;
     points.forEach(e => {
       let tp = e.tp
       if (!tp)
-        tp = rndUnit()
+        if (wc > 0) {
+          tp = 'warrior'
+          wc--
+        }
+        else {
+          tp = rndUnit()
+        }
       data.unit.push(makeUnit(tp, e.x, e.y, 3));
     });
   }
@@ -194,7 +173,7 @@ exports.new = (rank, ai) => {
   }
 
   // let market = [];
-  
+
 
   bluearr.forEach(e => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 1));
@@ -202,7 +181,7 @@ exports.new = (rank, ai) => {
   orangearr.forEach(e => {
     data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 2));
   });
- 
+
 
   return data
 

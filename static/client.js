@@ -7,7 +7,7 @@ let local = {
   focus: false,
   fisher: [999, 999],
   sandclock: { x: 0, y: 0 },
-  tip: { text: 'Подключение к серверу...', x: 3, y: 3, color: '#F00', font: "3vmax verdana", dur: 30 },
+  tip: { text: 'Подключение к серверу...', x: 3, y: 3, color: '#F00', font: 300, dur: 30 },
   turn: 1,
   gameid: findGetParameter("game"),
   frame: 0,
@@ -95,7 +95,7 @@ let fieldmask = (() => {
 
 let tip = (text, x, y, color, dur, font) => {
   if (!font) {
-    font = "1.5vmax/1.2 Verdana"
+    font = 100
   }
   if (!dur)
     dur = 5;
@@ -261,6 +261,7 @@ let render = () => {
       drawBackground('edgeWait');
     }
   }
+  renderpanel();
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
       renderfield(x, y)
@@ -279,11 +280,10 @@ let render = () => {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)
   }
 
-  renderpanel();
   rendertrail();
   renderakt();
   if (!socket.connected)
-    tip('Разорвано соединение с сервером...', 3, 3, '#F00', 5, '2vmax verdana');
+    tip('Разорвано соединение с сервером...', 3, 3, '#F00', 5, 200);
 
   rendertip();
   if (local.focus) {
@@ -298,7 +298,7 @@ let renderpanel = () => {
     [-2, 8],
     [-2, 6],
     [-2, 4]
-  ] 
+  ]
   if (orientation == 'h') {
     c.forEach(e => e.reverse());
   }
@@ -308,7 +308,11 @@ let renderpanel = () => {
     // drawSize('frame', c[3][0], c[3][1], 2, 2)
   } else {
     // drawSize('help', c[3][0], c[3][1], 2, 2)
-    drawSize('surrender', c[2][0], c[2][1], 2, 1)
+    if (orientation == 'w') {
+      drawSize('surrender', c[2][0], c[2][1], 2, 1)
+    } else
+      drawSize('surrenderh', c[2][0], c[2][1], 1, 2)
+
   }
 
   if (local.frame > 0)
@@ -374,13 +378,10 @@ let renderpanel = () => {
       for (let fy = 0; fy < 9; fy++) {
         if (orientation == 'h') {
           drawImgNormal('bonus', fy, fx)
-
-          drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', "3vmax monospace")
-
+          drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', 170)
         } else {
           drawImgNormal('bonus', fx, fy)
-
-          drawTxt(("0" + i).slice(-2), fx + 0.20, fy + 0.20, '#000', "3vmax monospace")
+          drawTxt(("0" + i).slice(-2), fx + 0.24, fy + 0.30, '#000',170 )
 
         }
         i++
@@ -403,7 +404,7 @@ let onStep = (diff) => {
       local.fisher[1]--;
     }
     if (!data.bonus && local.fisher[0] != '' && local.fisher[0] == 30) {
-      tip('Вы не успеваете закончить ход. Ход будет передан сопернику через 30 секунд!', 3, 3, '#F00', 5, '2vmax verdana');
+      tip('Вы не успеваете закончить ход. Ход будет передан сопернику через 30 секунд!', 3, 3, '#F00', 5, 200);
       render();
     };
     // if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
@@ -436,7 +437,7 @@ let onUpdate = (val) => {
   local.fisher[1] = data.fisher[1];
   // console.log('dataturn',data.turn)
   if (local.turn == false && data.turn == true) {
-    tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, '4vmax verdana');
+    tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, 400);
     local.turn = data.turn;
   }
   data.unit.forEach((u) => {
@@ -465,18 +466,18 @@ let getAkt = (x, y) => {
 
 let onMouseDown = () => {
   if (!socket.connected) {
-    tip('Подключение к серверу...', 3, 3, '#FF0', 5, '2vmax verdana');
+    tip('Подключение к серверу...', 3, 3, '#FF0', 5, 200);
     login();
   }
   else if (data.history) {
-    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <=7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
+    if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
       // if (data.finished) {
       // rematch();
       if (local.frame > 0)
         showframe(data.keyframe);
       // }
     } else {
-      showframe(data.frame+1);
+      showframe(data.frame + 1);
     }
   }
   else {
@@ -487,12 +488,12 @@ let onMouseDown = () => {
       }
     }
     else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 4 && mouseCell.x <= 5) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 4 && mouseCell.y <= 5))) {
-      if(local.unit)
-        tip(local.unit.description, 3, 3, '#000', 5, '2vmax verdana');
+      if (local.unit)
+        tip(local.unit.description, 3, 3, '#000', 5, 120);
       else if (local.build)
-        tip('Контрольная точка. Приносит 1 золото в конце хода. Позволяет строить юнитов', 3, 3, '#000', 5, '2vmax verdana');
+        tip('Контрольная точка. Приносит 1 золото в конце хода. Позволяет строить юнитов', 3, 3, '#000', 5, 120);
       else
-        tip('Выдели юнита и нажми на эту кнопку, чтобы узнать его способность', 3, 3, '#000', 5, '2vmax verdana');
+        tip('Выдели юнита и нажми на эту кнопку, чтобы узнать его способность', 3, 3, '#000', 5, 120);
     }
     else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
       // if (data.finished) {
