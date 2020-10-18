@@ -5,7 +5,7 @@ exports.warrior = {
   name: 'незаполнено', description: 'Наносит раны',
   weight: 100,
   rank: 0,
-  class: 'none',
+  class: 'nope',
   life: 3,
   img: 'warrior',
   akt: (akt) => {
@@ -32,7 +32,7 @@ exports.base = {
     name: 'незаполнено', description: 'Захватывает нейтральных юнитов. Остальных юнитов помещает в телепорт. Юнит в телепорте не сможет ходить в свой ход, только телепортироваться',
     weight: 100,
     rank: 0,
-    class: 'base',
+    class: 'nope',
     life: 3,
     img: 'base',
     akt: (akt) => {
