@@ -2,7 +2,7 @@ const en = require('./engine');
 const _ = require('lodash');
 
 exports.warrior = {
-  name: 'незаполнено', description: 'Подходит и наносит рану',
+  name: 'Воин', description: 'Подходит и наносит рану',
   weight: 100,
   rank: 0,
   class: 'nope',
@@ -10,6 +10,61 @@ exports.warrior = {
   img: 'warrior',
   akt: (akt) => {
     return akt.move().concat(akt.hand('wound'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+}
+exports.headcrab = {
+  name: 'Мозгососка', description: 'Захватывает разум юнитов',
+  weight: 100,
+  rank: 0,
+  class: 'nope',
+  life: 3,
+  img: 'headcrab',
+  akt: (akt) => {
+    return akt.move().concat(akt.hand('headcrab','notally'))
+  },
+  headcrab: (wd) => {
+    wd.target.unit.team = wd.me.team;
+    wd.target.unit.isReady = false;
+    wd.kill(wd.me);
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+}
+exports.snail = {
+  name: 'Улитка', description: 'Ходит на одну клетку, давит юнитов и оставляет огненный след',
+  weight: 100,
+  rank: 0,
+  class: 'norm',
+  life: 3,
+  img: 'snail',
+  akt: (akt) => {
+    return akt.hand('move','free').concat(akt.hand('snail'))
+  },
+  snail: (wd) => {
+    wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
+    wd.kill();
+    wd.walk();
+    wd.tire();
+  },
+  move: (wd) => {
+    wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
+    wd.walk();
+    wd.tire();
+  },
+}
+exports.mine = {
+  name: 'Шахта', description: 'Приносит три золота в конце хода',
+  weight: 100,
+  rank: 0,
+  class: 'norm',
+  life: 3,
+  img: 'mine',
+  akt: (akt) => {
+    return []
   },
   move: (wd) => {
     wd.walk();
@@ -38,14 +93,8 @@ exports.archer = {
           y: pt.y,
           img: 'wound',
         })
-      else if (!u)
-        akts.push({
-          x: pt.x,
-          y: pt.y,
-          img: 'move',
-        })
     });
-    return akts;
+    return akts.concat(akt.move())
   },
   move: (wd) => {
     wd.walk();
@@ -82,7 +131,7 @@ exports.merchant = {
   name: 'Продавец', description: 'пока не придумал',
   weight: 100,
   rank: 30,
-  class: 'none',
+  class: 'norm',
   life: 3,
   img: 'merchant',
   akt: (akt) => {
@@ -104,7 +153,7 @@ exports.chicken = {
   name: 'Уменьшитель', description: 'Превращает юнита в яйцо. В конце хода юнит благополучно вылупится обратно, если конечно никто его не раздавит раньше.',
   weight: 100,
   rank: 150,
-  class: 'warrior',
+  class: 'norm',
   life: 3,
   img: 'chicken',
   akt: (akt) => {
@@ -125,7 +174,7 @@ exports.firebat = {
   name: 'Поджигатель',
   weight: 100,
   rank: 80,
-  class: 'warrior',
+  class: 'norm',
   life: 3,
   img: 'firebat',
   akt: (akt) => {
@@ -157,7 +206,7 @@ exports.bomber = {
   name: 'Бомбер',
   weight: 100,
   rank: 80,
-  class: 'warrior',
+  class: 'norm',
   life: 3,
   img: 'bomber',
   akt: (akt) => {
@@ -220,7 +269,7 @@ exports.staziser = {
   name: 'Поджигатель',
   weight: 100,
   rank: 80,
-  class: 'archer',
+  class: 'norm',
   life: 3,
   img: 'staziser',
   akt: (akt) => {
@@ -245,7 +294,7 @@ exports.lover = {
   name: 'Влюбленный',
   weight: 100,
   rank: 80,
-  class: 'archer',
+  class: 'norm',
   life: 3,
   img: 'lover',
   akt: (akt) => {
@@ -295,7 +344,7 @@ exports.aerostat = {
   name: 'Дерижабль',
   weight: 100,
   rank: 100,
-  class: 'spec',
+  class: 'norm',
   life: 3,
   img: 'aerostat',
   akt: (akt) => {
@@ -454,7 +503,7 @@ exports.zombie = {
   name: 'незаполнено', description: 'Превращает в зомби за пару ударов. Бегите.',
   weight: 100,
   rank: 50,
-  class: 'none',
+  class: 'norm',
   life: 3,
   img: 'zombie',
   akt: (akt) => {
@@ -564,7 +613,7 @@ exports.bush = {
   // neutral: true,
   rank: 0,
   weight: 100,
-  class: 'warrior',
+  class: 'neutral',
   life: 3,
   img: 'bush',
   akt: (akt) => {
@@ -593,15 +642,15 @@ exports.bush = {
   }
 }
 
-exports.mashroom = {
-  name: 'Гриб',
-  description: 'Обычно он нейтрален. Обычно он просто растет. Растет медленно, поэтому в течении партии это никак незаметно.',
+exports.polymorpher = {
+  name: 'Маг',
+  description: 'Превращает юнита в случайного другого юнита',
   // neutral: true,
   rank: 0,
   weight: 50,
-  class: 'warrior',
+  class: 'nope',
   life: 3,
-  img: 'mashroom',
+  img: 'polymorpher',
   akt: (akt) => {
     return akt.move().concat(akt.hand('polymorph'))
   },
@@ -609,6 +658,25 @@ exports.mashroom = {
     wd.walk();
   },
 }
+
+exports.mashroom = {
+  name: 'Гриб',
+  description: 'Он просто растет',
+  // neutral: true,
+  rank: 0,
+  weight: 50,
+  class: 'neutral',
+  life: 3,
+  img: 'mashroom',
+  akt: (akt) => {
+    return akt.move()
+    // .concat(akt.hand('polymorph'))
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+}
+
 exports.pusher = {
   name: 'Толкатель',
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
@@ -644,7 +712,7 @@ exports.fountain = {
   name: 'Фонтан', description: 'Разливает воду по низине в которой находится. При движении копает себе озеро. Юнитов в воде топит ударом.',
   // neutral: true,
   rank: 70,
-  class: 'none',
+  class: 'norm',
   weight: 40,
   life: 3,
   img: 'fountain',
@@ -669,7 +737,7 @@ exports.telepath = {
   name: 'Внушитель', description: 'Заставляет юнита соперника или нейтрала выполнить любой приказ',
   weight: 100,
   rank: 40,
-  class: 'archer',
+  class: 'norm',
   life: 3,
   img: 'telepath',
   akt: (akt) => {
@@ -688,7 +756,7 @@ exports.spliter = {
   name: 'Расщипитель', description: 'Разделяет юнита на три. Все три копии нестабильны и погибают после первого своего действия',
   weight: 100,
   rank: 145,
-  class: 'spec',
+  class: 'norm',
   life: 3,
   img: 'spliter',
   akt: (akt) => {
@@ -736,7 +804,7 @@ exports.bird = {
   weight: 0,
   rank: 10,
   life: 3,
-  class: 'spec',
+  class: 'norm',
   img: 'bird',
   akt: (akt) => {
     let akts = [];
@@ -800,8 +868,7 @@ exports.plant = {
   weight: 50,
   life: 3,
   rank: 60,
-  class: 'none',
-
+  class: 'neutral',
   // neutral: true,
   img: 'plant',
   akt: (akt) => {
@@ -833,7 +900,7 @@ exports.worm = {
   weight: 100,
   life: 3,
   rank: 100,
-  class: 'spec',
+  class: 'norm',
   img: 'worm',
   akt: (akt) => {
     let akts = [];
@@ -870,7 +937,7 @@ exports.rocket = {
   life: 3,
   rank: 100,
   // neutral: true,
-  class: 'warrior',
+  class: 'norm',
   img: (wd) => {
     let img = 'rocket'
     for (i = wd.game.spoil.length; i--; i > 0) {
@@ -918,7 +985,7 @@ exports.landmine = {
   name: 'Мина', description: 'Выкапывается и уничтожает юнита, если он на нее наступил. Закапывается после каждого передвижения',
   weight: 100,
   rank: 115,
-  class: 'archer',
+  class: 'norm',
   life: 3,
   img: 'landmine',
   akt: (akt) => {
@@ -962,7 +1029,7 @@ exports.kicker = {
   rank: 50,
   name: 'Пинатель',
   description: 'Пинает юнита и тот летит до ближайшего препятствия или края поля по прямой и ломает его. Препятствие, не край поля.',
-  class: 'none',
+  class: 'norm',
   life: 3,
   img: 'kicker',
   akt: (akt) => {
@@ -1013,20 +1080,20 @@ exports.kicker = {
 //   }
 // }
 
-exports.slime = {
-  name: 'незаполнено', description: 'Заковывает всех по цепочке',
-  weight: 0,
-  rank: 130,
-  class: 'spec',
-  img: 'slime',
-  akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
-    return akt.move()
-    // .concat(akt.hand('electric'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
+// exports.slime = {
+//   name: 'незаполнено', description: 'Заковывает всех по цепочке',
+//   weight: 0,
+//   rank: 130,
+//   class: 'norm',
+//   img: 'slime',
+//   akt: (akt) => {
+//     // return [{ x: 5, y: 5, img: 'move' }]
+//     return akt.move()
+//     // .concat(akt.hand('electric'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
 
   // electric: (wd) => {
   //   let marks = new Map();
@@ -1053,13 +1120,13 @@ exports.slime = {
   //   });
   //   wd.tire();
   // }
-}
+// }
 
 exports.bear = {
   name: 'незаполнено', description: 'Перекидывает юнитов через себя',
   rank: 20,
   weight: 100,
-  class: 'none',
+  class: 'norm',
   img: 'bear',
   akt: (akt) => {
     let akts = akt.move()
@@ -1095,7 +1162,7 @@ exports.frog = {
   name: 'незаполнено', description: 'Прыгает через юнитов, копирует их статусы себе и накладывает все накопленные статусы на них.',
   weight: 100,
   rank: 30,
-  class: 'warrior',
+  class: 'norm',
   life: 3,
   img: 'frog',
   akt: (akt) => {

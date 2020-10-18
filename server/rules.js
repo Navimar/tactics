@@ -35,6 +35,12 @@ exports.firestt = (game) => {
 		}
 	});
 }
+exports.mine = (game) => {
+	game.unit.forEach((u) => {
+		if (u.team == game.turn && u.tp=='mine')
+			game.gold[game.turn-1]+=3
+	});
+}
 exports.fireend = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		let sp = game.spoil[i];

@@ -175,6 +175,8 @@ let render = () => {
     //   drawImgNormal('sn' + data.field[x][y] + data.field[x][y + 1], x, y, fieldmask[x][y]);
     if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
       drawImgNormal('we' + data.field[x - 1][y] + data.field[x][y], x - 0.5, y, fieldmask[x][y]);
+    if (data.field[x][y] == 'team1' && data.gold[0] >= 5)
+      drawImg('canBuild', x, y,);
     // if (data.field[x+1][y])
     //   drawImgNormal('ew' + data.field[x][y] + data.field[x+1][y], x, y, fieldmask[x][y]);
 
@@ -382,7 +384,6 @@ let renderpanel = () => {
         } else {
           drawImgNormal('bonus', fx, fy)
           drawTxt(("0" + i).slice(-2), fx + 0.24, fy + 0.30, '#000',170 )
-
         }
         i++
       }

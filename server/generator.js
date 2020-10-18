@@ -12,6 +12,13 @@ exports.new = (rank, ai) => {
         if (meta[key].class != 'nope')
           barraks.push(key)
   });
+  let neutral = [];
+  Object.keys(meta).forEach(function (key) {
+    if (meta[key].rank <= rank)
+      if (meta[key].weight)
+        if (meta[key].class == 'neutral')
+          neutral.push(key)
+  });
 
   let makeUnit = (tp, x, y, team) => {
     // let life = meta[tp].life;
@@ -121,23 +128,24 @@ exports.new = (rank, ai) => {
 
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 7);
-    orangearr = _.sampleSize(orangearr, 7);
-    bluearr[0].tp = 'mashroom'
-    orangearr[0].tp = 'mashroom'
+    bluearr = _.sampleSize(bluearr, 8);
+    orangearr = _.sampleSize(orangearr, 8);
+    bluearr[0].tp = 'polymorpher'
+    orangearr[0].tp = 'polymorpher'
     bluearr[1].tp = 'warrior'
     orangearr[1].tp = 'warrior'
     bluearr[2].tp = 'warrior'
     orangearr[2].tp = 'warrior'
     bluearr[3].tp = 'warrior'
     orangearr[3].tp = 'warrior'
-    bluearr[4].tp = 'archer'
-    orangearr[4].tp = 'archer'
+    bluearr[4].tp = 'warrior'
+    orangearr[4].tp = 'warrior'
     bluearr[5].tp = 'warrior'
     orangearr[5].tp = 'warrior'
-    bluearr[6].tp = 'archer'
-    orangearr[6].tp = 'archer' 
-    
+    bluearr[6].tp = 'warrior'
+    orangearr[6].tp = 'warrior' 
+    bluearr[7].tp = 'polymorpher'
+    orangearr[7].tp = 'polymorpher'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -145,7 +153,7 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, 0);
+    points = _.sampleSize(points, 5);
     let wc = 0;
     points.forEach(e => {
       let tp = e.tp
@@ -157,7 +165,8 @@ exports.new = (rank, ai) => {
         else {
           tp = rndUnit()
         }
-      data.unit.push(makeUnit(tp, e.x, e.y, 3));
+      // data.unit.push(makeUnit(tp, e.x, e.y, 3));
+      data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
     });
   }
   else {

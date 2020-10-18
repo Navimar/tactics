@@ -90,6 +90,11 @@ module.exports = (game, me) => {
           let u = en.unitInPoint(game, pt.x, pt.y)
           if (u && u.team == 3) return true;
         });
+      } else if (who == 'free') {
+        points = points.filter(pt => {
+          let u = en.unitInPoint(game, pt.x, pt.y)
+          if (!u) return true;
+        });
       } else {
         points = points.filter(pt =>
           en.isOccupied(game, pt.x, pt.y)

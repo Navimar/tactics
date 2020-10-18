@@ -27,7 +27,7 @@ exports.new = (p1, p2, ai) => {
 }
 
 let creategame = (p1, p2, id, ai) => {
-  let leftturns = 30
+  let leftturns = 15
   let chooseteam = true;
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
@@ -241,11 +241,15 @@ exports.endturn = (game, p) => {
         game.fisher[game.turn - 1] += 120;
       }
     }
-    cnFlag()
-    game.turn = game.turn == 1 ? 2 : 1;
     fisher(game)
 
     //onEndTurn
+    rules.mine(game)
+    cnFlag()
+
+    game.turn = game.turn == 1 ? 2 : 1;
+
+    //onStartTurn
     rules.telepath(game);
     rules.frog(game);
     rules.drillgun(game);
@@ -253,10 +257,10 @@ exports.endturn = (game, p) => {
     rules.landmine(game);
     rules.egg(game);
     rules.rockettarget(game);
-    rules.worm(game);
     rules.firestt(game);
     rules.splitOnEndturn(game)
-    rules.drill(game)
+    rules.worm(game);
+    // rules.drill(game)
 
     onOrder(game);
 

@@ -27,7 +27,7 @@ exports.polymorph = (wd) => {
   let tp
   do {
     tp = _.sample(Object.keys(meta));
-  } while (tp == wd.target.unit.tp)
+  } while (tp == wd.target.unit.tp || meta[tp].class == 'neutral')
   wd.target.unit.tp = tp;
   wd.tire();
 }
