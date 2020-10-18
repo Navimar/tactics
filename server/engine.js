@@ -1,3 +1,5 @@
+const meta = require('./meta');
+
 let en = {};
 en.near = (x, y) => {
   return [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }].filter(pt => pt.x <= 8 && pt.x >= 0 && pt.y >= 0 && pt.y <= 8)
@@ -44,6 +46,8 @@ en.death = (game, unit) => {
 en.disappear = (game, unit) => {
   if (unit) {
     game.trail.push({ img: 'disappear', x: unit.x, y: unit.y });
+    if (meta[unit.tp].onDisappear)
+      game.deadPool.push(unit);
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 }
@@ -98,7 +102,7 @@ en.move = (game, unit, x, y) => {
         unit.x = x
         unit.y = y
       } else {
-        require('./send').logicerror(game, 'move cell is busy ' + unit.x +' ' +unit.y)
+        require('./send').logicerror(game, 'move cell is busy ' + unit.x + ' ' + unit.y)
       }
     } else {
       en.disappear(game, unit);

@@ -27,7 +27,7 @@ exports.new = (p1, p2, ai) => {
 }
 
 let creategame = (p1, p2, id, ai) => {
-  let leftturns = 20
+  let leftturns = 30
   let chooseteam = true;
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
@@ -152,7 +152,7 @@ let updateAkts = (game) => {
     onAkt.teleporter(game, u);
   });
 }
-let endgame = (game, winner) => {
+exports.endgame = (game, winner) => {
   game.finished = true;
   game.winner = winner;
   let words = ['Вы победили.', 'Вы проиграли.']
@@ -179,10 +179,10 @@ let endgame = (game, winner) => {
 exports.surrender = (game, p) => {
   if (game && !game.finished) {
     if (p == 1) {
-      endgame(game, 2);
+      exports.endgame(game, 2);
     }
     else {
-      endgame(game, 1);
+      exports.endgame(game, 1);
     }
     updateAkts(game);
     send.data(game);
@@ -221,39 +221,17 @@ exports.endturn = (game, p) => {
   }
 
   if (game && !game.finished) {
-    let one, two
     game.unit.forEach(u => {
       u.energy = 3;
       u.isReady = true;
-      if (u.team == 1) {
-        one = true;
-      }
-      if (u.team == 2) {
-        two = true;
-      }
     });
-    if (!one && two) {
-      endgame(game, 2);
-    }
-    if (one && !two) {
-      endgame(game, 1);
-    }
-    if (!one && !two) {
-      let flag = cnFlag();
-      if (flag[0] > flag[1]) {
-        endgame(game, 1);
-      } else {
-        endgame(game, 2);
-      }
-    }
-
     game.leftturns--;
     if (game.leftturns == 0) {
       let flag = cnFlag();
       if (flag[0] > flag[1]) {
-        endgame(game, 1);
+        exports.endgame(game, 1);
       } else {
-        endgame(game, 2);
+        exports.endgame(game, 2);
       }
     } else {
       if (game.fisher[game.turn - 1] < 0) {

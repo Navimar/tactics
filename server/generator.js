@@ -121,18 +121,23 @@ exports.new = (rank, ai) => {
 
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 5);
-    orangearr = _.sampleSize(orangearr, 5);
-    bluearr[0].tp = 'base'
-    orangearr[0].tp = 'base'
+    bluearr = _.sampleSize(bluearr, 7);
+    orangearr = _.sampleSize(orangearr, 7);
+    bluearr[0].tp = 'mashroom'
+    orangearr[0].tp = 'mashroom'
     bluearr[1].tp = 'warrior'
     orangearr[1].tp = 'warrior'
     bluearr[2].tp = 'warrior'
     orangearr[2].tp = 'warrior'
     bluearr[3].tp = 'warrior'
     orangearr[3].tp = 'warrior'
-    bluearr[4].tp = 'warrior'
-    orangearr[4].tp = 'warrior'
+    bluearr[4].tp = 'archer'
+    orangearr[4].tp = 'archer'
+    bluearr[5].tp = 'warrior'
+    orangearr[5].tp = 'warrior'
+    bluearr[6].tp = 'archer'
+    orangearr[6].tp = 'archer' 
+    
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -140,7 +145,7 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, 10);
+    points = _.sampleSize(points, 0);
     let wc = 0;
     points.forEach(e => {
       let tp = e.tp

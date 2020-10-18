@@ -39,7 +39,7 @@ module.exports = (game, me, target) => {
       } else if (x != undefined && y == undefined) {
         en.death(game, x);
       } else {
-        en.death(game, en.unitInPoint(game, target.x, target.y));
+        en.death(game, target.unit);
       }
     },
     disappear: (x, y) => {

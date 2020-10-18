@@ -31,3 +31,16 @@ exports.polymorph = (wd) => {
   wd.target.unit.tp = tp;
   wd.tire();
 }
+
+exports.wound = (wd) => {
+  if (wd.target.unit.status.includes('wound')) {
+    wd.target.unit.status.remove('wound')
+    wd.addStatus('wound2');
+  }
+  else if (wd.target.unit.status.includes('wound2')) {
+    wd.kill()
+  }
+  else
+    wd.addStatus('wound');
+  wd.tire();
+}
