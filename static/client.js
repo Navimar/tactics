@@ -175,6 +175,13 @@ let render = () => {
     //   drawImgNormal('sn' + data.field[x][y] + data.field[x][y + 1], x, y, fieldmask[x][y]);
     if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
       drawImgNormal('we' + data.field[x - 1][y] + data.field[x][y], x - 0.5, y, fieldmask[x][y]);
+    if (!data.chooseteam && data.bonus == 'ready') {
+    } else {
+      if (data.field[x][y] == 'team1')
+        drawImgNormal('bluestart', x, y, fieldmask[x][y]);
+      if (data.field[x][y] == 'team2')
+        drawImgNormal('orangestart', x, y, fieldmask[x][y]);
+    }
     if (data.field[x][y] == 'team1' && data.gold[0] >= 5)
       drawImg('canBuild', x, y,);
     // if (data.field[x+1][y])
@@ -366,7 +373,11 @@ let renderpanel = () => {
 
   drawTxt(arr.length + '', c[1][0] + 0.15, c[1][1] + 1.6, '#222')
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
-  drawTxt(data.gold[0] + '', c[1][0] + 0.15, c[1][1] + 0.3, '#090')
+
+  let goldtext = data.gold[0] + '';
+  if (data.gold[0] >= 5)
+    goldtext += '  !!!';
+  drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, '#090')
   drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
 
 

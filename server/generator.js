@@ -98,11 +98,14 @@ exports.new = (rank, ai) => {
     else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
       data.field[p.x][p.y] = 'mountain'
   });
-  data.field[2][2] = 'team' + 1;
-  data.field[2][6] = 'team' + 1;
-  data.field[4][4] = 'team' + 1;
-  data.field[6][6] = 'team' + 2;
-  data.field[6][2] = 'team' + 2;
+
+  let numbers = [1, 1, 1, 2, 2]
+  numbers = _.sampleSize(numbers, numbers.length);
+  data.field[1][1] = 'team' + numbers[0];
+  data.field[1][7] = 'team' + numbers[1];
+  data.field[4][4] = 'team' + numbers[2];
+  data.field[7][7] = 'team' + numbers[3];
+  data.field[7][1] = 'team' + numbers[4];
 
   points = []
   let bluearr = []
