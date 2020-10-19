@@ -93,7 +93,7 @@ exports.rockettarget = (game) => {
 		if (game.spoil[i].name == 'rockettarget') {
 			if (game.spoil[i].data.timer == 0) {
 				let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-				if (en.isAlive(game, game.spoil[i].data.unit)) {
+				if (en.isAlive(game, game.spoil[i].data.unit) && game.spoil[i].data.unit.tp=='rocket') {
 					if (game.spoil[i].data.unit != unit) {
 						en.death(game, unit);
 						en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);

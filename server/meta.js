@@ -1,25 +1,25 @@
 const en = require('./engine');
 const _ = require('lodash');
 
-exports.warrior = {
-  name: 'Воин', description: 'Подходит и наносит рану',
-  weight: 100,
-  rank: 0,
-  class: 'nope',
-  life: 3,
-  img: 'warrior',
-  akt: (akt) => {
-    return akt.move().concat(akt.hand('wound'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.warrior = {
+//   name: 'Воин', description: 'Подходит и наносит рану',
+//   weight: 100,
+//   rank: 0,
+//   class: 'nope',
+//   life: 3,
+//   img: 'warrior',
+//   akt: (akt) => {
+//     return akt.move().concat(akt.hand('wound'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 exports.headcrab = {
   name: 'Мозгососка', description: 'Захватывает разум юнитов',
   weight: 100,
   rank: 0,
-  class: 'nope',
+  class: 'norm',
   life: 3,
   img: 'headcrab',
   akt: (akt) => {
@@ -56,56 +56,56 @@ exports.snail = {
     wd.tire();
   },
 }
-exports.mine = {
-  name: 'Шахта', description: 'Приносит три золота в конце хода',
-  weight: 100,
-  rank: 0,
-  class: 'norm',
-  life: 3,
-  img: 'mine',
-  akt: (akt) => {
-    return []
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.mine = {
+//   name: 'Шахта', description: 'Приносит три золота в конце хода',
+//   weight: 100,
+//   rank: 0,
+//   class: 'norm',
+//   life: 3,
+//   img: 'mine',
+//   akt: (akt) => {
+//     return []
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
-exports.archer = {
-  name: 'незаполнено', description: 'Ходит или стреляет нанося рану',
-  weight: 100,
-  rank: 0,
-  class: 'nope',
-  life: 3,
-  img: 'archer',
-  akt: (akt) => {
-    let akts = []
-    let points = en.allPoints();
-    points = points.filter(pt => {
-      if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
-        return true
-    });
-    points.forEach((pt) => {
-      let u = en.unitInPoint(akt.game, pt.x, pt.y)
-      if (u && u != akt.me && akt.me.energy == 3)
-        akts.push({
-          x: pt.x,
-          y: pt.y,
-          img: 'wound',
-        })
-    });
-    return akts.concat(akt.move())
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.archer = {
+//   name: 'незаполнено', description: 'Ходит или стреляет нанося рану',
+//   weight: 100,
+//   rank: 0,
+//   class: 'nope',
+//   life: 3,
+//   img: 'archer',
+//   akt: (akt) => {
+//     let akts = []
+//     let points = en.allPoints();
+//     points = points.filter(pt => {
+//       if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
+//         return true
+//     });
+//     points.forEach((pt) => {
+//       let u = en.unitInPoint(akt.game, pt.x, pt.y)
+//       if (u && u != akt.me && akt.me.energy == 3)
+//         akts.push({
+//           x: pt.x,
+//           y: pt.y,
+//           img: 'wound',
+//         })
+//     });
+//     return akts.concat(akt.move())
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
 exports.base = {
   name: 'незаполнено', description: 'Захватывает нейтральных юнитов. Остальных юнитов помещает в телепорт. Юнит в телепорте не сможет ходить в свой ход, только телепортироваться',
   weight: 100,
   rank: 0,
-  class: 'nope',
+  class: 'norm',
   life: 3,
   img: 'base',
   akt: (akt) => {
@@ -120,7 +120,7 @@ exports.base = {
     wd.walk();
   },
   capture: (wd) => {
-    if (wd.target.unit.team == 3)
+    if (wd.target.unit.team == 3) 
       wd.target.unit.team = wd.me.team;
     else
       wd.addStatus('teleporter');
@@ -642,40 +642,40 @@ exports.bush = {
   }
 }
 
-exports.polymorpher = {
-  name: 'Маг',
-  description: 'Превращает юнита в случайного другого юнита',
-  // neutral: true,
-  rank: 0,
-  weight: 50,
-  class: 'nope',
-  life: 3,
-  img: 'polymorpher',
-  akt: (akt) => {
-    return akt.move().concat(akt.hand('polymorph'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.polymorpher = {
+//   name: 'Маг',
+//   description: 'Превращает юнита в случайного другого юнита',
+//   // neutral: true,
+//   rank: 0,
+//   weight: 50,
+//   class: 'nope',
+//   life: 3,
+//   img: 'polymorpher',
+//   akt: (akt) => {
+//     return akt.move().concat(akt.hand('polymorph'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
-exports.mashroom = {
-  name: 'Гриб',
-  description: 'Он просто растет',
-  // neutral: true,
-  rank: 0,
-  weight: 50,
-  class: 'neutral',
-  life: 3,
-  img: 'mashroom',
-  akt: (akt) => {
-    return akt.move()
-    // .concat(akt.hand('polymorph'))
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.mashroom = {
+//   name: 'Гриб',
+//   description: 'Он просто растет',
+//   // neutral: true,
+//   rank: 0,
+//   weight: 50,
+//   class: 'neutral',
+//   life: 3,
+//   img: 'mashroom',
+//   akt: (akt) => {
+//     return akt.move()
+//     // .concat(akt.hand('polymorph'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
 exports.pusher = {
   name: 'Толкатель',
@@ -791,10 +791,8 @@ exports.spliter = {
 //     return akts;
 //   },
 //   hatchery: (wd) => {
-//     let u = wd.addUnit('mashroom')
-//     // console.log(u)
-//     wd.tire()
-//     // console.log('zerg',u)
+//     let u = wd.addUnit('warrior')
+//     wd.tire())
 //     if (u)
 //       u.isReady = false;
 //   }

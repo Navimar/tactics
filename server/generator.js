@@ -21,7 +21,6 @@ exports.new = (rank, ai) => {
   });
 
   let makeUnit = (tp, x, y, team) => {
-    // let life = meta[tp].life;
     return en.makeUnit(tp, x, y, team)
   }
   let rndUnit = () => {
@@ -34,11 +33,11 @@ exports.new = (rank, ai) => {
       return 'warrior'
   }
 
-  let c = 0;
   let data = {
     unit: [],
     field: [],
   };
+
   for (let x = 0; x < 9; x++) {
     data.field[x] = [];
     for (let y = 0; y < 9; y++) {
@@ -99,12 +98,6 @@ exports.new = (rank, ai) => {
     else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
       data.field[p.x][p.y] = 'mountain'
   });
-
-  // data.field[1][1] = 'team' + rndTeam();
-  // data.field[1][7] = 'team' + rndTeam();
-  // data.field[4][4] = 'team' + rndTeam();
-  // data.field[7][7] = 'team' + rndTeam();
-  // data.field[7][1] = 'team' + rndTeam();
   data.field[2][2] = 'team' + 1;
   data.field[2][6] = 'team' + 1;
   data.field[4][4] = 'team' + 1;
@@ -126,26 +119,13 @@ exports.new = (rank, ai) => {
     }
   }
 
-
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 8);
-    orangearr = _.sampleSize(orangearr, 8);
-    bluearr[0].tp = 'polymorpher'
-    orangearr[0].tp = 'polymorpher'
-    bluearr[1].tp = 'warrior'
-    orangearr[1].tp = 'warrior'
-    bluearr[2].tp = 'warrior'
-    orangearr[2].tp = 'warrior'
-    bluearr[3].tp = 'warrior'
-    orangearr[3].tp = 'warrior'
-    bluearr[4].tp = 'warrior'
-    orangearr[4].tp = 'warrior'
-    bluearr[5].tp = 'warrior'
-    orangearr[5].tp = 'warrior'
-    bluearr[6].tp = 'warrior'
-    orangearr[6].tp = 'warrior' 
-    bluearr[7].tp = 'polymorpher'
-    orangearr[7].tp = 'polymorpher'
+    bluearr = _.sampleSize(bluearr, 2);
+    orangearr = _.sampleSize(orangearr, 2);
+    bluearr[0].tp = 'base'
+    orangearr[0].tp = 'base'
+    bluearr[1].tp = 'chicken'
+    orangearr[1].tp = 'chicken'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -153,7 +133,7 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, 5);
+    points = _.sampleSize(points, 13);
     let wc = 0;
     points.forEach(e => {
       let tp = e.tp
@@ -165,8 +145,8 @@ exports.new = (rank, ai) => {
         else {
           tp = rndUnit()
         }
-      // data.unit.push(makeUnit(tp, e.x, e.y, 3));
-      data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
+      data.unit.push(makeUnit(tp, e.x, e.y, 3));
+      // data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
     });
   }
   else {
@@ -194,21 +174,12 @@ exports.new = (rank, ai) => {
     orangearr[8].tp = 'firebat'
   }
 
-  // let market = [];
-
-
   bluearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 1));
+    data.unit.push(makeUnit(e.tp || 'chicken', e.x, e.y, 1));
   });
   orangearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'chiken', e.x, e.y, 2));
+    data.unit.push(makeUnit(e.tp || 'chicken', e.x, e.y, 2));
   });
 
-
   return data
-
-}
-
-let rndTeam = () => {
-  return (Math.random() >= 0.5) ? 1 : 2;
 }

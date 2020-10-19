@@ -27,7 +27,7 @@ exports.new = (p1, p2, ai) => {
 }
 
 let creategame = (p1, p2, id, ai) => {
-  let leftturns = 15
+  let leftturns = 20
   let chooseteam = true;
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
