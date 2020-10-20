@@ -182,7 +182,7 @@ let render = () => {
       if (data.field[x][y] == 'team2')
         drawImgNormal('orangestart', x, y, fieldmask[x][y]);
     }
-    if (data.field[x][y] == 'team1' && data.gold[0] >= 5)
+    if (data.field[x][y] == 'team1' && data.gold[0] >= local.unitcn)
       drawImg('canBuild', x, y,);
     // if (data.field[x+1][y])
     //   drawImgNormal('ew' + data.field[x][y] + data.field[x+1][y], x, y, fieldmask[x][y]);
@@ -375,8 +375,7 @@ let renderpanel = () => {
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
 
   let goldtext = data.gold[0] + '';
-  if (data.gold[0] >= 5)
-    goldtext += '  !!!';
+  goldtext += ' цена: ' + local.unitcn
   drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, '#090')
   drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
 
@@ -394,7 +393,7 @@ let renderpanel = () => {
           drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', 170)
         } else {
           drawImgNormal('bonus', fx, fy)
-          drawTxt(("0" + i).slice(-2), fx + 0.24, fy + 0.30, '#000',170 )
+          drawTxt(("0" + i).slice(-2), fx + 0.24, fy + 0.30, '#000', 170)
         }
         i++
       }
@@ -452,10 +451,13 @@ let onUpdate = (val) => {
     tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, 400);
     local.turn = data.turn;
   }
+  local.unitcn = 0;
   data.unit.forEach((u) => {
     if (u.isActive && u.akt.length > 0) {
       local.unit = u
     }
+    if (u.color == 1)
+      local.unitcn++
   });
   // console.log(data.history,local.frame, data.frame,data.keyframe);
 
@@ -463,7 +465,7 @@ let onUpdate = (val) => {
     local.frame = data.frame
   }
   render();
-  if (!data.history && allakts() == 0 && data.gold[0] < 5) {
+  if (!data.history && allakts() == 0 && data.gold[0] < local.unitcn) {
     endturn();
   }
 }
@@ -546,7 +548,7 @@ let onMouseDown = () => {
             local.build = false;
           }
           else if (data.field[mouseCell.x][mouseCell.y] == 'team1') {
-            let g = 5
+            let g = local.unitcn
             if (data.gold[0] >= g) {
               local.build = { x: mouseCell.x, y: mouseCell.y }
               local.unit = false;

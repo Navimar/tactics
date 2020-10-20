@@ -60,8 +60,11 @@ module.exports = (game, me, target) => {
     unitInPoint: (x, y) => {
       return en.unitInPoint(game, x, y);
     },
-    spoilInPoint: (x, y) => {
-      return en.spoilInPoint(game, x, y);
+    spoilInPoint: (x, y, name) => {
+      return en.spoilInPoint(game, x, y).filter(s => {
+        console.log(s)
+        return s.name == name
+      });
     },
     tire: () => {
       me.isReady = false;
@@ -80,6 +83,12 @@ module.exports = (game, me, target) => {
     },
     spoil: (name, x, y, data, team) => {
       en.addSpoil(game, name, x, y, data, team)
+    },
+    clearspoil: (x, y, name) => {
+      for (i = game.spoil.length; i--; i > 0) {
+        if (game.spoil[i].name == name && game.spoil[i].x == x && game.spoil[i].y == y)
+          game.spoil.splice(i, 1)
+      }
     },
     addStatus: (st, x, y) => {
       if (_.isFinite(x) && _.isFinite(y))

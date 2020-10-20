@@ -8,31 +8,31 @@ const _ = require('lodash');
 
 module.exports = (game, unit, akt) => {
   //проверяем жив ли кто вообще
-  if (game && !game.finished) {
-    let one, two
-    game.unit.forEach(u => {
-      if (u.team == 1) {
-        one = true;
-      }
-      if (u.team == 2) {
-        two = true;
-      }
-    });
-    if (!one && two) {
-      Game.endgame(game, 2);
-    }
-    if (one && !two) {
-      Game.endgame(game, 1);
-    }
-    if (!one && !two) {
-      let flag = cnFlag();
-      if (flag[0] > flag[1]) {
-        Game.endgame(game, 1);
-      } else {
-        Game.endgame(game, 2);
-      }
-    }
-  }
+  // if (game && !game.finished) {
+  //   let one, two
+  //   game.unit.forEach(u => {
+  //     if (u.team == 1) {
+  //       one = true;
+  //     }
+  //     if (u.team == 2) {
+  //       two = true;
+  //     }
+  //   });
+  //   if (!one && two) {
+  //     Game.endgame(game, 2);
+  //   }
+  //   if (one && !two) {
+  //     Game.endgame(game, 1);
+  //   }
+  //   if (!one && !two) {
+  //     let flag = cnFlag();
+  //     if (flag[0] > flag[1]) {
+  //       Game.endgame(game, 1);
+  //     } else {
+  //       Game.endgame(game, 2);
+  //     }
+  //   }
+  // }
 
   //возимся с мертвыми и выполняем правила
   do {

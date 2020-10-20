@@ -23,7 +23,7 @@ exports.headcrab = {
   life: 3,
   img: 'headcrab',
   akt: (akt) => {
-    return akt.move().concat(akt.hand('headcrab','notally'))
+    return akt.move().concat(akt.hand('headcrab', 'notally'))
   },
   headcrab: (wd) => {
     wd.target.unit.team = wd.me.team;
@@ -42,7 +42,7 @@ exports.snail = {
   life: 3,
   img: 'snail',
   akt: (akt) => {
-    return akt.hand('move','free').concat(akt.hand('snail'))
+    return akt.hand('move', 'free').concat(akt.hand('snail'))
   },
   snail: (wd) => {
     wd.spoil('fire', wd.me.x, wd.me.y, false, 3);
@@ -71,33 +71,49 @@ exports.snail = {
 //   },
 // }
 
-// exports.archer = {
-//   name: 'незаполнено', description: 'Ходит или стреляет нанося рану',
+// exports.hoplite = {
+//   name: 'незаполнено', description: 'Ходит и бросает копье. Подберите копье, чтобы бросить снова',
 //   weight: 100,
 //   rank: 0,
-//   class: 'nope',
+//   class: 'norm',
 //   life: 3,
-//   img: 'archer',
+//   img: (wd) => {
+//     let img = 'hoplite'
+//     if (wd.me.data.spear)
+//       img = "hoplite2"
+//     return img
+//   },
 //   akt: (akt) => {
 //     let akts = []
-//     let points = en.allPoints();
-//     points = points.filter(pt => {
-//       if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
-//         return true
-//     });
-//     points.forEach((pt) => {
-//       let u = en.unitInPoint(akt.game, pt.x, pt.y)
-//       if (u && u != akt.me && akt.me.energy == 3)
-//         akts.push({
-//           x: pt.x,
-//           y: pt.y,
-//           img: 'wound',
-//         })
-//     });
+//     if (!akt.me.data.spear) {
+//       let points = en.allPoints();
+//       points = points.filter(pt => {
+//         if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
+//           return true
+//       });
+//       points.forEach((pt) => {
+//         let u = en.unitInPoint(akt.game, pt.x, pt.y)
+//         if (u && u != akt.me && akt.me.energy == 3)
+//           akts.push({
+//             x: pt.x,
+//             y: pt.y,
+//             img: 'hoplite',
+//           })
+//       });
+//     }
 //     return akts.concat(akt.move())
 //   },
 //   move: (wd) => {
 //     wd.walk();
+//     if (wd.spoilInPoint(wd.me.x, wd.me.y, 'spear').length)
+//       wd.me.data.spear = false
+//     wd.clearspoil(wd.me.x, wd.me.y, 'spear');
+//   },
+//   hoplite: (wd) => {
+//     wd.me.data.spear = true
+//     wd.spoil('spear', wd.target.x, wd.target.y, false, 3) 
+//     wd.kill();
+//     wd.tire();
 //   },
 // }
 
@@ -120,7 +136,7 @@ exports.base = {
     wd.walk();
   },
   capture: (wd) => {
-    if (wd.target.unit.team == 3) 
+    if (wd.target.unit.team == 3)
       wd.target.unit.team = wd.me.team;
     else
       wd.addStatus('teleporter');
@@ -1093,31 +1109,31 @@ exports.kicker = {
 //     wd.walk();
 //   },
 
-  // electric: (wd) => {
-  //   let marks = new Map();
-  //   marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
-  //   let nw = true;
-  //   while (nw) {
-  //     nw = false;
-  //     wd.game.unit.forEach((u) => {
-  //       if (u != wd.me) {
-  //         let npt = en.near(u.x, u.y)
-  //         npt.forEach((n) => {
-  //           if (marks.get(n.x + '_' + n.y)) {
-  //             if (!marks.get(u.x + '_' + u.y)) {
-  //               marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
-  //               nw = true;
-  //             }
-  //           }
-  //         });
-  //       }
-  //     });
-  //   }
-  //   marks.forEach((v, k, m) => {
-  //     wd.damage(v.x, v.y);
-  //   });
-  //   wd.tire();
-  // }
+// electric: (wd) => {
+//   let marks = new Map();
+//   marks.set(wd.target.x + '_' + wd.target.y, { x: wd.target.x, y: wd.target.y });
+//   let nw = true;
+//   while (nw) {
+//     nw = false;
+//     wd.game.unit.forEach((u) => {
+//       if (u != wd.me) {
+//         let npt = en.near(u.x, u.y)
+//         npt.forEach((n) => {
+//           if (marks.get(n.x + '_' + n.y)) {
+//             if (!marks.get(u.x + '_' + u.y)) {
+//               marks.set(u.x + '_' + u.y, { x: u.x, y: u.y });
+//               nw = true;
+//             }
+//           }
+//         });
+//       }
+//     });
+//   }
+//   marks.forEach((v, k, m) => {
+//     wd.damage(v.x, v.y);
+//   });
+//   wd.tire();
+// }
 // }
 
 exports.bear = {

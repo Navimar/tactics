@@ -157,9 +157,9 @@ exports.new = (rank, ai) => {
     bluearr = _.sampleSize(bluearr, 9);
     orangearr = _.sampleSize(orangearr, 9);
     let e = 'firebat'
-    bluearr[0].tp = barraks[0]
-    bluearr[1].tp = barraks[1]
-    bluearr[2].tp = barraks[2]
+    bluearr[0].tp = 'hoplite'
+    bluearr[1].tp = 'hoplite'
+    bluearr[2].tp = 'hoplite'
     bluearr[3].tp = barraks[3]
     bluearr[4].tp = barraks[4]
     bluearr[5].tp = barraks[5]

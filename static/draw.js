@@ -61,7 +61,6 @@ function drawTxt(txt, x, y, color, size, font) {
   size = dh * 0.24 * size * 0.01
   font = font || 'Verdana'
   font = size + 'px ' + font
-  console.log(font);
   ctx.font = font;
   ctx.fillStyle = 'white';
   ctx.textBaseline = "top";
