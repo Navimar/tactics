@@ -13,6 +13,7 @@ let local = {
   frame: 0,
   unitencn: 9,
   unitcn: 9,
+  cost: 5,
 
 };
 let data = {
@@ -186,7 +187,7 @@ let render = () => {
         drawImgNormal('orangestart', x, y, fieldmask[x][y]);
     }
     if (data.turn)
-      if (data.field[x][y] == 'team1' && data.gold[0] >= local.unitcn)
+      if (data.field[x][y] == 'team1' && data.gold[0] >= local.cost)
         drawImg('canBuild', x, y,);
     // if (data.field[x+1][y])
     //   drawImgNormal('ew' + data.field[x][y] + data.field[x+1][y], x, y, fieldmask[x][y]);
@@ -556,13 +557,12 @@ let onMouseDown = () => {
             local.build = false;
           }
           else if (data.field[mouseCell.x][mouseCell.y] == 'team1') {
-            let g = local.unitcn
-            if (data.gold[0] >= g) {
+            if (data.gold[0] >= local.cost) {
               local.build = { x: mouseCell.x, y: mouseCell.y }
               local.unit = false;
             }
             else {
-              tip('Нужно ' + g + ' золота, чтобы построить юнита. У вас ' + data.gold[0] + " золота", mouseCell.x, mouseCell.y, '#f00')
+              tip('Нужно ' + local.cost + ' золота, чтобы построить юнита. У вас ' + data.gold[0] + " золота", mouseCell.x, mouseCell.y, '#f00')
             }
           }
           // let arr = [];

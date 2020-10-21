@@ -87,10 +87,8 @@ exports.order = (game, u, akt) => {
     game.trail = [];
     let unit = en.unitInPoint(game, u.x, u.y);
     if (akt.img == 'build') {
-      let ucn = 0
       game.unit.forEach(u => {
         if (u.team == game.turn)
-          ucn++
         if (u.energy < 3 && u.isReady) {
           wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
           //onTire
@@ -98,9 +96,9 @@ exports.order = (game, u, akt) => {
           rules.aerostat(game);
         }
       });
-      game.gold[game.turn - 1] -= ucn;
+      game.gold[game.turn - 1] -= 5;
       let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
-      // newu.isReady = false;
+      newu.isReady = false;
     } else {
       if (unit && unit.isReady) {
         if (game.chooseteam) addbonus(game, unit)
