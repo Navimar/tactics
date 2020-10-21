@@ -88,7 +88,7 @@ exports.order = (game, u, akt) => {
     let unit = en.unitInPoint(game, u.x, u.y);
     if (akt.img == 'build') {
       // console.log('build')
-      let ucn=0
+      let ucn = 0
       game.unit.forEach(u => {
         if (u.team == game.turn)
           ucn++
@@ -136,6 +136,23 @@ exports.order = (game, u, akt) => {
     updateAkts(game);
     send.data(game);
 
+    let flag = [0, 0]
+    for (let x = 0; x < 9; x++) {
+      for (let y = 0; y < 9; y++) {
+        if (game.field[x][y] == 'team1') {
+          flag[0]++
+        }
+        if (game.field[x][y] == 'team2') {
+          flag[1]++
+        }
+      }
+    }
+    if (flag[0] == 5) {
+      exports.endgame(game, 1);
+    }
+    else if (flag[1] == 5) {
+      exports.endgame(game, 2);
+    }
   }
 }
 let updateAkts = (game) => {
@@ -158,6 +175,7 @@ let updateAkts = (game) => {
 exports.endgame = (game, winner) => {
   game.finished = true;
   game.winner = winner;
+  send.data(game);
   let words = ['Вы победили.', 'Вы проиграли.']
   if (winner == 2)
     words = words.reverse()
@@ -176,7 +194,6 @@ exports.endgame = (game, winner) => {
   }
   player.clear(game.players[0], game.id)
   player.clear(game.players[1], game.id)
-
 
 }
 exports.surrender = (game, p) => {

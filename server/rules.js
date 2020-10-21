@@ -2,6 +2,7 @@ const en = require('./engine');
 const _ = require('lodash');
 const meta = require('./meta');
 const wrapper = require('./wrapper');
+const { isEmpty } = require('lodash');
 
 exports.dead = (game) => {
 	while (game.deadPool.length > 0) {
@@ -37,8 +38,8 @@ exports.firestt = (game) => {
 }
 exports.mine = (game) => {
 	game.unit.forEach((u) => {
-		if (u.team == game.turn && u.tp=='mine')
-			game.gold[game.turn-1]+=3
+		if (u.team == game.turn && u.tp == 'mine')
+			game.gold[game.turn - 1] += 3
 	});
 }
 exports.fireend = (game) => {
@@ -93,7 +94,7 @@ exports.rockettarget = (game) => {
 		if (game.spoil[i].name == 'rockettarget') {
 			if (game.spoil[i].data.timer == 0) {
 				let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-				if (en.isAlive(game, game.spoil[i].data.unit) && game.spoil[i].data.unit.tp=='rocket') {
+				if (en.isAlive(game, game.spoil[i].data.unit) && game.spoil[i].data.unit.tp == 'rocket') {
 					if (game.spoil[i].data.unit != unit) {
 						en.death(game, unit);
 						en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
@@ -337,4 +338,15 @@ exports.drill = (game) => {
 		}
 	});
 
+}
+
+exports.hoplite = (game) => {
+	for (i = game.spoil.length; i--; i > 0) {
+		let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
+		if (u && game.spoil[i].name == 'spear' && u.tp == 'hoplite') {
+			if (u.data.spear)
+				game.spoil.splice(i, 1)
+			u.data.spear = false;
+		}
+	}
 }

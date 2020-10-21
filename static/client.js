@@ -11,6 +11,9 @@ let local = {
   turn: 1,
   gameid: findGetParameter("game"),
   frame: 0,
+  unitencn: 9,
+  unitcn: 9,
+
 };
 let data = {
   fisher: ['???', '!!!'],
@@ -182,8 +185,9 @@ let render = () => {
       if (data.field[x][y] == 'team2')
         drawImgNormal('orangestart', x, y, fieldmask[x][y]);
     }
-    if (data.field[x][y] == 'team1' && data.gold[0] >= local.unitcn)
-      drawImg('canBuild', x, y,);
+    if (data.turn)
+      if (data.field[x][y] == 'team1' && data.gold[0] >= local.unitcn)
+        drawImg('canBuild', x, y,);
     // if (data.field[x+1][y])
     //   drawImgNormal('ew' + data.field[x][y] + data.field[x+1][y], x, y, fieldmask[x][y]);
 
@@ -375,10 +379,10 @@ let renderpanel = () => {
   drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
 
   let goldtext = data.gold[0] + '';
-  goldtext += ' цена: ' + local.unitcn
   drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, '#090')
   drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
-
+  drawTxt(local.unitcn + '', c[1][0] + 1.6, c[1][1] + 0.3, '#222')
+  drawTxt(local.unitencn + '', c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, '#222')
 
 
   // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
@@ -452,12 +456,16 @@ let onUpdate = (val) => {
     local.turn = data.turn;
   }
   local.unitcn = 0;
+  local.unitencn = 0;
+
   data.unit.forEach((u) => {
     if (u.isActive && u.akt.length > 0) {
       local.unit = u
     }
     if (u.color == 1)
       local.unitcn++
+    if (u.color == 2)
+      local.unitencn++
   });
   // console.log(data.history,local.frame, data.frame,data.keyframe);
 
@@ -632,7 +640,7 @@ let onMouseDownRight = () => {
       let u = getUnit(mouseCell.x, mouseCell.y);
       if (u) {
         if (!blocked) {
-          socket.emit("order", { unit: u.img, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
+          socket.emit("order", { unit: u.tp, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
           local.build = false
         }
         blocked = true;

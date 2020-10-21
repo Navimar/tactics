@@ -8,7 +8,7 @@ exports.teleport = (wd) => {
   wd.me.status.remove('teleporter');
   wd.tire();
 }
-exports.diger = (wd) => {
+exports.digger = (wd) => {
   // wd.flywalk();
 
   if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
