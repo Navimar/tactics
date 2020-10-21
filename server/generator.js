@@ -99,13 +99,11 @@ exports.new = (rank, ai) => {
       data.field[p.x][p.y] = 'mountain'
   });
 
-  let numbers = [1, 1, 1, 2, 2]
-  numbers = _.sampleSize(numbers, numbers.length);
-  data.field[1][1] = 'team' + numbers[0];
-  data.field[1][7] = 'team' + numbers[1];
-  data.field[4][4] = 'team' + numbers[2];
-  data.field[7][7] = 'team' + numbers[3];
-  data.field[7][1] = 'team' + numbers[4];
+  data.field[1][1] = 'team' + 1;
+  data.field[1][7] = 'team' +1;
+  data.field[4][4] = 'team' + 1;
+  data.field[7][7] = 'team' + 2;
+  data.field[7][1] = 'team' + 2;
 
   points = []
   let bluearr = []
