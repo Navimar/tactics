@@ -87,7 +87,6 @@ exports.order = (game, u, akt) => {
     game.trail = [];
     let unit = en.unitInPoint(game, u.x, u.y);
     if (akt.img == 'build') {
-      // console.log('build')
       let ucn = 0
       game.unit.forEach(u => {
         if (u.team == game.turn)
@@ -101,7 +100,7 @@ exports.order = (game, u, akt) => {
       });
       game.gold[game.turn - 1] -= ucn;
       let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
-      newu.isReady = false;
+      // newu.isReady = false;
     } else {
       if (unit && unit.isReady) {
         if (game.chooseteam) addbonus(game, unit)
