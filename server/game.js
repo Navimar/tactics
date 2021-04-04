@@ -89,12 +89,12 @@ exports.order = (game, u, akt) => {
     if (akt.img == 'build') {
       game.unit.forEach(u => {
         if (u.team == game.turn)
-        if (u.energy < 3 && u.isReady) {
-          wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-          //onTire
-          rules.frog(game);
-          rules.aerostat(game);
-        }
+          if (u.energy < 3 && u.isReady) {
+            wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+            //onTire
+            rules.frog(game);
+            rules.aerostat(game);
+          }
       });
       game.gold[game.turn - 1] -= 5;
       let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
@@ -334,8 +334,8 @@ function addbonus(game, unit) {
       }
     }
   }
-  game.gold[0] = game.bonus[1]
-  game.gold[1] = game.bonus[2]
+  game.gold[0] += game.bonus[1]
+  game.gold[1] += game.bonus[2]
   // if (game.bonus[3 - game.turn]) {
   //   while (game.bonus[3 - game.turn] > 0) {
   //     for (let x = 0; x < 9; x++) {

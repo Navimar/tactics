@@ -12,6 +12,8 @@ exports.new = (rank, ai) => {
         if (meta[key].class != 'nope')
           barraks.push(key)
   });
+  barraks = _.sampleSize(barraks, 4);
+
   let neutral = [];
   Object.keys(meta).forEach(function (key) {
     if (meta[key].rank <= rank)
@@ -26,7 +28,7 @@ exports.new = (rank, ai) => {
   let rndUnit = () => {
     let i = _.random(barraks.length - 1)
     let r = barraks[i];
-    barraks.splice(i, 1)
+    // barraks.splice(i, 1)
     if (r)
       return r
     else
@@ -100,7 +102,7 @@ exports.new = (rank, ai) => {
   });
 
   data.field[1][1] = 'team' + 1;
-  data.field[1][7] = 'team' +1;
+  data.field[1][7] = 'team' + 1;
   data.field[4][4] = 'team' + 1;
   data.field[7][7] = 'team' + 2;
   data.field[7][1] = 'team' + 2;
@@ -125,8 +127,8 @@ exports.new = (rank, ai) => {
     orangearr = _.sampleSize(orangearr, 2);
     bluearr[0].tp = 'base'
     orangearr[0].tp = 'base'
-    bluearr[1].tp = 'chicken'
-    orangearr[1].tp = 'chicken'
+    bluearr[1].tp = 'polymorpher'
+    orangearr[1].tp = 'polymorpher'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
