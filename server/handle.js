@@ -120,9 +120,9 @@ exports.bot = (ctx, bot) => {
     send.gamelist(id, p, bot);
   }
   else if (text == '/mission') {
-    p.game.push(game.new(p, p, 'ai'))
-    send.bot(id, 'Игра успешно создана!', bot);
-    send.gamelist(id, p, bot);
+    // p.game.push(game.new(p, p, 'ai'))
+    // send.bot(id, 'Игра успешно создана!', bot);
+    // send.gamelist(id, p, bot);
   }
   else if (text == '/cancel') {
     queue.cancel(p)
