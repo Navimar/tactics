@@ -9,10 +9,10 @@ exports.new = (rank, ai) => {
   Object.keys(meta).forEach(function (key) {
     if (meta[key].rank <= rank)
       if (meta[key].weight)
-        if (meta[key].class != 'nope')
+        if (meta[key].class == 'basic')
           barraks.push(key)
   });
-  barraks = _.sampleSize(barraks, 4);
+  // barraks = _.sampleSize(barraks, 4);
 
   let neutral = [];
   Object.keys(meta).forEach(function (key) {
@@ -60,8 +60,8 @@ exports.new = (rank, ai) => {
   // let defgrass = _.random(70)
   // let defsky =  _.random(15)
   // let n = _.random(500)
-  let defground = 0
-  let defgrass = 50
+  let defground = 1
+  let defgrass = 1
   let defsky = 0
   let defmountain = 0
   let n = 999999
@@ -123,12 +123,16 @@ exports.new = (rank, ai) => {
   }
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 2);
-    orangearr = _.sampleSize(orangearr, 2);
-    bluearr[0].tp = 'base'
-    orangearr[0].tp = 'base'
-    bluearr[1].tp = 'polymorpher'
-    orangearr[1].tp = 'polymorpher'
+    bluearr = _.sampleSize(bluearr, 7);
+    orangearr = _.sampleSize(orangearr, 7);
+    for (i in bluearr) {
+      bluearr[i].tp = rndUnit();
+    }
+    for (i in orangearr) {
+      orangearr[i].tp = rndUnit();
+    }
+    bluearr[0].tp = 'aerostat'
+    orangearr[0].tp = 'aerostat'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -136,7 +140,7 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, 13);
+    points = _.sampleSize(points, _.random(12));
     let wc = 0;
     points.forEach(e => {
       let tp = e.tp
@@ -148,8 +152,8 @@ exports.new = (rank, ai) => {
         else {
           tp = rndUnit()
         }
-      data.unit.push(makeUnit(tp, e.x, e.y, 3));
-      // data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
+      // data.unit.push(makeUnit(tp, e.x, e.y, 3));
+      data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
     });
   }
   else {
