@@ -264,6 +264,12 @@ exports.bomber = (wd) => {
 	}
 }
 
+exports.drop = (wd) => {
+	if (wd.me.sticker) {
+		en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+	}
+}
+
 exports.slime = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('slime')

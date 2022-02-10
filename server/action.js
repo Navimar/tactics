@@ -24,21 +24,17 @@ exports.kill = (wd) => {
   wd.tire();
 }
 exports.polymorph = (wd) => {
-  let tp
-  do {
-    tp = _.sample(Object.keys(meta));
-  } while (tp == wd.target.unit.tp || meta[tp].class == 'neutral')
-  wd.target.unit.tp = tp;
+  wd.polymorph();
   wd.tire();
 }
 
 exports.wound = (wd) => {
-  if (wd.target.unit.status.includes('wound')) {
+  if (wd.target.unit.status.includes('wound2')) {
+    wd.kill()
+  }
+  else if (wd.target.unit.status.includes('wound')) {
     wd.target.unit.status.remove('wound')
     wd.addStatus('wound2');
-  }
-  else if (wd.target.unit.status.includes('wound2')) {
-    wd.kill()
   }
   else
     wd.addStatus('wound');

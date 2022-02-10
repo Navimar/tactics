@@ -46,6 +46,38 @@ exports.archer = {
   },
 }
 
+exports.fish = {
+  name: 'Рыба', description: 'Подплывает и наносит рану',
+  weight: 100,
+  rank: 0,
+  class: 'none',
+  life: 3,
+  img: 'fish',
+  akt: (akt) => {
+    let akts = [];
+    if (akt.game.field[akt.me.x][akt.me.y] == 'water' || akt.game.field[akt.me.x][akt.me.y].slice(0, -1) == 'team') {
+      let points = en.allPoints();
+      points = points.filter(pt => {
+        if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy && !en.unitInPoint(akt.game, pt.x, pt.y) && (akt.game.field[pt.x][pt.y] == 'water' || akt.game.field[pt.x][pt.y].slice(0, -1) == 'team'))
+          return true
+      });
+      points.forEach((pt) => {
+        if (!en.unitInPoint(akt.game, pt.x, pt.y))
+          akts.push({
+            x: pt.x,
+            y: pt.y,
+            img: 'move',
+          })
+      });
+    }
+    return akts.concat(akt.hand('wound'));
+  },
+  move: (wd) => {
+    wd.flywalk();
+  },
+
+}
+
 exports.headcrab = {
   name: 'Мозгососка', description: 'Захватывает разум юнитов',
   weight: 100,
@@ -429,13 +461,13 @@ exports.aerostat = {
     }
     return akts;
   },
-  onDeath: (wd) => {
-    if (wd.me.sticker) {
-      wd.kill(wd.me.x, wd.me.y);
-      en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
-      wd.me.sticker = false
-    }
-  },
+  // onDeath: (wd) => {
+  //   if (wd.me.sticker) {
+  //     wd.kill(wd.me.x, wd.me.y);
+  //     en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
+  //     wd.me.sticker = false
+  //   }
+  // },
   onDisappear: true,
   fly: (wd) => {
     let x = wd.me.x
@@ -575,7 +607,7 @@ exports.digger = {
   // life: 3,
   rank: 80,
   weight: 100,
-  class: 'spec',
+  class: 'norm',
   img: 'digger',
   akt: (akt) => {
     let akts = akt.move()
@@ -695,7 +727,7 @@ exports.polymorpher = {
   // neutral: true,
   rank: 0,
   weight: 50,
-  class: 'nope',
+  class: 'none',
   life: 3,
   img: 'polymorpher',
   akt: (akt) => {
@@ -722,6 +754,16 @@ exports.mashroom = {
   move: (wd) => {
     wd.walk();
   },
+  onDeath: (wd) => {
+    wd.polymorph(wd.me.x - 1, wd.me.y - 1);
+    wd.polymorph(wd.me.x, wd.me.y - 1);
+    wd.polymorph(wd.me.x + 1, wd.me.y - 1);
+    wd.polymorph(wd.me.x + 1, wd.me.y);
+    wd.polymorph(wd.me.x - 1, wd.me.y);
+    wd.polymorph(wd.me.x - 1, wd.me.y + 1);
+    wd.polymorph(wd.me.x, wd.me.y + 1);
+    wd.polymorph(wd.me.x + 1, wd.me.y + 1)
+  }
 }
 
 exports.pusher = {
@@ -729,7 +771,7 @@ exports.pusher = {
   description: 'Может занять место другого юнита вытолкнув его на соседнюю клетку, а если она тоже занята, то толкает весь ряд',
   rank: 70,
   weight: 100,
-  class: 'none',
+  class: 'norm',
   life: 3,
   img: 'pusher',
   akt: (akt) => {
@@ -764,20 +806,33 @@ exports.fountain = {
   life: 3,
   img: 'fountain',
   akt: (akt) => {
-    let akts = akt.move().concat(akt.hand('digger').concat(akt.hand('kill')));
+    let akts = [];
+    akts = akts.concat(akt.hand('fish'))
     akts = akts.filter(a => {
-      let f = akt.game.field[a.x][a.y]
-      if ((a.img == 'digger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water')) || f != 'water' && a.img == 'kill')
+      if (akt.game.field[a.x][a.y] != 'water' || en.unitInPoint(akt.game, a.x, a.y).tp == 'fish')
         return false
       else
         return true
     });
+    akts = akts.concat(akt.hand('digger'));
+    akts = akts.filter(a => {
+      let f = akt.game.field[a.x][a.y];
+      if (a.img == 'digger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water'))
+        return false
+      else
+        return true
+    });
+    akts = akts.concat(akt.move());
     return akts
   },
   move: (wd) => {
     // if (wd.game.field[wd.target.x][wd.target.y] == 'grass')
     //   wd.game.field[wd.target.x][wd.target.y] = 'ground'
     wd.flywalk();
+  },
+  fish: (wd) => {
+    wd.target.unit.tp = 'fish';
+    wd.tire();
   },
 }
 exports.telepath = {
@@ -830,7 +885,7 @@ exports.hatchery = {
   weight: 0,
   life: 3,
   rank: 160,
-  class: 'none',
+  class: 'norm',
   img: 'hatchery',
   akt: (akt) => {
     let akts = akt.move()
@@ -838,7 +893,7 @@ exports.hatchery = {
     return akts;
   },
   hatchery: (wd) => {
-    let u = wd.addUnit('warrior')
+    let u = wd.addUnit('fish')
     wd.tire();
     if (u)
       u.isReady = false;
@@ -1250,66 +1305,66 @@ exports.frog = {
       wd.target.unit.isReady = false;
     }
     else {
-      wd.addStatus('frog')
+      // wd.addStatus('frog')
 
-      // wd.me.status = wd.me.status.concat(wd.target.unit.status);
-      // wd.me.status.forEach((status) =>
-      //   wd.addStatus(status))
+      wd.me.status = wd.me.status.concat(wd.target.unit.status);
+      wd.me.status.forEach((status) =>
+        wd.addStatus(status))
     }
   }
 }
-exports.drill = {
-  name: 'Крот',
-  description: '',
-  weight: 0,
-  rank: 30,
-  class: 'warrior',
-  life: 3,
-  img: 'drill',
-  akt: (akter) => {
-    let akts = []
-    akter.near().forEach(pt =>
-      akts.push({ img: 'dir', x: pt.x, y: pt.y }));
-    return akts
-  },
-  dir: (wd) => {
-    let x = wd.target.x - wd.me.x
-    let y = wd.target.y - wd.me.y
-    wd.me.data.dir = { x, y };
-    wd.tire();
-  }
-}
-exports.drillgun = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 100,
-  rank: 0,
-  class: 'none',
-  life: 3,
-  img: 'drillgun',
-  akt: (akter) => {
-    let akts = []
-    if (!akter.me.data.summoned)
-      akter.near().forEach(pt =>
-        akts.push({ img: 'newdrill', x: pt.x, y: pt.y }));
-    else
-      akts = akter.move();
-    return akts
-  },
-  move: (wd) => {
-    wd.walk();
-    wd.me.data.summoned = false;
-    wd.tire();
-  },
-  newdrill: (wd) => {
-    wd.kill(wd.target.x, wd.target.y)
-    let u = wd.addUnit('drill', wd.target.x, wd.target.y, 3)
-    if (u) {
-      u.isReady = false;
-      u.data.dir = {
-        x: wd.target.x - wd.me.x,
-        y: wd.target.y - wd.me.y,
-      }
-    }
-    wd.me.data.summoned = true;
-  }
-}
+// exports.drill = {
+//   name: 'Крот',
+//   description: '',
+//   weight: 0,
+//   rank: 30,
+//   class: 'warrior',
+//   life: 3,
+//   img: 'drill',
+//   akt: (akter) => {
+//     let akts = []
+//     akter.near().forEach(pt =>
+//       akts.push({ img: 'dir', x: pt.x, y: pt.y }));
+//     return akts
+//   },
+//   dir: (wd) => {
+//     let x = wd.target.x - wd.me.x
+//     let y = wd.target.y - wd.me.y
+//     wd.me.data.dir = { x, y }; а
+//     wd.tire();
+//   }
+// }
+// exports.drillgun = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 100,
+//   rank: 0,
+//   class: 'none',
+//   life: 3,
+//   img: 'drillgun',
+//   akt: (akter) => {
+//     let akts = []
+//     if (!akter.me.data.summoned)
+//       akter.near().forEach(pt =>
+//         akts.push({ img: 'newdrill', x: pt.x, y: pt.y }));
+//     else
+//       akts = akter.move();
+//     return akts
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//     wd.me.data.summoned = false;
+//     wd.tire();
+//   },
+//   newdrill: (wd) => {
+//     wd.kill(wd.target.x, wd.target.y)
+//     let u = wd.addUnit('drill', wd.target.x, wd.target.y, 3)
+//     if (u) {
+//       u.isReady = false;
+//       u.data.dir = {
+//         x: wd.target.x - wd.me.x,
+//         y: wd.target.y - wd.me.y,
+//       }
+//     }
+//     wd.me.data.summoned = true;
+//   }
+// }

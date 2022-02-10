@@ -110,5 +110,23 @@ module.exports = (game, me, target) => {
       if (unit.team != 3)
         unit.team = 3 - unit.team;
     },
+    polymorph: (x, y) => {
+      let unit;
+      if (x != undefined && y != undefined) {
+        unit = en.unitInPoint(game, x, y)
+      } else if (x != undefined && y == undefined) {
+        unit = x;
+      } else {
+        unit = target.unit
+      }
+      if (unit) {
+        let tp;
+        do {
+          tp = _.sample(Object.keys(meta));
+        } while (tp == unit.tp || meta[tp].class == 'neutral' || meta[tp].class == 'none')
+        unit.tp = tp;
+        game.trail.push({ img: 'polymorph', x: unit.x, y: unit.y });
+      }
+    }
   }
 }

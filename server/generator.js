@@ -103,24 +103,48 @@ exports.new = (rank, ai) => {
 
   data.field[1][1] = 'team' + 1;
   data.field[1][7] = 'team' + 1;
-  data.field[4][4] = 'team' + 1;
+  data.field[4][4] = 'team' + (_.random(1) + 1);
   data.field[7][7] = 'team' + 2;
   data.field[7][1] = 'team' + 2;
 
-  points = []
+  // points = []
   let bluearr = []
-  for (let y = 2; y < 7; y++) {
-    for (let x = 0; x < 2; x++) {
-      bluearr.push({ x, y });
-    }
-  }
+  // for (let y = 2; y < 7; y++) {
+  //   for (let x = 0; x < 2; x++) {
+  //     bluearr.push({ x, y });
+  //   }
+  // }
 
   let orangearr = []
-  for (let y = 2; y < 7; y++) {
-    for (let x = 7; x < 9; x++) {
-      orangearr.push({ x, y });
-    }
-  }
+  // for (let y = 2; y < 7; y++) {
+  //   for (let x = 7; x < 9; x++) {
+  //     orangearr.push({ x, y });
+  //   }
+  // }
+  bluearr.push({ x: 0, y: 1 });
+  bluearr.push({ x: 1, y: 0 });
+  // bluearr.push({ x: 1, y: 1 });
+  bluearr.push({ x: 2, y: 1 });
+  bluearr.push({ x: 1, y: 2 });
+
+  bluearr.push({ x: 1, y: 6 });
+  // bluearr.push({ x: 1, y: 7 });
+  bluearr.push({ x: 0, y: 7 });
+  bluearr.push({ x: 2, y: 7 });
+  bluearr.push({ x: 1, y: 8 });
+
+  orangearr.push({ x: 6, y: 1 });
+  orangearr.push({ x: 7, y: 0 });
+  // orangearr.push({ x: 7, y: 1 });
+  orangearr.push({ x: 8, y: 1 });
+  orangearr.push({ x: 7, y: 2 });
+
+  orangearr.push({ x: 7, y: 6 });
+  // orangearr.push({ x: 7, y: 7 });
+  orangearr.push({ x: 6, y: 7 });
+  orangearr.push({ x: 8, y: 7 });
+  orangearr.push({ x: 7, y: 8 });
+
 
   if (!ai) {
     bluearr = _.sampleSize(bluearr, 7);
@@ -136,7 +160,7 @@ exports.new = (rank, ai) => {
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        if ((x < 0 || x > 1) && (x < 7 || x > 8) || y < 2 || y > 6)
+        if ((x > 2 || y > 2) && (x < 6 || y > 2) && (x < 6 || y < 6) && (x > 2 || y < 6))
           points.push({ x, y });
       }
     }

@@ -302,21 +302,22 @@ exports.setbonus = (game, p, bonus) => {
     game.bonus[1] = bonus;
     game.bonus[2] = bonus;
   }
-  if (game.bonus[1] !== null && game.bonus[2] !== null) {
-    if (game.bonus[1] < game.bonus[2]) {
-      game.bonus[1] = 0;
-      game.turn = 1;
-    } else {
-      game.bonus[2] = 0;
-      game.turn = 2;
+  if (game.bonus[1] == 17 && game.bonus[2] == 17)
+    this.rematch(game);
+  else {
+    if (game.bonus[1] !== null && game.bonus[2] !== null) {
+      if (game.bonus[1] < game.bonus[2]) {
+        game.bonus[1] = 0;
+        game.turn = 1;
+      } else {
+        game.bonus[2] = 0;
+        game.turn = 2;
+      }
+      game.chooseteam = true;
     }
-    game.chooseteam = true;
+    updateAkts(game);
+    send.data(game);
   }
-  // else {
-  //   game.turn = game.turn == 1 ? 2 : 1;
-  // }
-  updateAkts(game);
-  send.data(game);
 }
 function addbonus(game, unit) {
   if (unit.team !== game.turn) {
