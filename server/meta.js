@@ -716,8 +716,11 @@ exports.bush = {
   change: (wd) => {
     let x = wd.me.x
     let y = wd.me.y
-    wd.kill(x, y);
+    wd.disappear(x, y);
     wd.teleport(wd.target.x, wd.target.y, x, y)
+  },
+  onDeath: (wd) => {
+    wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, 3)
   }
 }
 
@@ -801,7 +804,7 @@ exports.fountain = {
   name: 'Фонтан', description: 'Разливает воду по низине в которой находится. При движении копает себе озеро. Юнитов в воде топит ударом.',
   // neutral: true,
   rank: 70,
-  class: 'neutral',
+  class: 'norm',
   weight: 40,
   life: 3,
   img: 'fountain',

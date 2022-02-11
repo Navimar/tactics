@@ -164,7 +164,7 @@ exports.new = (rank, ai) => {
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, _.random(12));
+    points = _.sampleSize(points, _.random(11) + 1);
     let wc = 0;
     points.forEach(e => {
       let tp = e.tp
