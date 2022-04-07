@@ -52,7 +52,7 @@ exports.data = (game) => {
     let send = {
       frame: (() => {
         if (!game.sandbox && player == 2)
-          return game.frame.length-1
+          return game.frame.length - 1
         else
           return game.frame.length
       })(),
@@ -114,22 +114,6 @@ exports.data = (game) => {
           return false
       })(),
     };
-
-    // let id = 0;
-
-    // game.unit.forEach(u => {
-    //   u.akt = [];
-    //   if (u.isReady) {
-    //     u.akt = meta[u.tp].akt(akter(game, u));
-    //     u.akt.forEach(uakt => { 
-    //       uakt.id = id++;
-    //     });
-    //   }
-    //   onAkt.telepath(game,u);
-    //   onAkt.worm(game,u)
-    //   onAkt.slime(game, u);
-    //   onAkt.stazis(game, u);
-    // });
 
     game.unit.forEach(u => {
       send.unit.push({

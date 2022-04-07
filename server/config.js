@@ -10,7 +10,7 @@ if (os.platform() == 'darwin' || os.platform() == 'win32') {
 } else {
   module.exports = {
     ip: "167.99.138.89",
-    port: "80",
+    port: "8000",
     botkey: '1000504506:AAGsQTgD-paoUrMwoldGeQMwWdmjN3pcbJ4',
     speed: 1,
   }
