@@ -2,4 +2,6 @@ node_modules
 imglib
 *.pxm
 data
+package.json
+package-lock.json
 config/config.js
