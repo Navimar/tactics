@@ -193,7 +193,7 @@ exports.new = (rank, ai) => {
     bluearr[5].tp = barraks[5]
     bluearr[6].tp = barraks[6]
     bluearr[7].tp = barraks[7]
-    bluearr[8].tp = barraks[8]
+    // bluearr[8].tp = barraks[8]
     orangearr[1].tp = 'firebat'
     orangearr[2].tp = 'firebat'
     orangearr[3].tp = 'firebat'
@@ -202,7 +202,7 @@ exports.new = (rank, ai) => {
     orangearr[5].tp = 'firebat'
     orangearr[6].tp = 'lover'
     orangearr[7].tp = 'firebat'
-    orangearr[8].tp = 'firebat'
+    // orangearr[8].tp = 'firebat'
   }
 
   bluearr.forEach(e => {

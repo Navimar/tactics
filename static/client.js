@@ -120,6 +120,10 @@ window.onload = function () {
   renderhtml();
 };
 
+window.addEventListener('resize', function (event) {
+  render();
+}, true);
+
 
 function step(lastTime) {
   let time = new Date().getTime();

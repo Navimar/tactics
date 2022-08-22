@@ -2,3 +2,4 @@ node_modules
 imglib
 *.pxm
 data
+config/config.js

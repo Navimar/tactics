@@ -3,7 +3,7 @@ const meta = require('./meta');
 const akter = require('./akter');
 const wrapper = require('./wrapper');
 
-const config = require('./config');
+const config = require('../config/config.js');
 const player = require('./player');
 
 exports.web = (p, game) => {

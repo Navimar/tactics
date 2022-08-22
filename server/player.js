@@ -1,12 +1,12 @@
 const fs = require('fs');
 const sha = require("sha256");
-const config = require('./config');
+const config = require('../config/config.js');
 
 const playerArr = [];
 
 let player = {}
 player.register = (id, username) => {
-  let p = { id, rank: 0, socket: new Map, key: false, game: [], username, lastsocket: 0 }
+  let p = { id, rank: 0, socket: new Map, key: false, game: [], username, lastsocket: 0, subscribe: true }
   fs.readFile('data/' + p.id, 'utf8', function (err, data) {
     if (data) {
       p.rank = parseInt(data);
@@ -30,6 +30,14 @@ player.number = (gm, p) => {
   return n
 }
 
+player.list = () => {
+  return playerArr;
+}
+
+player.stop = (p) => {
+  return (p.subscribe = !p.subscribe);
+}
+
 player.addSocket = (p, gameid, socket) => {
   p.socket.set(gameid, socket);
 }
@@ -37,10 +45,10 @@ player.addSocket = (p, gameid, socket) => {
 player.wins = (winner, loser) => {
   winner.rank = Math.ceil(winner.rank + loser.rank * 3 / 100 * (1 - winner.rank / 30000) + 1)
   loser.rank = Math.floor(loser.rank * 97 / 100);
-  fs.writeFile('data/' + winner.id, winner.rank, function (err) {
+  fs.writeFile('data/' + winner.id, winner.rank.toString(), function (err) {
     if (err) throw err;
   });
-  fs.writeFile('data/' + loser.id, loser.rank, function (err) {
+  fs.writeFile('data/' + loser.id, loser.rank.toString(), function (err) {
     if (err) throw err;
   });
 }

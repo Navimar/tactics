@@ -2,7 +2,7 @@
 const bot = require('./bot');
 const time = require('./time');
 
-const config = require('./config');
+const config = require('../config/config.js');
 const handle = require('./handle');
 
 const input = {};

@@ -15,16 +15,22 @@ function resize() {
   // canvas.width = window.visualViewport.width;
   // canvas.height = window.visualViewport.height;
   if (canvas.width > canvas.height) {
-    dh = (canvas.height / 9);
-    shiftX = (canvas.width - dh * 9) / 2;
-    shiftY = 0
+    if (canvas.height / 9 < canvas.width / 13)
+      dh = (canvas.height / 9);
+    else
+      dh = canvas.width / 13;
     orientation = 'w'
   } else {
-    dh = canvas.width / (9);
+    if (canvas.height / 13 < canvas.width / 9)
+      dh = (canvas.height / 13);
+    else
+      dh = canvas.width / 9;
     shiftX = 0;
     shiftY = (canvas.height - dh * 9) / 2;
     orientation = 'h'
   }
+  shiftX = (canvas.width - dh * 9) / 2;
+  shiftY = (canvas.height - dh * 9) / 2;
   ctx.fillStyle = "rgb(0,0,0)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }

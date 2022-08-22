@@ -1,7 +1,7 @@
 const game = require('./game');
 const send = require('./send');
 const player = require('./player');
-const config = require('./config');
+const config = require('../config/config.js');
 
 
 let queue = []
@@ -19,7 +19,12 @@ exports.find = (p, bot) => {
         } else {
             queue = [p];
             // console.log(queue[0]);
-            send.bot(p.id, "Вы ищите игру", bot);
+            player.list().forEach(e => {
+                if (p.id == e.id)
+                    send.bot(p.id, "Вы ищите игру", bot);
+                else if (e.subscribe)
+                    send.bot(e.id, "Игрок с рангом " + e.rank + " ищет игру, нажмите /find, чтобы присоединиться к игре! (/subscribe, чтобы больше не получать уведомлений)", bot);
+            });
         }
     } else {
         send.bot(p.id, "Вы уже ищите игру", bot);

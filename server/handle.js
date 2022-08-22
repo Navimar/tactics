@@ -4,7 +4,7 @@ const game = require('./game');
 const meta = require('./meta');
 const queue = require('./queue');
 const send = require('./send.js');
-const config = require('./config');
+const config = require('../config/config');
 const sha = require('sha256');
 
 exports.socket = (socket, e, msg) => {
@@ -120,27 +120,35 @@ exports.bot = (ctx, bot) => {
     send.gamelist(id, p, bot);
   }
   else if (text == '/mission') {
-    // p.game.push(game.new(p, p, 'ai'))
-    // send.bot(id, 'Игра успешно создана!', bot);
-    // send.gamelist(id, p, bot);
+    p.game.push(game.new(p, p, 'ai'))
+    send.bot(id, 'Игра успешно создана!', bot);
+    send.gamelist(id, p, bot);
   }
   else if (text == '/cancel') {
     queue.cancel(p)
-    send.bot(id, 'поиск отменен', bot);
+    send.bot(id, 'Поиск отменен', bot);
+  }
+  else if (text == '/subscribe') {
+    let mes;
+    if (player.stop(p))
+      mes = 'Теперь вы будете получать сообщение, когда другие игроки будут искать соперника'
+    else
+      mes = 'Вы больше не будете получать сообщение, когда другие игроки будут искать соперника'
+    send.bot(id, mes, bot);
   }
   else if (text == '/rank') {
-    let mes = 'Ваш ранг ' + p.rank
-    mes += '\n\nВам доступны юниты:';
-    arr.forEach((e) => {
-      if (meta[e.key].class != 'none') {
-        if (meta[e.key].rank <= p.rank)
-          mes += '\n/' + e.key + ' ' + e.name
-      }
-    });
+    let mes = 'Ваш ранг ' + p.rank;
+
     send.bot(id, mes, bot);
   }
   else if (text == '/tutorial') {
-    send.bot(id, 'Обучение пока не готово ¯\\_(ツ)_/¯\nНо я вам так расскажу. В общем это пошаговая игра. Просто ходите каждым юнитом в каждый свой ход и перебейте всех врагов :) Чтобы узнать способности юнитов и посмотреть какие юниты доступны на вашем ранге используйте команду /rank. Выигрывайте, чтобы открыть новых юнитов! В очереди на игру пока никого не водится, поэтому договаривайтесь об играх заранее, желающих сыграть можно найти в нашей группе @unitcraft', bot);
+    let mes = 'Обучение пока не готово ¯\\_(ツ)_/¯\nНо я вам так расскажу. В общем это пошаговая игра. Просто ходите каждым юнитом в каждый свой ход и перебейте всех врагов :) В очереди на игру пока никого не водится, поэтому договаривайтесь об играх заранее, желающих сыграть можно найти в нашей группе @unitcraft'
+    // mes += '\n\nВам доступны юниты:';
+    // arr.forEach((e) => {
+    //   if (meta[e.key].class != 'none')
+    //     mes += '\n/' + e.key + ' ' + e.name
+    // });
+    send.bot(id, mes, bot);
 
   }
   else {
@@ -153,7 +161,7 @@ exports.bot = (ctx, bot) => {
       }
     });
     if (f) {
-      send.bot(id, '/find чтобы найти соперника\n/play чтобы вернутся в игру\n/mission чтобы играть с AI\n/sandbox чтобы играть самому с собой\n/cancel чтобы отменить поиск соперника\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
+      send.bot(id, '/find чтобы найти соперника\n/cancel чтобы отменить поиск соперника\n/play чтобы вернуться в игру\n/subscribe чтобы отписаться/дописаться от уведомлений о том, что кто-то ищет игру\n/mission чтобы играть с AI\n/sandbox чтобы играть самому с собой\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
     }
   }
 };
