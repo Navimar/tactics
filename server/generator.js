@@ -46,11 +46,11 @@ exports.new = (rank, ai) => {
       data.field[x][y] = 'none';
     }
   }
-  let points = []
 
+  let points = []
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      points.push({ x, y, type: [0, 1, 2, 3], });
+      points.push({ x, y });
     }
   }
   points = _.sampleSize(points, 81);
@@ -107,6 +107,15 @@ exports.new = (rank, ai) => {
   data.field[7][7] = 'team' + 2;
   data.field[7][1] = 'team' + 2;
 
+  data.field[2][1] = data.field[3][1];
+  data.field[1][2] = data.field[1][3];
+  data.field[6][1] = data.field[5][1];
+  data.field[1][6] = data.field[1][5];
+  data.field[7][2] = data.field[7][3];
+  data.field[2][7] = data.field[3][7];
+  data.field[7][6] = data.field[7][5];
+  data.field[6][7] = data.field[5][7];
+
   // points = []
   let bluearr = []
   // for (let y = 2; y < 7; y++) {
@@ -147,16 +156,16 @@ exports.new = (rank, ai) => {
 
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 7);
-    orangearr = _.sampleSize(orangearr, 7);
+    bluearr = _.sampleSize(bluearr, 8);
+    orangearr = _.sampleSize(orangearr, 8);
     for (i in bluearr) {
       bluearr[i].tp = rndUnit();
     }
     for (i in orangearr) {
       orangearr[i].tp = rndUnit();
     }
-    bluearr[0].tp = 'aerostat'
-    orangearr[0].tp = 'aerostat'
+    // bluearr[0].tp = 'aerostat'
+    // orangearr[0].tp = 'aerostat'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {

@@ -804,7 +804,7 @@ exports.fountain = {
   name: 'Фонтан', description: 'Разливает воду по низине в которой находится. При движении копает себе озеро. Юнитов в воде топит ударом.',
   // neutral: true,
   rank: 70,
-  class: 'norm',
+  class: 'neutral',
   weight: 40,
   life: 3,
   img: 'fountain',
