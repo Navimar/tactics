@@ -561,13 +561,13 @@ let onMouseDown = () => {
       if (local.unit && !local.unit.isReady) {
         tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
       }
-      if (leftclickcn == 5) {
+      if (leftclickcn == 1) {
         let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
         if (mobile)
           txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
         tip(txt, mouseCell.x, mouseCell.y, '#550000')
 
-        leftclickcn = 2;
+        leftclickcn = 0;
       }
     }
     else if (data.bonus == 'choose') {
@@ -600,7 +600,7 @@ let onMouseDownRight = () => {
       if (local.order) {
         send();
         local.sandclock = { x: local.order.x, y: local.order.y }
-        leftclickcn -= 5;
+        leftclickcn -= 3;
       }
     }
     if (local.build && data.turn) {
@@ -612,7 +612,7 @@ let onMouseDownRight = () => {
         }
         blocked = true;
         local.sandclock = { x: local.build.x, y: local.build.y }
-        leftclickcn -= 5;
+        leftclickcn -= 3;
       } else {
         tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
       }
