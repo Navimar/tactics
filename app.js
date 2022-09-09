@@ -7,6 +7,7 @@ let config = require('./config/config.js');
 
 app.use(express.static(__dirname + '/static'));
 app.use(express.static(__dirname + '/script'));
+app.use(express.static(__dirname + '/img.nosync'));
 app.use(express.static(__dirname + '/img'));
 app.use(express.static(__dirname + '/sound'));
 app.use(express.static(__dirname + '/config'));

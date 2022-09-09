@@ -159,63 +159,16 @@ let render = () => {
 
   }
   let renderfield = (x, y) => {
-    // for (let y = 8; y >= 0; y--) {
-    //   for (let x = 8; x >= 0; x--) {
-    //     drawField('back', x, y, fieldmask[x][y]);
-    //     // drawImgNormal('cliff', x, y, fieldmask[x][y]);
 
-    //   }
-    // }
-    // for (let y = 8; y >= 0; y--) {
-    //   for (let x = 8; x >= 0; x--) {
     let v = 0
-    // if (data.field[x][y] == 'ground')
-    //   v = 0.4
-    //     if (data.field[x][y] == 'team1' || data.field[x][y] == 'team2')
-    //   v = 0.2
-    // if (data.field[x][y] == 'ground') data.field[x][y] = 'water'
-
     drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
-
     if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
       drawImgNormal('ns' + data.field[x][y - 1] + data.field[x][y], x, y - 0.5, fieldmask[x][y]);
-    // if (data.field[x][y + 1])
-    //   drawImgNormal('sn' + data.field[x][y] + data.field[x][y + 1], x, y, fieldmask[x][y]);
     if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
       drawImgNormal('we' + data.field[x - 1][y] + data.field[x][y], x - 0.5, y, fieldmask[x][y]);
-    if (!data.chooseteam && data.bonus == 'ready') {
-    } else {
-      if (data.field[x][y] == 'team1')
-        drawImgNormal('bluestart', x, y, fieldmask[x][y]);
-      if (data.field[x][y] == 'team2')
-        drawImgNormal('orangestart', x, y, fieldmask[x][y]);
-    }
     if (data.turn)
       if (data.field[x][y] == 'team1' && data.gold[0] >= local.cost)
         drawImg('canBuild', x, y,);
-    // if (data.field[x+1][y])
-    //   drawImgNormal('ew' + data.field[x][y] + data.field[x+1][y], x, y, fieldmask[x][y]);
-
-
-    // if (data.field[x][y] == 'water' && data.field[x][y - 1] == 'grass')
-    //   drawImgNormal('water.grass.cliff', x, y, fieldmask[x][y]);
-    // if (data.field[x][y] == 'water' && (data.field[x][y - 1] == 'team1' || data.field[x][y - 1] == 'team2'))
-    //   drawImgNormal('water.team.cliff', x, y, fieldmask[x][y]);
-    // if (data.field[x][y] == 'ground' && (data.field[x][y - 1] == 'team1' || data.field[x][y - 1] == 'team2'))
-    //   drawImgNormal('team.cliff', x, y, fieldmask[x][y]);
-
-
-    // drawField(data.field[x][y], x, y + v, fieldmask[x][y]);
-    // drawImg("grass", x, y);
-    // for (let y = 0; y < 9; y++) {
-    //   for (let x = 0; x < 9; x++) {
-    //     if (data.field[x][y] == 'team1' || data.field[x][y] == 'team2') drawSize('teamroof1',x-0.5, y-0.5, 2, 2)
-    //   }
-    // }
-    // if (data.field[x][y] == 'grass') drawImgNormal(data.field[x][y], x, y, fieldmask[x][y]);
-    // if (data.field[x][y] == 'ground' && data.field[x][y - 1] == 'grass' && ((data.field[x + 1] && (data.field[x + 1][y - 1] == 'team1' || data.field[x + 1][y - 1] == 'team2')) ||( data.field[x - 1] && (data.field[x - 1][y - 1] == 'team1' || data.field[x - 1][y - 1] == 'team2'))))
-    //   drawImgNormal('cliff', x, y, fieldmask[x][y]);
-    // drawBoard();
 
   }
   let renderunit = (x, y) => {
@@ -290,9 +243,14 @@ let render = () => {
     for (let x = 0; x < 9; x++) {
       renderunit(x, y);
     }
-    // for (let x = 0; x < 9; x++) {
-    //   rendersticker(x,y);
-    // }
+    if (data.chooseteam || !data.bonus == 'ready') {
+      for (let x = 0; x < 9; x++) {
+        if (data.field[x][y] == 'team1')
+          drawImgNormal('bluestart', x, y);
+        if (data.field[x][y] == 'team2')
+          drawImgNormal('orangestart', x, y);
+      }
+    }
   }
   if (local.sandclock) {
     drawImg('sandclock', local.sandclock.x, local.sandclock.y)

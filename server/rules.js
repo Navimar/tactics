@@ -274,6 +274,7 @@ exports.drop = (wd) => {
 exports.slime = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('slime')
+		u.status.remove('openslime')
 	});
 
 	let slimes = game.unit.filter(u => u.tp == 'slime');
@@ -298,8 +299,10 @@ exports.slime = (game) => {
 		}
 		marks.forEach((v, k, m) => {
 			let u = en.unitInPoint(game, v.x, v.y)
-			if (!(u.tp == 'slime' && slime.team == u.team))
+			if (u.tp != 'slime' && slime.team != u.team)
 				en.addStatus(en.unitInPoint(game, v.x, v.y), 'slime');
+			else if (u.tp != 'slime' && slime.team == u.team)
+				en.addStatus(en.unitInPoint(game, v.x, v.y), 'openslime');
 		});
 	});
 }

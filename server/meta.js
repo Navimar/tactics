@@ -812,19 +812,20 @@ exports.fountain = {
     let akts = [];
     akts = akts.concat(akt.hand('fish'))
     akts = akts.filter(a => {
-      if (akt.game.field[a.x][a.y] != 'water' || en.unitInPoint(akt.game, a.x, a.y).tp == 'fish')
+      // if (akt.game.field[a.x][a.y] != 'water' ||
+      if (en.unitInPoint(akt.game, a.x, a.y).tp == 'fish')
         return false
       else
         return true
     });
-    akts = akts.concat(akt.hand('digger'));
-    akts = akts.filter(a => {
-      let f = akt.game.field[a.x][a.y];
-      if (a.img == 'digger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water'))
-        return false
-      else
-        return true
-    });
+    // akts = akts.concat(akt.hand('digger'));
+    // akts = akts.filter(a => {
+    //   let f = akt.game.field[a.x][a.y];
+    //   if (a.img == 'digger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water'))
+    //     return false
+    //   else
+    //     return true
+    // });
     akts = akts.concat(akt.move());
     return akts
   },
@@ -904,7 +905,7 @@ exports.hatchery = {
 }
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты. При смерти взрывается квадратром 3х3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя.',
-  weight: 0,
+  weight: 100,
   rank: 10,
   life: 3,
   class: 'norm',
@@ -1184,7 +1185,7 @@ exports.kicker = {
 
 exports.slime = {
   name: 'незаполнено', description: 'Заковывает всех по цепочке',
-  weight: 0,
+  weight: 100,
   rank: 130,
   class: 'norm',
   img: 'slime',
