@@ -271,6 +271,7 @@ function drawImg(name, x, y) {
 
 function drawImgNormal(name, x, y, mask) {
   let img
+  mask = null;
   if (mask && mask.length > 0)
     img = getImg(name, dh, mask[0]);
   else
