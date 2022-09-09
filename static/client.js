@@ -316,8 +316,8 @@ let renderpanel = () => {
     drawSize('defeat', c[0][0], c[0][1], 2, 2)
   }
 
-  drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
-  drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
+  // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
+  // drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
   let team1 = 0
   let team2 = 0
 
@@ -420,7 +420,7 @@ let onUpdate = (val) => {
   local.fisher[1] = data.fisher[1];
   // console.log('dataturn',data.turn)
   if (local.turn == false && data.turn == true) {
-    tip('ВАШ ХОД!!!', 3, 3, "#1ebe29", 10, 400);
+    tip('ВАШ ХОД!!!', 3, 4, "#1ebe29", 10, 250);
     local.turn = data.turn;
   }
   local.unitcn = 0;
