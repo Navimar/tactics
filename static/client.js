@@ -120,10 +120,15 @@ window.onload = function () {
   renderhtml();
 };
 
+var resizeId;
 window.addEventListener('resize', function (event) {
-  render();
+  clearTimeout(resizeId);
+  resizeId = setTimeout(doneResizing, 500);
 }, true);
 
+function doneResizing() {
+  render();
+}
 
 function step(lastTime) {
   let time = new Date().getTime();

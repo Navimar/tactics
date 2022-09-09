@@ -119,11 +119,11 @@ exports.bot = (ctx, bot) => {
     send.bot(id, 'Игра успешно создана!', bot);
     send.gamelist(id, p, bot);
   }
-  else if (text == '/mission') {
-    p.game.push(game.new(p, p, 'ai'))
-    send.bot(id, 'Игра успешно создана!', bot);
-    send.gamelist(id, p, bot);
-  }
+  // else if (text == '/mission') {
+  //   p.game.push(game.new(p, p, 'ai'))
+  //   send.bot(id, 'Игра успешно создана!', bot);
+  //   send.gamelist(id, p, bot);
+  // }
   else if (text == '/cancel') {
     queue.cancel(p)
     send.bot(id, 'Поиск отменен', bot);
@@ -161,7 +161,9 @@ exports.bot = (ctx, bot) => {
       }
     });
     if (f) {
-      send.bot(id, '/find чтобы найти соперника\n/cancel чтобы отменить поиск соперника\n/play чтобы вернуться в игру\n/subscribe чтобы отписаться/дописаться от уведомлений о том, что кто-то ищет игру\n/mission чтобы играть с AI\n/sandbox чтобы играть самому с собой\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
+      send.bot(id, '/find чтобы найти соперника\n/cancel чтобы отменить поиск соперника\n/play чтобы вернуться в игру\n/subscribe чтобы отписаться/дописаться от уведомлений о том, что кто-то ищет игру\n' +
+        // '/mission чтобы играть с AI\n'+
+        '/sandbox чтобы играть самому с собой\n/rank чтобы проверить свой ранг\n/tutorial чтобы научится играть!', bot)
     }
   }
 };
