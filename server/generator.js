@@ -47,12 +47,8 @@ exports.new = (rank, ai) => {
     }
   }
 
-  let points = []
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      points.push({ x, y });
-    }
-  }
+
+  let points = en.allPoints();
   points = _.sampleSize(points, 81);
 
 
@@ -101,20 +97,37 @@ exports.new = (rank, ai) => {
       data.field[p.x][p.y] = 'mountain'
   });
 
+
+  // data.field[1 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 1;
+  // data.field[1 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 1;
+  // data.field[4 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 1;
+  // data.field[7 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 2;
+  // data.field[7 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 2;
+
+  // data.field[1 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 1;
+  // data.field[4 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 2;
+  // data.field[7 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 2;
+  // data.field[4 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 2;
+
   data.field[1][1] = 'team' + 1;
   data.field[1][7] = 'team' + 1;
-  data.field[4][4] = 'team' + (_.random(1) + 1);
+  data.field[4][4] = 'team' + 1;
   data.field[7][7] = 'team' + 2;
   data.field[7][1] = 'team' + 2;
 
-  data.field[2][1] = data.field[3][1];
-  data.field[1][2] = data.field[1][3];
-  data.field[6][1] = data.field[5][1];
-  data.field[1][6] = data.field[1][5];
-  data.field[7][2] = data.field[7][3];
-  data.field[2][7] = data.field[3][7];
-  data.field[7][6] = data.field[7][5];
-  data.field[6][7] = data.field[5][7];
+  data.field[1][4] = 'team' + 1;
+  data.field[4][1] = 'team' + 2;
+  data.field[7][4] = 'team' + 2;
+  data.field[4][7] = 'team' + 2;
+
+  // data.field[2][1] = data.field[3][1];
+  // data.field[1][2] = data.field[1][3];
+  // data.field[6][1] = data.field[5][1];
+  // data.field[1][6] = data.field[1][5];
+  // data.field[7][2] = data.field[7][3];
+  // data.field[2][7] = data.field[3][7];
+  // data.field[7][6] = data.field[7][5];
+  // data.field[6][7] = data.field[5][7];
 
   // points = []
   let bluearr = []
@@ -130,34 +143,43 @@ exports.new = (rank, ai) => {
   //     orangearr.push({ x, y });
   //   }
   // }
-  bluearr.push({ x: 0, y: 1 });
+  // bluearr.push({ x: 0, y: 1 });
   bluearr.push({ x: 1, y: 0 });
   // bluearr.push({ x: 1, y: 1 });
   bluearr.push({ x: 2, y: 1 });
   bluearr.push({ x: 1, y: 2 });
 
+  bluearr.push({ x: 1, y: 3 });
+  bluearr.push({ x: 2, y: 4 });
+  bluearr.push({ x: 1, y: 5 });
+
+
   bluearr.push({ x: 1, y: 6 });
   // bluearr.push({ x: 1, y: 7 });
-  bluearr.push({ x: 0, y: 7 });
+  // bluearr.push({ x: 0, y: 7 });
   bluearr.push({ x: 2, y: 7 });
   bluearr.push({ x: 1, y: 8 });
 
-  orangearr.push({ x: 6, y: 1 });
   orangearr.push({ x: 7, y: 0 });
+  orangearr.push({ x: 6, y: 1 });
   // orangearr.push({ x: 7, y: 1 });
-  orangearr.push({ x: 8, y: 1 });
+  // orangearr.push({ x: 8, y: 1 });
   orangearr.push({ x: 7, y: 2 });
+
+
+  orangearr.push({ x: 7, y: 3 });
+  orangearr.push({ x: 6, y: 4 });
+  orangearr.push({ x: 7, y: 5 });
 
   orangearr.push({ x: 7, y: 6 });
   // orangearr.push({ x: 7, y: 7 });
   orangearr.push({ x: 6, y: 7 });
-  orangearr.push({ x: 8, y: 7 });
   orangearr.push({ x: 7, y: 8 });
 
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 8);
-    orangearr = _.sampleSize(orangearr, 8);
+    bluearr = _.sampleSize(bluearr, 9);
+    orangearr = _.sampleSize(orangearr, 9);
     for (i in bluearr) {
       bluearr[i].tp = rndUnit();
     }
@@ -169,24 +191,17 @@ exports.new = (rank, ai) => {
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        if ((x > 2 || y > 2) && (x < 6 || y > 2) && (x < 6 || y < 6) && (x > 2 || y < 6))
+        if ((x > 2 || x < 1) && (x < 6 || x > 7))
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, _.random(11) + 1);
+    points = _.sampleSize(points, _.random(8) + 3);
     let wc = 0;
-    points.forEach(e => {
-      let tp = e.tp
-      if (!tp)
-        if (wc > 0) {
-          tp = 'warrior'
-          wc--
-        }
-        else {
-          tp = rndUnit()
-        }
-      // data.unit.push(makeUnit(tp, e.x, e.y, 3));
-      data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
+    points.forEach((e, i) => {
+      if (i == 0)
+        data.unit.push(makeUnit('flower', e.x, e.y, 3));
+      else
+        data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
     });
   }
   else {

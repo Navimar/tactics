@@ -32,6 +32,9 @@ let creategame = (p1, p2, id, ai) => {
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
   let bonus = [null, null, null]
+  let flowermap = en.allPoints();
+  flowermap.forEach(m => m.w = 1);
+  console.log(flowermap);
   if (p1 == p2) {
     sandbox = true
   }
@@ -66,6 +69,7 @@ let creategame = (p1, p2, id, ai) => {
     ai,
     frame: [],
     keyframe: 0,
+    flowermap,
     destroy: () => {
       for (i = p1.game.length; i--; i > 0) {
         if (p1.game.id == this.id)
@@ -130,27 +134,8 @@ exports.order = (game, u, akt) => {
     }
     //onOrder
     onOrder(game, unit, akt);
-
     updateAkts(game);
-    send.data(game);
-
-    let flag = [0, 0]
-    for (let x = 0; x < 9; x++) {
-      for (let y = 0; y < 9; y++) {
-        if (game.field[x][y] == 'team1') {
-          flag[0]++
-        }
-        if (game.field[x][y] == 'team2') {
-          flag[1]++
-        }
-      }
-    }
-    if (flag[0] == 5) {
-      exports.endgame(game, 1);
-    }
-    else if (flag[1] == 5) {
-      exports.endgame(game, 2);
-    }
+    send.data(game, { unit: u, akt });
   }
 }
 let updateAkts = (game) => {
@@ -168,6 +153,11 @@ let updateAkts = (game) => {
     onAkt.slime(game, u);
     onAkt.stazis(game, u);
     onAkt.teleporter(game, u);
+    // onAkt.flower(game, u);
+    if (u.akt.length == 0) {
+      u.isReady = false;
+      u.isActive = false;
+    }
   });
 }
 exports.endgame = (game, winner) => {
@@ -263,6 +253,7 @@ exports.endturn = (game, p) => {
 
     //onEndTurn
     rules.mine(game)
+    // rules.airdrop(game);
     cnFlag()
 
     game.turn = game.turn == 1 ? 2 : 1;

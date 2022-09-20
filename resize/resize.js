@@ -1,6 +1,7 @@
 const sharp = require('sharp')
 const fs = require('fs');
-const { imageHash } = require('image-hash');
+const pixelmatch = require('pixelmatch');
+const PNG = require('pngjs').PNG;
 
 const input = '../img/'
 const output = '../img.nosync/'
@@ -17,34 +18,29 @@ const convert = (file) => {
 
     let name = file.substring(0, file.length - 4)
     let fn = () => {
-        for (let i = 30; i < 200; i += 2) {
+        for (let i = 30; i < 200; i += 1) {
             lresize(i, file);
         }
         sharp(input + file).toFile(output + name + '.raw.png')
     }
-    fn();
+    // fn();
 
-    // if (!fs.existsSync(input + file) || !fs.existsSync(output + name + '.raw.png'))
-    //     fn();
-    // else
-    //     imageHash(input + file, 16, true, (error, data) => {
-    //         if (error) throw (error);
-    //         imageHash(output + name + '.raw.png', 16, true, (error, data2) => {
-    //             if (error) throw (error);
-    //             else if (data == data2) {
-    //                 // fn();
-    //                 console.log(file + ' is same');
-    //             }
-    //             else {
-    //                 console.log(data);
-    //                 console.log(data2);
-    //                 fn();
-    //             }
-    //         });
-    //     });
+    if (!fs.existsSync(input + file) || !fs.existsSync(output + name + '.raw.png'))
+        fn();
+    else {
+        const img1 = PNG.sync.read(fs.readFileSync(input + file));
+        const img2 = PNG.sync.read(fs.readFileSync(output + name + '.raw.png'));
+        const { width, height } = img1;
+        const diff = new PNG({ width, height });
+        const difference = pixelmatch(img1.data, img2.data, diff.data, width, height, { threshold: 0.5 });
+        console.log(name, difference)
+        if (difference != 0)
+            fn();
+    }
 }
 
 fs.readdir(input, (err, files) => {
+    // files = ['grass.png', 'ground.png', 'frame.png']
     files.forEach(file => {
         if (file[0] != '.') {
             convert(file)

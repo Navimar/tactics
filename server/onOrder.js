@@ -27,6 +27,7 @@ module.exports = (game, unit, akt) => {
     rules.capture(game);
     rules.fireend(game);
     rules.wormportal(game);
+    rules.flagwin(game);
   } while (game.deadPool.length > 0);
   // rules.dead(game);
 }

@@ -195,13 +195,6 @@ exports.base = {
   move: (wd) => {
     wd.walk();
   },
-  capture: (wd) => {
-    if (wd.target.unit.team == 3)
-      wd.target.unit.team = wd.me.team;
-    else
-      wd.addStatus('teleporter');
-    wd.tire();
-  }
 }
 exports.merchant = {
   name: 'Продавец', description: 'пока не придумал',
@@ -698,7 +691,11 @@ exports.bush = {
   akt: (akt) => {
     let akts = []
     let points = en.allPoints();
-    points = points.filter(pt => en.isOccupied(akt.game, pt.x, pt.y))
+    points = points.filter(pt => {
+      let u = en.unitInPoint(akt.game, pt.x, pt.y)
+      if (u && u.team == akt.me.team)
+        return true
+    });
     points.forEach((pt) => {
       if (pt.x != akt.me.x || pt.y != akt.me.y) {
         akts.push({
@@ -719,27 +716,66 @@ exports.bush = {
     wd.disappear(x, y);
     wd.teleport(wd.target.x, wd.target.y, x, y)
   },
-  onDeath: (wd) => {
-    wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, 3)
-  }
+  // onDeath: (wd) => {
+  //   wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, wd.me.team)
+  // }
 }
 
-exports.polymorpher = {
-  name: 'Маг',
-  description: 'Превращает юнита в случайного другого юнита',
+exports.flower = {
+  name: 'Цветок',
+  description: 'Превращается в любого юнита',
   // neutral: true,
   rank: 0,
-  weight: 50,
-  class: 'none',
+  weight: 100,
+  class: 'neutral',
   life: 3,
-  img: 'polymorpher',
+  img: 'flower',
   akt: (akt) => {
-    return akt.move().concat(akt.hand('polymorph'))
+    let akts = []
+    let points = en.allPoints();
+    points = points.filter(pt => en.isOccupied(akt.game, pt.x, pt.y))
+    points.forEach((pt) => {
+      if (pt.x != akt.me.x || pt.y != akt.me.y) {
+        akts.push({
+          x: pt.x,
+          y: pt.y,
+          img: 'change',
+        })
+      }
+    });
+    return akts;
   },
   move: (wd) => {
     wd.walk();
   },
+  change: (wd) => {
+    if (wd.target.unit.tp == 'flower')
+      wd.polymorph(wd.me.x, wd.me.y)
+    else
+      wd.me.tp = wd.target.unit.tp;
+  },
+  onDeath: (wd) => {
+    wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, wd.me.team)
+  }
 }
+
+
+// exports.polymorpher = {
+//   name: 'Маг',
+//   description: 'Превращает юнита в случайного другого юнита',
+//   // neutral: true,
+//   rank: 0,
+//   weight: 50,
+//   class: 'none',
+//   life: 3,
+//   img: 'polymorpher',
+//   akt: (akt) => {
+//     return akt.move().concat(akt.hand('polymorph'))
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
 exports.mashroom = {
   name: 'Гриб',
@@ -804,7 +840,7 @@ exports.fountain = {
   name: 'Фонтан', description: 'Разливает воду по низине в которой находится. Превращает юнитов в рыб',
   // neutral: true,
   rank: 70,
-  class: 'neutral',
+  class: 'norm',
   weight: 40,
   life: 3,
   img: 'fountain',
@@ -884,25 +920,25 @@ exports.spliter = {
     wd.tire();
   }
 }
-exports.hatchery = {
-  name: 'незаполнено', description: 'пока не придумал',
-  weight: 0,
-  life: 3,
-  rank: 160,
-  class: 'norm',
-  img: 'hatchery',
-  akt: (akt) => {
-    let akts = akt.move()
-    akts.forEach(e => e.img = 'hatchery');
-    return akts;
-  },
-  hatchery: (wd) => {
-    let u = wd.addUnit('fish')
-    wd.tire();
-    if (u)
-      u.isReady = false;
-  }
-}
+// exports.hatchery = {
+//   name: 'незаполнено', description: 'пока не придумал',
+//   weight: 0,
+//   life: 3,
+//   rank: 160,
+//   class: 'norm',
+//   img: 'hatchery',
+//   akt: (akt) => {
+//     let akts = akt.move()
+//     akts.forEach(e => e.img = 'hatchery');
+//     return akts;
+//   },
+//   hatchery: (wd) => {
+//     let u = wd.addUnit('fish')
+//     wd.tire();
+//     if (u)
+//       u.isReady = false;
+//   }
+// }
 exports.bird = {
   name: 'Бомба', description: 'В свой ход прыгает в любую точку карты. При смерти взрывается квадратром 3х3 уничтожая себя и все живое в радиусе одной клетки оставляя лишь пламя',
   weight: 100,

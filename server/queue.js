@@ -23,7 +23,7 @@ exports.find = (p, bot) => {
                 if (p.id == e.id)
                     send.bot(p.id, "Вы ищите игру", bot);
                 else if (e.subscribe)
-                    send.bot(e.id, "Игрок с рангом " + e.rank + " ищет игру, нажмите /find, чтобы присоединиться к игре! (/subscribe, чтобы больше не получать уведомлений)", bot);
+                    send.bot(e.id, "Игрок с рангом " + p.rank + " ищет игру, нажмите /find, чтобы присоединиться к игре! (/subscribe, чтобы больше не получать уведомлений)", bot);
             });
         }
     } else {

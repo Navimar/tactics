@@ -4,6 +4,9 @@ let en = {};
 en.near = (x, y) => {
   return [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }].filter(pt => pt.x <= 8 && pt.x >= 0 && pt.y >= 0 && pt.y <= 8)
 }
+en.near9 = (x, y) => {
+  return [{ x, y }, { x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }, { x: x - 1, y: y - 1 }, { x: x - 1, y: y + 1 }, { x: x + 1, y: y - 1 }, { x: x + 1, y: y + 1 }].filter(pt => pt.x <= 8 && pt.x >= 0 && pt.y >= 0 && pt.y <= 8)
+}
 
 en.allPoints = () => {
   let points = []
@@ -18,6 +21,13 @@ en.allPoints = () => {
 en.inField = (x, y) => {
   if (x >= 0 && x < 9 && y < 9 && y >= 0) return true
 }
+
+en.isNear4 = (x1, y1, x2, y2) => {
+  let dx = Math.abs(x1 - x2)
+  let dy = Math.abs(y1 - y2)
+  if (dx <= 1 && dy <= 1 && dy + dx == 1) return true
+}
+
 
 en.isOccupied = (game, x, y) => {
   if (en.inField(x, y)) {

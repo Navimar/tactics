@@ -1,8 +1,8 @@
 const en = require('./engine');
 const _ = require('lodash');
 const meta = require('./meta');
+const gm = require('./game');
 const wrapper = require('./wrapper');
-const { isEmpty } = require('lodash');
 
 exports.dead = (game) => {
 	while (game.deadPool.length > 0) {
@@ -358,5 +358,82 @@ exports.hoplite = (game) => {
 				game.spoil.splice(i, 1)
 			u.data.spear = false;
 		}
+	}
+}
+
+exports.airdrop = (game) => {
+	for (let i = game.spoil.length; i--; i > 0) {
+		if (game.spoil[i].name == 'airdrop' && !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)) {
+			let ptt = en.near9(game.spoil[i].x, game.spoil[i].y).filter(pt => game.field[pt.x][pt.y].substring(0, 4) == 'team')
+			ptt = ptt[0]
+			console.log('ptt', ptt)
+			console.log(game.field[ptt.x][ptt.y].substring(4));
+			let team = game.field[ptt.x][ptt.y].substring(4)
+			let fu = en.addUnit(game, 'flower', game.spoil[i].x, game.spoil[i].y, team);
+			fu.isReady = false;
+			fu.isActive = false;
+			game.spoil.splice(i, 1)
+		}
+	}
+	// let p = _.sampleSize(en.allPoints().filter(pp => !en.isOccupied(game, pp.x, pp.y)));
+	let min;
+	game.flowermap.forEach(f => {
+		if (!min || min > f.w)
+			min = f.w
+	});
+	let ptf = game.flowermap;
+
+	ptf = ptf.filter(mappt => {
+		if (en.isOccupied(game, mappt.x, mappt.y) || mappt.w != min)
+			return false
+		return true
+	});
+
+	ptf = _.sampleSize(ptf);
+	// console.log("ptf", ptf);
+
+	i = 0;
+	// let ptf = game.flowermap.filter(mappt => !en.isOccupied(game, mappt.x, mappt.y))
+	// let sum = 0;
+	// if (ptf.length > 0) {
+	// 	ptf.forEach(e => sum += e.w);
+	// 	let r = _.random(sum);
+	// 	i = 0;
+	// 	while (r > 0) {
+	// 		r -= ptf[i].w;
+	// 		if (r > 0)
+	// 			i++;
+	// 	}
+	// console.log('ptf', i, ptf[i])
+	en.addSpoil(game, 'airdrop', ptf[i].x, ptf[i].y, false, 3);
+	// game.flowermap.forEach(mappt => mappt.w = mappt.w + Math.round(Math.pow((Math.abs(mappt.x - ptf[i].x) + Math.abs(mappt.y - ptf[i].y)), 3) / 10))
+	let fx = Math.ceil((ptf[i].x + 1) / 3)
+	let fy = Math.ceil((ptf[i].y + 1) / 3)
+	game.flowermap.forEach(mappt => {
+		if (Math.ceil((mappt.x + 1) / 3) == fx && Math.ceil((mappt.y + 1) / 3) == fy)
+			mappt.w += 1
+		else
+			mappt.w += 0
+	});
+	console.log(game.flowermap);
+}
+
+exports.flagwin = (game) => {
+	let flag = [0, 0]
+	for (let x = 0; x < 9; x++) {
+		for (let y = 0; y < 9; y++) {
+			if (game.field[x][y] == 'team1') {
+				flag[0]++
+			}
+			if (game.field[x][y] == 'team2') {
+				flag[1]++
+			}
+		}
+	}
+	if (flag[0] == 0) {
+		gm.endgame(game, 2);
+	}
+	else if (flag[1] == 0) {
+		gm.endgame(game, 1);
 	}
 }

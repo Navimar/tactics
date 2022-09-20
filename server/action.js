@@ -40,3 +40,13 @@ exports.wound = (wd) => {
     wd.addStatus('wound');
   wd.tire();
 }
+
+exports.capture = (wd) => {
+  if (wd.target.unit.team == 3) {
+    wd.target.unit.team = wd.me.team;
+    wd.target.unit.isReady = false;
+  }
+  else
+    wd.addStatus('teleporter');
+  wd.tire();
+}

@@ -66,3 +66,14 @@ exports.stazis = (game, u) => {
       return true
   });
 }
+
+// exports.flower = (game, u) => {
+//   u.akt = u.akt.filter((a) => {
+//     let t = en.unitInPoint(game, a.x, a.y)
+//     if (t && t.team == 3 && en.isNear4(a.x, a.y, u.x, u.y))
+//       return false
+//     return true
+//   })
+//   u.akt = u.akt.concat(akter(game, u).hand('capture', 'neutral'))
+// }
+
