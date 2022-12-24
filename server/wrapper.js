@@ -103,8 +103,12 @@ module.exports = (game, me, target) => {
       }
       if (!team)
         team = me.team
-      if (!en.unitInPoint(game, x, y) && en.inField(x, y))
-        return en.addUnit(game, tp, x, y, team)
+      if (!en.unitInPoint(game, x, y) && en.inField(x, y)) {
+        let u = en.addUnit(game, tp, x, y, team)
+        game.appearPool.push(u);
+        // console.log('in wrapper game.appearPool', game.appearPool);
+        return u;
+      }
     },
     changeTeam: (unit) => {
       if (unit.team != 3)
@@ -125,8 +129,8 @@ module.exports = (game, me, target) => {
           tp = _.sample(Object.keys(meta));
         } while (tp == unit.tp || meta[tp].class == 'neutral' || meta[tp].class == 'none')
         unit.tp = tp;
-        game.trail.push({ img: 'polymorph', x: unit.x, y: unit.y });
       }
+      game.trail.push({ img: 'polymorph', x, y });
     }
   }
 }

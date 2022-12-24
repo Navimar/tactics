@@ -14,6 +14,8 @@ let local = {
   unitencn: 9,
   unitcn: 9,
   cost: 5,
+  rise: false,
+  cadr: 0,
 
 };
 let data = {
@@ -136,10 +138,11 @@ function step(lastTime) {
   lastTime = time;
 
   onStep(timeDiff);
-  setTimeout(function () { step(lastTime) }, 10);
-  // requestAnimFrame(function () {
-  // step(lastTime);
-  // });
+  // setTimeout(function () {
+  requestAnimationFrame(function () {
+    step(lastTime);
+  });
+  // }, 1000 / 100);
 }
 
 let renderhtml = (login) => {
@@ -157,14 +160,14 @@ let renderhtml = (login) => {
   if (login == 'success')
     html = `Ваш ID ` + findGetParameter("id");
 }
-
-let render = () => {
+let render = (diff) => {
+  if (!diff)
+    diff = 0;
+  if (diff > 100)
+    diff = 100
   resize();
-  let renderhistory = () => {
 
-  }
   let renderfield = (x, y) => {
-
     let v = 0
     drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
     if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
@@ -176,24 +179,72 @@ let render = () => {
         drawImg('canBuild', x, y,);
 
   }
-  let renderunit = (x, y) => {
+  let renderunit = (x, y, diff) => {
     let u = data.unit.filter(u => u.x == x && u.y == y)[0];
     if (u) {
-      // let v = -0.15
-      if (data.field[x][y] == 'ground')
-        drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
-      else
-        if (data.field[x][y] == 'water') {
-          drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive);
-          drawImgNormal('drawn', x, y, fieldmask[x][y]);
-        }
-        else
-          drawProp(u.img, u.x, u.y - 0.1, u.m, u.color, u.isReady, u.isActive, 18);
-      // drawLife(u.life, u.x, u.y);
+      let groundsize = 0
 
-      if (u.sticker)
-        drawSize(u.sticker, x + 0.2, y + 0.4, 0.6, 0.6)
-      u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
+      if (data.field[x][y] == 'grass' || data.field[x][y] == 'team1' || data.field[x][y] == 'team2')
+        groundsize = 56
+
+      if (!data.order || u.x != data.order.akt.x || u.y != data.order.akt.y) {
+        let sizeadd;
+        if (u.isReady && u.color == 1)
+          sizeadd = local.cadr * 20 / 1000;
+        else
+          sizeadd = local.cadr * 8 / 1000;
+        if (data.field[x][y] == 'ground')
+          drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+        else
+          if (data.field[x][y] == 'water') {
+            drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+            drawImgNormal('drawn', x, y, fieldmask[x][y]);
+          }
+          else
+            drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+        if (u.sticker)
+          drawSize(u.sticker, x + 0.2, y + 0.4, 0.6, 0.6)
+        u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
+
+      } else if (data.order.akt.img == 'move') {
+        let progress
+
+        if (!u.progress)
+          u.progress = 0;
+        u.progress += diff
+        if (u.progress > 1000)
+          progress = 1000
+        else
+          progress = u.progress
+        let xd = (u.x * (progress / 500) + data.order.unit.x * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 150
+        let yd = (u.y * (progress / 500) + data.order.unit.y * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 45
+        drawProp(u.img, xd, yd, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
+        u.status.forEach(stt => drawStatus(stt, xd, yd, u.m, u.color, u.isReady, u.isActive));
+
+
+      } else {
+        if (!u.progress)
+          u.progress = 0;
+        u.progress += diff
+        if (u.progress > 500)
+          progress = 0
+        else
+          progress = u.progress
+        let dx = 0
+        let dy = 0
+        let easingCoef = progress / 1000;
+        var easing = Math.pow(easingCoef - 1, 3) + 1;
+        dx = u.x + (easing * (Math.cos(progress * 0.1) + Math.cos(progress * 0.3115))) / 40;
+        dy = u.y + (easing * (Math.sin(progress * 0.05) + Math.sin(progress * 0.057113))) / 40;
+        drawProp(u.img, dx, dy, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true)
+        u.status.forEach(stt => drawStatus(stt, dx, dy, u.m, u.color, u.isReady, u.isActive));
+        if (data.field[x][y] == 'water')
+          drawImgNormal('drawn', x, y, fieldmask[x][y]);
+
+      }
+      if (data.field[x][y] == 'water' && (!u.progress || u.progress > 1000))
+        drawImgNormal('drawn', x, y, fieldmask[x][y]);
+
     }
   }
   let renderspoil = (x, y) => {
@@ -203,9 +254,17 @@ let render = () => {
     });
   }
   let renderakt = () => {
+    let right
     if (local.unit && local.unit.akt) {
       local.unit.akt.forEach(a => {
-        drawAkt(a.img, a.x, a.y);
+        right = false
+        data.unit.forEach(u => {
+          if (u.x == a.x && u.y == a.y && u.color == local.unit.color) {
+            right = true
+          }
+        }
+        );
+        drawAkt(a.img, a.x, a.y, right);
       });
       drawImg('focus', local.unit.x, local.unit.y)
     } else if (local.build) {
@@ -245,9 +304,9 @@ let render = () => {
     for (let x = 0; x < 9; x++) {
       renderspoil(x, y);
     }
-    for (let x = 0; x < 9; x++) {
-      renderunit(x, y);
-    }
+    // for (let x = 0; x < 9; x++) {
+    //   renderunit(x, y, diff);
+    // }
     if (data.chooseteam || !data.bonus == 'ready') {
       for (let x = 0; x < 9; x++) {
         if (data.field[x][y] == 'team1')
@@ -255,6 +314,11 @@ let render = () => {
         if (data.field[x][y] == 'team2')
           drawImgNormal('orangestart', x, y);
       }
+    }
+  }
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      renderunit(x, y, diff);
     }
   }
   if (local.sandclock) {
@@ -270,7 +334,8 @@ let render = () => {
   if (local.focus) {
     drawImg('focus', local.focus.x, local.focus.y)
   }
-
+  if (diff)
+    drawTxt('fps ' + (parseInt(1000 / diff)).toString(), 8, 0, "#000000");
 }
 let renderpanel = () => {
   let c = [
@@ -283,82 +348,10 @@ let renderpanel = () => {
   if (orientation == 'h') {
     c.forEach(e => e.reverse());
   }
-  drawSize('help', c[4][0], c[4][1], 2, 2)
-
-  if (data.finished) {
-    // drawSize('frame', c[3][0], c[3][1], 2, 2)
-  } else {
-    // drawSize('help', c[3][0], c[3][1], 2, 2)
-    if (orientation == 'w') {
-      drawSize('surrender', c[2][0], c[2][1], 2, 1)
-    } else
-      drawSize('surrenderh', c[2][0], c[2][1], 1, 2)
-
-  }
-
-  if (local.frame > 0)
-    drawSize('frame', c[3][0], c[3][1], 2, 2)
-
-  if (data.bonus == 'choose') {
-    drawSize('choose', c[0][0], c[0][1], 2, 2)
-  } else if (data.bonus == 'wait') {
-    drawSize('wait', c[0][0], c[0][1], 2, 2)
-  }
-  else if (data.turn) {
-    drawSize('turn', c[0][0], c[0][1], 2, 2)
-  } else {
-    drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
-  }
-  if (data.win == 'win') {
-    drawSize('win', c[0][0], c[0][1], 2, 2)
-  }
-  if (data.win == 'defeat') {
-    drawSize('defeat', c[0][0], c[0][1], 2, 2)
-  }
-
-  // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
-  // drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
-  let team1 = 0
-  let team2 = 0
-
-  data.unit.forEach((u) => {
-    if (u.color == 1)
-      team1 += u.life
-    if (u.color == 2)
-      team2 += u.life
-  });
-  if (team1 - team2 > 0) {
-    team1 -= team2;
-    team2 -= team2
-  } else {
-    team2 -= team1;
-    team1 -= team1
-  }
-
-  let arr = [];
-  data.unit.forEach((u) => {
-    if (u.color == 1 && u.isReady && !u.isActive) {
-      arr.push(u);
-    }
-  });
-  drawSize('next', c[1][0], c[1][1], 2, 2)
-
-  drawTxt(arr.length + '', c[1][0] + 0.15, c[1][1] + 1.6, '#222')
-  drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
-
-  let goldtext = data.gold[0] + '';
-  drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, '#090')
-  drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
-  drawTxt(local.unitcn + '', c[1][0] + 1.6, c[1][1] + 0.3, '#222')
-  drawTxt(local.unitencn + '', c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, '#222')
-
-
-  // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
-  // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
 
   if (data.bonus == 'choose') {
     let i = 0;
-    for (let fx = 9; fx < 11; fx++) {
+    for (let fx = -2; fx < 0; fx++) {
       for (let fy = 0; fy < 9; fy++) {
         if (orientation == 'h') {
           drawImgNormal('bonus', fy, fx)
@@ -370,6 +363,81 @@ let renderpanel = () => {
         i++
       }
     }
+  } else {
+
+    drawSize('help', c[4][0], c[4][1], 2, 2)
+
+    if (data.finished) {
+      // drawSize('frame', c[3][0], c[3][1], 2, 2)
+    } else {
+      // drawSize('help', c[3][0], c[3][1], 2, 2)
+      if (orientation == 'w') {
+        drawSize('surrender', c[2][0], c[2][1], 2, 1)
+      } else
+        drawSize('surrenderh', c[2][0], c[2][1], 1, 2)
+
+    }
+
+    if (local.frame > 0)
+      drawSize('frame', c[3][0], c[3][1], 2, 2)
+
+    if (data.bonus == 'choose') {
+      drawSize('choose', c[0][0], c[0][1], 2, 2)
+    } else if (data.bonus == 'wait') {
+      drawSize('wait', c[0][0], c[0][1], 2, 2)
+    }
+    else if (data.turn) {
+      drawSize('turn', c[0][0], c[0][1], 2, 2)
+    } else {
+      drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
+    }
+    if (data.win == 'win') {
+      drawSize('win', c[0][0], c[0][1], 2, 2)
+    }
+    if (data.win == 'defeat') {
+      drawSize('defeat', c[0][0], c[0][1], 2, 2)
+    }
+
+    // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
+    // drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
+    let team1 = 0
+    let team2 = 0
+
+    data.unit.forEach((u) => {
+      if (u.color == 1)
+        team1 += u.life
+      if (u.color == 2)
+        team2 += u.life
+    });
+    if (team1 - team2 > 0) {
+      team1 -= team2;
+      team2 -= team2
+    } else {
+      team2 -= team1;
+      team1 -= team1
+    }
+
+    let arr = [];
+    data.unit.forEach((u) => {
+      if (u.color == 1 && u.isReady && !u.isActive) {
+        arr.push(u);
+      }
+    });
+    drawSize('next', c[1][0], c[1][1], 2, 2)
+
+    drawTxt(arr.length + '', c[1][0] + 0.15, c[1][1] + 1.6, '#222')
+    drawTxt(data.leftturns + '', c[0][0] + 1.5, c[0][1] + 0.1, '#222');
+
+    let goldtext = data.gold[0] + '';
+    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, '#090')
+    drawTxt(data.gold[1] + '', c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, '#f00')
+    drawTxt(local.unitcn + '', c[1][0] + 1.6, c[1][1] + 0.3, '#222')
+    drawTxt(local.unitencn + '', c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, '#222')
+
+
+    // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
+    // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
+
   }
 
 }
@@ -397,6 +465,22 @@ let onStep = (diff) => {
     onMouseDownRight();
     tapDown = false;
   }
+
+  if (local.cadr > 1000) {
+    local.rise = false
+    local.cadr = 1000
+  }
+  if (local.cadr < -1000) {
+    local.rise = true
+    local.cadr = -1000
+
+  }
+  if (local.rise)
+    local.cadr += diff
+  else
+    local.cadr -= diff
+  render(diff);
+
 }
 
 let onLogin = (val) => {
@@ -451,7 +535,50 @@ let getUnit = (x, y) => {
   return data.unit.find(u => (x == u.x && y == u.y));
 }
 let getAkt = (x, y) => {
-  return local.unit.akt.find(a => (x == a.x && y == a.y));
+  if (local.unit && local.unit.akt)
+    return local.unit.akt.find(a => (x == a.x && y == a.y));
+}
+
+let clickOnAkt = () => {
+  if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
+    local.order = getAkt(mouseCell.x, mouseCell.y);
+    if (local.order) {
+      send();
+      local.sandclock = { x: local.order.x, y: local.order.y }
+      leftclickcn = 0;
+      return true
+    }
+  }
+  if (local.build && data.turn) {
+    let u = getUnit(mouseCell.x, mouseCell.y);
+    if (u) {
+      if (!blocked) {
+        socket.emit("order", { unit: u.tp, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
+        local.build = false
+      }
+      blocked = true;
+      local.sandclock = { x: local.build.x, y: local.build.y }
+    } else {
+      tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
+    }
+  }
+  else if (!data.turn) {
+    tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
+  }
+  else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
+    tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
+  }
+  else if (local.unit && local.unit.color != 1) {
+    if (data.chooseteam) {
+      tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
+    } else
+      tip('Это юнит соперника! Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
+  }
+  else if (local.unit) {
+    tip('Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!', mouseCell.x, mouseCell.y, '#333')
+  }
+  console.log('on alt false');
+  return false
 }
 
 let onMouseDown = () => {
@@ -470,6 +597,21 @@ let onMouseDown = () => {
       showframe(data.frame + 1);
     }
   }
+  else if (data.bonus == 'choose') {
+    if (((mouseCell.y > -3 && mouseCell.y < 0) || (mouseCell.x > -3 && mouseCell.x < 0))) {
+      let b
+      if (mouseCell.x < 0)
+        b = (mouseCell.x + 2) * 9 + mouseCell.y;
+      if (mouseCell.y < 0)
+        b = (mouseCell.y + 2) * 9 + mouseCell.x;
+      sendbonus(b);
+    } else {
+      tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
+    }
+  }
+  else if (data.bonus == 'wait') {
+    tip('Соперник еще выбирает бонус. Подождите', mouseCell.x, mouseCell.y, '#222')
+  }
   else {
     local.tip = false;
     if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 8) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 8))) {
@@ -486,13 +628,11 @@ let onMouseDown = () => {
         tip('Выдели юнита и нажми на эту кнопку, чтобы узнать его способность', 3, 3, '#000', 5, 120);
     }
     else if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7))) {
-      // if (data.finished) {
-      // rematch();
       if (local.frame > 0)
         showframe(data.keyframe);
-      // }
     }
     else if (data.bonus == 'ready' && data.win != 'win' && data.win != 'defeat') {
+      let wise = false
       if (((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) || (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) && data.turn) {
         endturn();
       }
@@ -512,13 +652,27 @@ let onMouseDown = () => {
           // nextunit++;
         }
       }
-      else if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
+      else if ((local.unit.x != mouseCell.x || mouseCell.y != local.unit.y)) {
         let gu = getUnit(mouseCell.x, mouseCell.y);
-        if (gu) {
-          local.unit = gu
-          local.build = false;
+        let gakt = getAkt(mouseCell.x, mouseCell.y);
+        if (local.unit && gakt) {
+          leftclickcn++
+          if (leftclickcn == 2) {
+            let txt = 'Если вместо выделения вы хотите отдать приказ — нажмите ПРАВОЙ кнопкной мыши!!!'
+            if (mobile)
+              txt = 'Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!'
+            tip(txt, mouseCell.x, mouseCell.y, '#550000')
+            leftclickcn = 0;
+            wise = true;
+          }
         }
-        //если выделил пустоту
+
+        if (gu) {
+          if (gu.color == 1 || !clickOnAkt()) {
+            local.unit = gu
+            local.build = false;
+          }
+        }
         else {
           if (local.build && (mouseCell.x == local.build.x && mouseCell.y == local.build.y)) {
             local.build = false;
@@ -532,6 +686,11 @@ let onMouseDown = () => {
               tip('Нужно ' + local.cost + ' золота, чтобы построить юнита. У вас ' + data.gold[0] + " золота", mouseCell.x, mouseCell.y, '#f00')
             }
           }
+          else if (local.unit)
+            clickOnAkt()
+          else
+            tip('Выделите юнита с белой обводкой и ходите им!', 3, 3, '#000', 5, 120);
+
           // let arr = [];
           // data.unit.forEach((u) => {
           //   if (u.color == 1 && u.isReady) {
@@ -551,39 +710,16 @@ let onMouseDown = () => {
         //нажал на себя
         local.unit = false;
       }
-      leftclickcn++
       // local.focus = false;
       // local.akt = [];
       if (local.unit && local.unit.color == 3 && !local.unit.canMove) {
         // local.unit = false;
         tip('Это нейтральный юнит. Выбери другого', mouseCell.x, mouseCell.y, '#050')
       }
-      if (local.unit && !local.unit.isReady) {
+      if (local.unit && !local.unit.isReady && !wise) {
         tip('Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой', mouseCell.x, mouseCell.y, '#050')
       }
-      if (leftclickcn == 1) {
-        let txt = 'Приказывайте юнитам ПРАВОЙ кнопкной мыши!!!'
-        if (mobile)
-          txt = 'Приказывайте юнитам ДОЛГИМ нажатием!!!'
-        tip(txt, mouseCell.x, mouseCell.y, '#550000')
 
-        leftclickcn = 0;
-      }
-    }
-    else if (data.bonus == 'choose') {
-      if (((mouseCell.y > 8 && mouseCell.y < 11) || (mouseCell.x > 8 && mouseCell.x < 11))) {
-        let b
-        if (mouseCell.x > 8)
-          b = (mouseCell.x - 9) * 9 + mouseCell.y;
-        if (mouseCell.y > 8)
-          b = (mouseCell.y - 9) * 9 + mouseCell.x;
-        sendbonus(b);
-      } else {
-        tip('Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.', mouseCell.x, mouseCell.y, '#222')
-      }
-    }
-    else if (data.bonus == 'wait') {
-      tip('Соперник еще выбирает бонус. Подождите', mouseCell.x, mouseCell.y, '#222')
     }
   }
   render();
@@ -595,41 +731,9 @@ let onMouseDownRight = () => {
     nextunit = 0;
     if (blocked)
       tip('Секундочку...', mouseCell.x, mouseCell.y, '#005500')
-    if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
-      local.order = getAkt(mouseCell.x, mouseCell.y);
-      if (local.order) {
-        send();
-        local.sandclock = { x: local.order.x, y: local.order.y }
-        leftclickcn -= 3;
-      }
-    }
-    if (local.build && data.turn) {
-      let u = getUnit(mouseCell.x, mouseCell.y);
-      if (u) {
-        if (!blocked) {
-          socket.emit("order", { unit: u.tp, akt: { img: 'build', x: local.build.x, y: local.build.y }, gameid: local.gameid });
-          local.build = false
-        }
-        blocked = true;
-        local.sandclock = { x: local.build.x, y: local.build.y }
-        leftclickcn -= 3;
-      } else {
-        tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
-      }
-    }
+    clickOnAkt();
+
     // console.log(data.turn)
-    if (!data.turn) {
-      tip('Сейчас ход соперника', mouseCell.x, mouseCell.y, '#005500')
-    }
-    else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
-      tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
-    }
-    else if (local.unit && local.unit.color != 1) {
-      if (data.chooseteam) {
-        tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
-      } else
-        tip('Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
-    }
     render();
   }
 }

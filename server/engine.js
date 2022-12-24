@@ -17,6 +17,9 @@ en.allPoints = () => {
   }
   return points;
 }
+en.isFlag = (game, x, y) => {
+  return game.field[x][y].slice(0, -1) == 'team'
+}
 
 en.inField = (x, y) => {
   if (x >= 0 && x < 9 && y < 9 && y >= 0) return true

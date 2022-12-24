@@ -46,162 +46,138 @@ exports.new = (rank, ai) => {
       data.field[x][y] = 'none';
     }
   }
-
-
   let points = en.allPoints();
   points = _.sampleSize(points, 81);
 
-
-  // let defground = _.random(10)
-  // let defgrass = _.random(70)
-  // let defsky =  _.random(15)
-  // let n = _.random(500)
   let defground = 1
   let defgrass = 1
   let defsky = 0
   let defmountain = 0
-  let n = 999999
+  let n = 999
+  let grasspower = 10000
+  let groundpower = 10000
+
   points.forEach(p => {
-    let ground = defground
-    let grass = defgrass
-    let mountain = defmountain
-    let sky = defsky
-    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += n;
-    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'ground') ground += n;
-    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'ground') ground += n;
-    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'ground') ground += n;
+    if (data.field[p.x][p.y] == 'none') {
+      let ground = defground
+      let grass = defgrass
+      let mountain = defmountain
+      let sky = defsky
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'ground') ground += groundpower;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'ground') ground += groundpower;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'ground') ground += groundpower;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'ground') ground += groundpower;
 
-    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'grass') grass += n;
-    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'grass') grass += n;
-    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'grass') grass += n;
-    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'grass') grass += n;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'grass') grass += grasspower;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'grass') grass += grasspower;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'grass') grass += grasspower;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'grass') grass += grasspower;
 
-    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'sky') sky += n;
-    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'sky') sky += n;
-    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'sky') sky += n;
-    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'sky') sky += n;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'sky') sky += n;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'sky') sky += n;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'sky') sky += n;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'sky') sky += n;
 
-    if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'mountain') mountain += n;
-    if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'mountain') mountain += n;
-    if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
-    if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == 'mountain') mountain += n;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == 'mountain') mountain += n;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
 
-    let r = _.random(ground + grass + sky + mountain - 1)
-    if (r < ground)
-      data.field[p.x][p.y] = 'ground'
-    else if (r >= ground && r < ground + grass)
-      data.field[p.x][p.y] = 'grass'
-    else if (r >= ground + grass && r < ground + grass + sky)
-      data.field[p.x][p.y] = 'sky'
-    else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
-      data.field[p.x][p.y] = 'mountain'
+      // if (ground > grass)
+      //   grass = 0
+      // if (ground < grass)
+      //   ground = 0
+
+      let r = _.random(ground + grass + sky + mountain - 1)
+      if (r < ground)
+        data.field[p.x][p.y] = 'ground'
+      else if (r >= ground && r < ground + grass)
+        data.field[p.x][p.y] = 'grass'
+      else if (r >= ground + grass && r < ground + grass + sky)
+        data.field[p.x][p.y] = 'sky'
+      else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
+        data.field[p.x][p.y] = 'mountain'
+    }
   });
 
+  let makeflag = (px, py, team) => {
+    let dir = _.random(1) * -2 + 1
+    if (py < 4)
+      dir = +1
+    if (py > 4)
+      dir = -1
 
-  // data.field[1 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 1;
-  // data.field[1 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 1;
-  // data.field[4 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 1;
-  // data.field[7 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 2;
-  // data.field[7 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 2;
+    let i = 0
+    while (
+      data.field[px][py].slice(0, -1) == 'team'
+      || data.field[px][py + 1].slice(0, -1) == 'team'
+      || data.field[px][py - 1].slice(0, -1) == 'team'
+      || data.field[px - 1][py].slice(0, -1) == 'team'
+      || data.field[px + 1][py].slice(0, -1) == 'team'
+      || (
+        data.field[px][py + 1] == data.field[px][py]
+        && data.field[px][py - 1] == data.field[px][py]
+        && data.field[px - 1][py] == data.field[px][py]
+        && data.field[px + 1][py] == data.field[px][py]
+        && i++ < 25
+      )
+    ) {
+      py += 1 * dir
+      if (py >= 7 || py <= 1) {
+        dir *= -1
+      }
+    }
+    data.field[px][py] = 'team' + team;
 
-  // data.field[1 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 1;
-  // data.field[4 + _.random(2) - 1][1 + _.random(2) - 1] = 'team' + 2;
-  // data.field[7 + _.random(2) - 1][4 + _.random(2) - 1] = 'team' + 2;
-  // data.field[4 + _.random(2) - 1][7 + _.random(2) - 1] = 'team' + 2;
+    if (py <= 5)
+      dir = -1
+    else dir = 1
+    return { x: px, y: py, dir }
+  }
 
-  data.field[1][1] = 'team' + 1;
-  data.field[1][7] = 'team' + 1;
-  data.field[4][4] = 'team' + 1;
-  data.field[7][7] = 'team' + 2;
-  data.field[7][1] = 'team' + 2;
-
-  data.field[1][4] = 'team' + 1;
-  data.field[4][1] = 'team' + 2;
-  data.field[7][4] = 'team' + 2;
-  data.field[4][7] = 'team' + 2;
-
-  // data.field[2][1] = data.field[3][1];
-  // data.field[1][2] = data.field[1][3];
-  // data.field[6][1] = data.field[5][1];
-  // data.field[1][6] = data.field[1][5];
-  // data.field[7][2] = data.field[7][3];
-  // data.field[2][7] = data.field[3][7];
-  // data.field[7][6] = data.field[7][5];
-  // data.field[6][7] = data.field[5][7];
-
-  // points = []
   let bluearr = []
-  // for (let y = 2; y < 7; y++) {
-  //   for (let x = 0; x < 2; x++) {
-  //     bluearr.push({ x, y });
-  //   }
-  // }
-
   let orangearr = []
-  // for (let y = 2; y < 7; y++) {
-  //   for (let x = 7; x < 9; x++) {
-  //     orangearr.push({ x, y });
-  //   }
-  // }
-  // bluearr.push({ x: 0, y: 1 });
-  bluearr.push({ x: 1, y: 0 });
-  // bluearr.push({ x: 1, y: 1 });
-  bluearr.push({ x: 2, y: 1 });
-  bluearr.push({ x: 1, y: 2 });
-
-  bluearr.push({ x: 1, y: 3 });
-  bluearr.push({ x: 2, y: 4 });
-  bluearr.push({ x: 1, y: 5 });
-
-
-  bluearr.push({ x: 1, y: 6 });
-  // bluearr.push({ x: 1, y: 7 });
-  // bluearr.push({ x: 0, y: 7 });
-  bluearr.push({ x: 2, y: 7 });
-  bluearr.push({ x: 1, y: 8 });
-
-  orangearr.push({ x: 7, y: 0 });
-  orangearr.push({ x: 6, y: 1 });
-  // orangearr.push({ x: 7, y: 1 });
-  // orangearr.push({ x: 8, y: 1 });
-  orangearr.push({ x: 7, y: 2 });
-
-
-  orangearr.push({ x: 7, y: 3 });
-  orangearr.push({ x: 6, y: 4 });
-  orangearr.push({ x: 7, y: 5 });
-
-  orangearr.push({ x: 7, y: 6 });
-  // orangearr.push({ x: 7, y: 7 });
-  orangearr.push({ x: 6, y: 7 });
-  orangearr.push({ x: 7, y: 8 });
-
+  makeflag(4, 4, _.random(1) + 1);
+  up = makeflag(1, 1, 1);
+  bluearr.push({ x: up.x, y: up.y });
+  bluearr.push({ x: up.x - 1, y: up.y });
+  bluearr.push({ x: up.x, y: up.y + up.dir });
+  up = makeflag(1, 7, 1);
+  bluearr.push({ x: up.x, y: up.y });
+  bluearr.push({ x: up.x - 1, y: up.y });
+  bluearr.push({ x: up.x, y: up.y + up.dir });
+  up = makeflag(7, 1, 2);
+  orangearr.push({ x: up.x, y: up.y + up.dir });
+  orangearr.push({ x: up.x + 1, y: up.y });
+  orangearr.push({ x: up.x, y: up.y });
+  up = makeflag(7, 7, 2);
+  orangearr.push({ x: up.x, y: up.y + up.dir });
+  orangearr.push({ x: up.x + 1, y: up.y });
+  orangearr.push({ x: up.x, y: up.y });
 
   if (!ai) {
-    bluearr = _.sampleSize(bluearr, 9);
-    orangearr = _.sampleSize(orangearr, 9);
-    for (i in bluearr) {
-      bluearr[i].tp = rndUnit();
-    }
-    for (i in orangearr) {
-      orangearr[i].tp = rndUnit();
-    }
     // bluearr[0].tp = 'aerostat'
     // orangearr[0].tp = 'aerostat'
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        if ((x > 2 || x < 1) && (x < 6 || x > 7))
+        if (data.field[x][y].slice(0, -1) != 'team'
+          && data.field[x + 1] && data.field[x + 1][y].slice(0, -1) != 'team'
+          && data.field[x - 1] && data.field[x - 1][y].slice(0, -1) != 'team'
+          && data.field[x][y + 1] && data.field[x][y + 1].slice(0, -1) != 'team'
+          && data.field[x][y - 1] && data.field[x][y - 1].slice(0, -1) != 'team'
+        )
           points.push({ x, y });
       }
     }
-    points = _.sampleSize(points, _.random(8) + 3);
+    points = _.sampleSize(points, _.random(5) + 2);
     let wc = 0;
     points.forEach((e, i) => {
-      if (i == 0)
-        data.unit.push(makeUnit('flower', e.x, e.y, 3));
-      else
-        data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
+      data.unit.push(makeUnit('mashroom', e.x, e.y, 3));
+      // if (i == 0)
+      //   data.unit.push(makeUnit('mashroom', e.x, e.y, 3));
+      // else
+      //   data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
     });
   }
   else {
@@ -230,10 +206,10 @@ exports.new = (rank, ai) => {
   }
 
   bluearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'chicken', e.x, e.y, 1));
+    data.unit.push(makeUnit(e.tp || rndUnit(), e.x, e.y, 1));
   });
   orangearr.forEach(e => {
-    data.unit.push(makeUnit(e.tp || 'chicken', e.x, e.y, 2));
+    data.unit.push(makeUnit(e.tp || rndUnit(), e.x, e.y, 2));
   });
 
   return data

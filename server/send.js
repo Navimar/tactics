@@ -27,8 +27,18 @@ exports.gamelist = (id, p, bot) => {
       text += 'Миссия: '
     else if (e.sandbox)
       text += 'Песочница: '
-    else
+    else {
+      console.log(e.bonus, e.chooseteam)
+      if (e.bonus[0] == null && e.players[0].id)
+        text += 'НОВАЯ ИГРА!!! ';
+      if (e.bonus[1] == null && e.players[1].id)
+        text += 'НОВАЯ ИГРА!!! ';
+      if (e.turn == 1 && id == e.players[0].id)
+        text += 'ВАШ ХОД!!! ';
+      else if (e.turn == 2 && id == e.players[1].id)
+        text += 'ВАШ ХОД!!! ';
       text += e.players[0].id + ' vs ' + e.players[1].id + ' ';
+    }
     text += config.ip + ':' + config.port + "/?id=" + id + "&key=" + key + 'u' + '&game=' + e.id + '\n'
   });
   if (text == '')
@@ -47,9 +57,10 @@ exports.successfulLogin = (socket) => {
   socket.emit('login', 'success');
 }
 
-exports.data = (game) => {
+exports.data = (game, order) => {
   let getData = (game, player) => {
     let send = {
+      order,
       frame: (() => {
         if (!game.sandbox && player == 2)
           return game.frame.length - 1

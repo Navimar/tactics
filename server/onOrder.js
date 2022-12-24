@@ -16,6 +16,12 @@ module.exports = (game, unit, akt) => {
       rules.drop(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
       game.deadPool.splice(i, 1);
     }
+    for (let i = game.appearPool.length; i--; i > 0) {
+      if (_.isFunction(meta[game.appearPool[i].tp].onAppear)) {
+        meta[game.appearPool[i].tp].onAppear(wrapper(game, game.appearPool[i], { x: game.appearPool[i].x, y: game.appearPool[i].y, unit: game.appearPool[i] }));
+      }
+      game.appearPool.splice(i, 1);
+    }
     rules.hoplite(game);
     rules.split(game, unit)
     rules.lover(game);

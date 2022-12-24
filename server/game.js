@@ -34,7 +34,6 @@ let creategame = (p1, p2, id, ai) => {
   let bonus = [null, null, null]
   let flowermap = en.allPoints();
   flowermap.forEach(m => m.w = 1);
-  console.log(flowermap);
   if (p1 == p2) {
     sandbox = true
   }
@@ -55,6 +54,7 @@ let creategame = (p1, p2, id, ai) => {
     bonus,
     unit: data.unit,
     deadPool: [],
+    appearPool: [],
     field: data.field,
     turn,
     winner: 0,
@@ -101,9 +101,11 @@ exports.order = (game, u, akt) => {
             rules.aerostat(game);
           }
       });
-      game.gold[game.turn - 1] -= 5;
-      let newu = en.addUnit(game, u, akt.x, akt.y, game.turn)
-      newu.isReady = false;
+      let newu = wrapper(game, u, { x: u.x, y: u.y, unit: u }).addUnit(u, akt.x, akt.y, game.turn);
+      if (newu) {
+        game.gold[game.turn - 1] -= 5;
+        newu.isReady = false;
+      }
     } else {
       if (unit && unit.isReady) {
         if (game.chooseteam) addbonus(game, unit)
