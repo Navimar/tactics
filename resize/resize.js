@@ -32,7 +32,11 @@ const convert = (file) => {
         const img2 = PNG.sync.read(fs.readFileSync(output + name + '.raw.png'));
         const { width, height } = img1;
         const diff = new PNG({ width, height });
-        const difference = pixelmatch(img1.data, img2.data, diff.data, width, height, { threshold: 0.3 });
+        let difference;
+        if (img1.data.length != img2.data.length)
+            difference = 'differnt size', img1.data.length, img2.data.length;
+        else
+            difference = pixelmatch(img1.data, img2.data, diff.data, width, height, { threshold: 0.3 });
         console.log(name, difference)
         if (difference != 0)
             fn();
