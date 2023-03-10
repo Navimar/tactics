@@ -8,12 +8,16 @@ const questionmark = new Image;
 questionmark.src = '/undefined.png';
 let dh = 0;
 let shiftX = 0;
+let shiftY = 0;
 
 function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  // canvas.width = window.visualViewport.width;
-  // canvas.height = window.visualViewport.height;
+
+  const realWidth = window.innerWidth * window.devicePixelRatio;
+  const realHeight = window.innerHeight * window.devicePixelRatio;
+  canvas.style.width = `${window.innerWidth}px`;
+  canvas.style.height = `${window.innerHeight}px`;
+  canvas.width = realWidth;
+  canvas.height = realHeight;
   if (canvas.width > canvas.height) {
     if (canvas.height / 9.3 < canvas.width / 13)
       dh = (canvas.height / 9.3);
@@ -97,8 +101,7 @@ function drawTxt(txt, x, y, color, size, font) {
         }
       }
       ctx.font = font;
-      lineHeight = ctx.font.substring(0, 2) * 1.1;
-      // lineHeight=100
+      lineHeight = size * 1.1
       ctx.fillStyle = 'white';
       context.fillText(line, marginLeft, marginTop);
     }
@@ -238,6 +241,7 @@ let drawShadow = (df, color) => {
   ctx.shadowBlur = 0;
   df();
 }
+
 function getImg(name, s, mask) {
   // s = Math.round(s);
   s = even(s);
@@ -265,6 +269,7 @@ function getImg(name, s, mask) {
     return img
   }
 }
+
 function drawImg(name, x, y) {
   let p = dh / 10;
   let s = dh + 2 * p;
@@ -297,6 +302,7 @@ function drawStatus(name, x, y) {
   let img = getImg(name + '.stt', s);
   drawImageEven(img, x * dh - p + shiftX, y * dh - p * 2 + shiftY, s, s);
 }
+
 function drawField(name, x, y, mask) {
   let p = dh / 15;
   let h = even(dh + 2 * p)
@@ -469,7 +475,3 @@ function initGrafio() {
     }
   }
 }
-
-
-
-

@@ -188,11 +188,11 @@ let render = (diff) => {
         groundsize = 56
 
       if (!data.order || u.x != data.order.akt.x || u.y != data.order.akt.y) {
-        let sizeadd;
+        let sizeadd = 0
         if (u.isReady && u.color == 1)
           sizeadd = local.cadr * 20 / 1000;
-        else
-          sizeadd = local.cadr * 8 / 1000;
+        // else
+        //   sizeadd = local.cadr * 8 / 1000;
         if (data.field[x][y] == 'ground')
           drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
         else
@@ -219,6 +219,8 @@ let render = (diff) => {
         let xd = (u.x * (progress / 500) + data.order.unit.x * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 150
         let yd = (u.y * (progress / 500) + data.order.unit.y * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 45
         drawProp(u.img, xd, yd, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
+        if (u.sticker)
+          drawSize(u.sticker, xd + 0.2, yd + 0.4, 0.6, 0.6)
         u.status.forEach(stt => drawStatus(stt, xd, yd, u.m, u.color, u.isReady, u.isActive));
 
 
@@ -238,10 +240,12 @@ let render = (diff) => {
         dy = u.y + (easing * (Math.sin(progress * 0.05) + Math.sin(progress * 0.057113))) / 40;
         drawProp(u.img, dx, dy, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true)
         u.status.forEach(stt => drawStatus(stt, dx, dy, u.m, u.color, u.isReady, u.isActive));
+        if (u.sticker)
+          drawSize(u.sticker, dx + 0.2, dy + 0.4, 0.6, 0.6)
         if (data.field[x][y] == 'water')
           drawImgNormal('drawn', x, y, fieldmask[x][y]);
-
       }
+
       if (data.field[x][y] == 'water' && (!u.progress || u.progress > 1000))
         drawImgNormal('drawn', x, y, fieldmask[x][y]);
 

@@ -4,16 +4,16 @@ const meta = require('./meta');
 const gm = require('./game');
 const wrapper = require('./wrapper');
 
-exports.dead = (game) => {
-	while (game.deadPool.length > 0) {
-		for (let i = game.deadPool.length; i--; i > 0) {
-			if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
-				meta[game.deadPool[i].tp].onDeath(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
-			}
-			game.deadPool.splice(i, 1)
-		}
-	}
-}
+// exports.dead = (game) => {
+// 	while (game.deadPool.length > 0) {
+// 		for (let i = game.deadPool.length; i--; i > 0) {
+// 			if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
+// 				meta[game.deadPool[i].tp].onDeath(wrapper(game, game.deadPool[i], { x: game.deadPool[i].x, y: game.deadPool[i].y, unit: game.deadPool[i] }));
+// 			}
+// 			game.deadPool.splice(i, 1)
+// 		}
+// 	}
+// }
 exports.telepath = (game) => {
 	game.unit.forEach((u) => {
 		u.status.remove('telepath')
@@ -200,6 +200,10 @@ exports.splitOnEndturn = (game) => {
 		if (u.status.includes('spliter2')) {
 			en.disappear(game, u);
 		}
+		if (u.status.includes('spliter')) {
+			u.status.remove('spliter')
+			u.status.push('spliter2')
+		}
 	}
 }
 
@@ -354,8 +358,8 @@ exports.hoplite = (game) => {
 	for (i = game.spoil.length; i--; i > 0) {
 		let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
 		if (u && game.spoil[i].name == 'spear' && u.tp == 'hoplite') {
-			if (u.data.spear)
-				game.spoil.splice(i, 1)
+			// if (u.data.spear)
+			game.spoil.splice(i, 1)
 			u.data.spear = false;
 		}
 	}

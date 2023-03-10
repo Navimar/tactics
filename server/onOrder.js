@@ -23,7 +23,7 @@ module.exports = (game, unit, akt) => {
       game.appearPool.splice(i, 1);
     }
     rules.hoplite(game);
-    rules.split(game, unit)
+    // rules.split(game, unit)
     rules.lover(game);
     rules.staziser(game);
     rules.spill(game);

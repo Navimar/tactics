@@ -32,8 +32,6 @@ let creategame = (p1, p2, id, ai) => {
   let turn = p1.rank > p2.rank ? 2 : 1
   let sandbox = false
   let bonus = [null, null, null]
-  let flowermap = en.allPoints();
-  flowermap.forEach(m => m.w = 1);
   if (p1 == p2) {
     sandbox = true
   }
@@ -60,6 +58,7 @@ let creategame = (p1, p2, id, ai) => {
     winner: 0,
     leftturns,
     started: time.clock(),
+    lastturn: time.clock(),
     sticker: [],
     spoil: [],
     finished: false,
@@ -69,7 +68,6 @@ let creategame = (p1, p2, id, ai) => {
     ai,
     frame: [],
     keyframe: 0,
-    flowermap,
     destroy: () => {
       for (i = p1.game.length; i--; i > 0) {
         if (p1.game.id == this.id)
@@ -156,17 +154,17 @@ let updateAkts = (game) => {
     onAkt.stazis(game, u);
     onAkt.teleporter(game, u);
     // onAkt.flower(game, u);
-    if (u.akt.length == 0) {
-      u.isReady = false;
-      u.isActive = false;
-    }
+    // if (u.akt.length == 0) {
+    //   u.isReady = false;
+    //   u.isActive = false;
+    // }
   });
 }
-exports.endgame = (game, winner) => {
+exports.endgame = (game, winner, words) => {
   game.finished = true;
   game.winner = winner;
   send.data(game);
-  let words = ['Вы победили.', 'Вы проиграли.']
+  words = words || ['Вы победили.', 'Вы проиграли.']
   if (winner == 2)
     words = words.reverse()
   if (!game.sandbox) {
@@ -179,8 +177,14 @@ exports.endgame = (game, winner) => {
     dif1 = game.players[1].rank - dif1
     if (dif0 > 0) dif0 = '+' + dif0
     if (dif1 > 0) dif1 = '+' + dif1
-    send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
-    send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
+    if (dif0 == 0)
+      send.bot(game.players[0].id, words[0] + ' Ваш ранг не изменился: ' + game.players[0].rank, bot);
+    else
+      send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
+    if (dif1 == 0)
+      send.bot(game.players[1].id, words[1] + ' Ваш ранг не изменился: ' + game.players[1].rank);
+    else
+      send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }
   player.clear(game.players[0], game.id)
   player.clear(game.players[1], game.id)
@@ -347,14 +351,23 @@ function addbonus(game, unit) {
   game.chooseteam = false;
 }
 
+exports.timeout = (game) => {
+  console.log(game.id, 'check time', time.clock(), game.lastturn);
+  if (time.clock() - game.lastturn > 86400 * 3) {
+    let winner = game.turn == 1 ? 2 : 1;
+    exports.endgame(game, winner, ['Техническая победа. Соперник давно не совершал ходов', 'Техническое поражение. Вы давно не совершали ходов.']);
+    console.log(game.id + ' timeout', time.clock(), game.lastturn);
+  }
+}
+
 let fisher = (game) => {
+  game.lastturn = time.clock();
   if (!game.lastturntime[game.turn - 1]) {
     game.lastturntime[game.turn - 1] = time.clock();
     game.fisher[game.turn - 1] = 120;
   }
   game.fisher[game.turn - 1] -= time.clock() - game.lastturntime[game.turn - 1];
   game.lastturntime[game.turn - 1] = time.clock();
-
 }
 
 exports.byId = (id) => {

@@ -7,6 +7,14 @@ const send = require('./send.js');
 const config = require('../config/config');
 const sha = require('sha256');
 
+exports.tick = (clock) => {
+  if (clock % 3600 == 0)
+    game.games().forEach(g => {
+      if (!g.finished)
+        game.timeout(g)
+    });
+}
+
 exports.socket = (socket, e, msg) => {
   if (msg) {
     let gm = game.byId(msg.gameid);

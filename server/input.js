@@ -36,11 +36,11 @@ input.tick = () => {
     let now = Date.now();
     actualTicks++;
     if (previousTick + tickLengthMs <= now) {
-        let delta = (now - previousTick) / 1000;
         previousTick = now;
 
         // update(delta);
         time.tick();
+        handle.tick(time.clock());
 
         // console.log('delta', delta, '(target: ' + tickLengthMs +' ms)', 'node ticks', actualTicks);
         actualTicks = 0;

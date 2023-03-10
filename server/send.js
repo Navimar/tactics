@@ -29,13 +29,10 @@ exports.gamelist = (id, p, bot) => {
       text += 'Песочница: '
     else {
       console.log(e.bonus, e.chooseteam)
-      if (e.bonus[0] == null && e.players[0].id)
+      if ((e.bonus[1] == null && e.players[0].id) || (e.bonus[2] == null && e.players[1].id)) {
         text += 'НОВАЯ ИГРА!!! ';
-      if (e.bonus[1] == null && e.players[1].id)
-        text += 'НОВАЯ ИГРА!!! ';
-      if (e.turn == 1 && id == e.players[0].id)
-        text += 'ВАШ ХОД!!! ';
-      else if (e.turn == 2 && id == e.players[1].id)
+      }
+      if ((e.turn == 1 && id == e.players[0].id) || (e.turn == 2 && id == e.players[1].id))
         text += 'ВАШ ХОД!!! ';
       text += e.players[0].id + ' vs ' + e.players[1].id + ' ';
     }
@@ -165,10 +162,10 @@ exports.data = (game, order) => {
   }
   if (game) {
     let p0socket = game.players[0].socket.get(game.id)
-    if (game.ai) {
+    if (game.ai && p0socket) {
       p0socket.emit('update', { data: getData(game, 1), history: false });
     }
-    else if (game.sandbox) {
+    else if (game.sandbox && p0socket) {
       p0socket.emit('update', { data: getData(game, game.turn), history: false });
     }
     else {

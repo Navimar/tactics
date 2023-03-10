@@ -6,6 +6,7 @@ const interval = 200;
 
 function getMousePos(canvas, evt) {
   let rect = canvas.getBoundingClientRect();
+
   return {
     x: evt.clientX - rect.left,
     y: evt.clientY - rect.top
@@ -59,10 +60,8 @@ function inputMouse() {
   canvas.addEventListener("touchstart", e => {
     mobile = true;
     mousePos = getTouchPos(canvas, e);
-    mouseCell = {
-      x: Math.floor((mousePos.x - shiftX) / dh),
-      y: Math.floor((mousePos.y - shiftY) / dh)
-    }
+    setMouseCell()
+
     tapTime = local.time;
     tapDown = true;
     // drawImgNormal('tap', mouseCell.x, mouseCell.y);
@@ -70,10 +69,8 @@ function inputMouse() {
   }, false);
   canvas.addEventListener("touchend", e => {
     mousePos = getTouchPos(canvas, e);
-    mouseCell = {
-      x: Math.floor((mousePos.x - shiftX) / dh),
-      y: Math.floor((mousePos.y - shiftY) / dh)
-    }
+    setMouseCell()
+
     tapDown = false;
     if (local.time - tapTime < interval) {
       onMouseDown();
@@ -94,10 +91,8 @@ function inputMouse() {
       case 1:
         //Left Mouse button pressed.
         mousePos = getMousePos(canvas, e);
-        mouseCell = {
-          x: Math.floor((mousePos.x - shiftX) / dh),
-          y: Math.floor((mousePos.y - shiftY) / dh)
-        }
+        setMouseCell()
+
         mouseDown = true;
         onMouseDown();
         break;
@@ -105,10 +100,8 @@ function inputMouse() {
         break;
       case 3:
         mousePos = getMousePos(canvas, e);
-        mouseCell = {
-          x: Math.floor((mousePos.x - shiftX) / dh),
-          y: Math.floor((mousePos.y - shiftY) / dh)
-        }
+        setMouseCell()
+
         mouseDown = true;
         onMouseDownRight();
         return false;
@@ -123,9 +116,13 @@ function inputMouse() {
   }, false);
   canvas.addEventListener("mousemove", e => {
     mousePos = getMousePos(canvas, e);
-    mouseCell = {
-      x: Math.floor((mousePos.x - shiftX) / dh),
-      y: Math.floor((mousePos.y - shiftY) / dh)
-    }
+    setMouseCell()
   }, false);
+}
+
+let setMouseCell = () => {
+  mouseCell = {
+    x: Math.floor((mousePos.x - shiftX / window.devicePixelRatio) / dh * window.devicePixelRatio),
+    y: Math.floor((mousePos.y - shiftY / window.devicePixelRatio) / dh * window.devicePixelRatio)
+  }
 }

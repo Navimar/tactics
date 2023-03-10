@@ -20,7 +20,7 @@ exports.archer = {
   name: 'Лучник', description: 'Ходит или стреляет. Наносит рану. Третья рана уничтожает юнита.',
   weight: 100,
   rank: 0,
-  class: 'basic',
+  class: 'norm',
   life: 3,
   img: 'archer',
   akt: (akt) => {
@@ -86,16 +86,21 @@ exports.headcrab = {
   life: 3,
   img: 'headcrab',
   akt: (akt) => {
-    return akt.move().concat(akt.hand('headcrab', 'notally'))
+    // return akt.move().concat(akt.hand('headcrab'))
+    return akt.hand('headcrab')
   },
   headcrab: (wd) => {
     wd.target.unit.team = wd.me.team;
+    wd.target.unit.sticker = { tp: wd.me.tp, team: wd.me.team }
     wd.target.unit.isReady = false;
     wd.kill(wd.me);
   },
   move: (wd) => {
     wd.walk();
   },
+  // onAppear: (wd) => {
+  //   wd.me.status.push('spliter');
+  // }
 }
 exports.snail = {
   name: 'Улитка', description: 'Ходит на одну клетку, давит юнитов и оставляет огненный след',
@@ -135,7 +140,7 @@ exports.mine = {
 }
 
 exports.hoplite = {
-  name: 'незаполнено', description: 'Ходит или бросает копье. Подберите копье, чтобы бросить снова',
+  name: 'Обратный гоплит', description: 'Обратный гоплит. Бросает себя вместо копья. Подберите копье, чтобы броситься снова.',
   weight: 100,
   rank: 0,
   class: 'norm',
@@ -171,8 +176,9 @@ exports.hoplite = {
   },
   hoplite: (wd) => {
     wd.me.data.spear = true
-    wd.spoil('spear', wd.target.x, wd.target.y, false, 3)
+    wd.spoil('spear', wd.me.x, wd.me.y, false, 3)
     wd.kill();
+    wd.go(wd.target.x, wd.target.y)
     wd.tire();
   },
 }
@@ -454,14 +460,7 @@ exports.aerostat = {
     }
     return akts;
   },
-  // onDeath: (wd) => {
-  //   if (wd.me.sticker) {
-  //     wd.kill(wd.me.x, wd.me.y);
-  //     en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3)
-  //     wd.me.sticker = false
-  //   }
-  // },
-  onDisappear: true,
+  // onDisappear: true,
   fly: (wd) => {
     let x = wd.me.x
     let y = wd.me.y
@@ -935,11 +934,11 @@ exports.spliter = {
     wd.addStatus('spliter');
     // console.log(wd.target);
     let u = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x), wd.target.y + (wd.target.y - wd.me.y), wd.target.unit.team)
-    let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
+    // let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
     if (u)
       u.status.push('spliter')
-    if (u2)
-      u2.status.push('spliter')
+    // if (u2)
+    //   u2.status.push('spliter')
     wd.tire();
   }
 }
@@ -1190,7 +1189,7 @@ exports.kicker = {
   weight: 100,
   rank: 50,
   name: 'Пинатель',
-  description: 'Пинает юнита и тот летит до ближайшего препятствия, а если препятствия не будет, то летит за край поля. Пока-пока',
+  description: 'Пинает юнита и отталкивается от него сам. Юниты разлетаются в разные стороны и следуют до ближайшего препятствия, жаль если они его так и не найдут.',
   class: 'norm',
   life: 3,
   img: 'kicker',
@@ -1208,12 +1207,17 @@ exports.kicker = {
     while (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == 0) {
       wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
     }
+    if (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == -1)
+      wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
+
     // if (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) > 0) {
     //   wd.kill(wd.target.unit.x + x, wd.target.unit.y + y)
     // }
-    if (wd.isOccupied(wd.target.unit.x + x, wd.target.unit.y + y) == -1)
-      wd.move(wd.target.unit.x + x, wd.target.unit.y + y);
-    // wd.damage(wd.target.unit);
+    while (wd.isOccupied(wd.me.x - x, wd.me.y - y) == 0) {
+      wd.go(wd.me.x - x, wd.me.y - y);
+    }
+    if (wd.isOccupied(wd.me.x - x, wd.me.y - y) == -1)
+      wd.go(wd.me.x - x, wd.me.y - y);
   }
 }
 
