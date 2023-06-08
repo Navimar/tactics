@@ -109,7 +109,7 @@ en.isAlive = (game, unit) => {
 }
 en.move = (game, unit, x, y) => {
   if (unit) {
-    game.trail.push({ img: 'move', x: unit.x, y: unit.y });
+    // game.trail.push({ img: 'move', x: unit.x, y: unit.y });
     if (x >= 0 && x < 9 && y < 9 && y >= 0) {
       if (!en.unitInPoint(game, x, y)) {
         unit.x = x

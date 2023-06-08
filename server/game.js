@@ -38,7 +38,7 @@ let creategame = (p1, p2, id, ai) => {
   if (ai) {
     ai = true
     bonus = [null, 0, 0]
-    leftturns = 20;
+    leftturns = 999;
     turn = 1;
     chooseteam = false;
   }
@@ -83,12 +83,12 @@ let creategame = (p1, p2, id, ai) => {
   rules.spill(game);
   return game;
 }
-exports.order = (game, u, akt) => {
+exports.order = (game, orderUnit, akt) => {
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
   if (game && !game.finished) {
     fisher(game);
     game.trail = [];
-    let unit = en.unitInPoint(game, u.x, u.y);
+    let unit = en.unitInPoint(game, orderUnit.x, orderUnit.y);
     if (akt.img == 'build') {
       game.unit.forEach(u => {
         if (u.team == game.turn)
@@ -99,7 +99,7 @@ exports.order = (game, u, akt) => {
             rules.aerostat(game);
           }
       });
-      let newu = wrapper(game, u, { x: u.x, y: u.y, unit: u }).addUnit(u, akt.x, akt.y, game.turn);
+      let newu = wrapper(game, orderUnit, { x: orderUnit.x, y: orderUnit.y, unit: orderUnit }).addUnit(orderUnit, akt.x, akt.y, game.turn);
       if (newu) {
         game.gold[game.turn - 1] -= 5;
         newu.isReady = false;
@@ -135,9 +135,10 @@ exports.order = (game, u, akt) => {
     //onOrder
     onOrder(game, unit, akt);
     updateAkts(game);
-    send.data(game, { unit: u, akt });
+    send.data(game, { unit: orderUnit, akt });
   }
 }
+
 let updateAkts = (game) => {
   let id = 0;
   game.unit.forEach(u => {
@@ -278,13 +279,16 @@ exports.endturn = (game, p) => {
     // rules.drill(game)
 
     onOrder(game);
-
+    if (game.ai && game.turn == 1)
+      worldshift(game);
     updateAkts(game);
+
     send.data(game);
 
     game.keyframe = game.frame.length - 1;
-    if (game.ai && game.turn == 2)
+    if (game.ai && game.turn == 2) {
       ai.go(game, 2);
+    }
 
     if (!game.sandbox)
       send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
@@ -368,6 +372,18 @@ let fisher = (game) => {
   }
   game.fisher[game.turn - 1] -= time.clock() - game.lastturntime[game.turn - 1];
   game.lastturntime[game.turn - 1] = time.clock();
+}
+
+function worldshift(game) {
+  for (let y = 0; y < game.field[0].length; y++) {
+    const firstElement = game.field[0][y];
+    for (let x = 0; x < game.field.length - 1; x++) {
+      game.field[x][y] = game.field[x + 1][y];
+      if (en.unitInPoint(game, x, y))
+        wrapper(game).teleport(x, y, x - 1, y);
+    }
+    game.field[game.field.length - 1][y] = firstElement;
+  }
 }
 
 exports.byId = (id) => {

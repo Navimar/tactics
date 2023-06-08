@@ -1,8 +1,10 @@
 const grafio = initGrafio();
 
 //load
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext('2d');
+const canvasStatic = document.getElementById("canvas");
+const ctxStatic = canvasStatic.getContext('2d');
+const canvasAnimated = document.getElementById("canvasanimated");
+const ctxAnimated = canvasAnimated.getContext('2d');
 
 const questionmark = new Image;
 questionmark.src = '/undefined.png';
@@ -10,8 +12,14 @@ let dh = 0;
 let shiftX = 0;
 let shiftY = 0;
 
-function resize() {
+let resize = (active) => {
+  if (active)
+    resizecanvas(canvasAnimated, ctxAnimated)
+  else
+    resizecanvas(canvasStatic, ctxStatic)
+}
 
+function resizecanvas(canvas, ctx) {
   const realWidth = window.innerWidth * window.devicePixelRatio;
   const realHeight = window.innerHeight * window.devicePixelRatio;
   canvas.style.width = `${window.innerWidth}px`;
@@ -33,8 +41,8 @@ function resize() {
   }
   shiftX = (canvas.width - dh * 9) / 2;
   shiftY = (canvas.height - dh * 9) / 2;
-  ctx.fillStyle = "rgb(0,0,0)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // ctx.fillStyle = "rgb(0,0,0)";
+  // ctx.fillRect(0, 0, canvas.width, canvas.height);
   dh = even(dh);
 }
 
@@ -43,12 +51,17 @@ let even = (n) =>
   Math.ceil(n);
 // Math.round(n) - Math.round(n) % 2;
 
-let drawImageEven = (img, x, y, w, h) => {
-  ctx.drawImage(img, even(x), even(y), even(w), even(h));
-
+let drawImageEven = (img, x, y, w, h, animate) => {
+  let ctx = animate ? ctxAnimated : ctxStatic
+  if (!animate)
+    ctx.drawImage(img, even(x), even(y), even(w), even(h));
+  else
+    ctx.drawImage(img, (x), (y), (w), (h));
 }
+
 function drawBackground(name) {
-  let img = getImg(name, 0, 0);
+  let s = dh
+  let img = getImg(name, s);
   for (var tileX = 0; tileX < canvas.width; tileX += dh) {
     for (var tileY = 0; tileY < canvas.height; tileY += dh) {
       drawImageEven(img, tileX, tileY, dh, dh);
@@ -73,7 +86,8 @@ function drawBoard() {
   ctx.restore();
 }
 
-function drawTxt(txt, x, y, color, size, font) {
+function drawTxt(txt, x, y, color, size, font, animate) {
+  let ctx = animate ? ctxAnimated : ctxStatic
   color = color || '#222';
   size = size || 100
   size = dh * 0.24 * size * 0.01
@@ -205,6 +219,7 @@ function drawTxt(txt, x, y, color, size, font) {
 }
 
 let drawShadow = (df, color) => {
+  let ctx = ctxAnimated
   let ss = 3;
   ctx.shadowColor = color;
   ctx.globalCompositeOperation = 'source-over';
@@ -243,15 +258,16 @@ let drawShadow = (df, color) => {
 }
 
 function getImg(name, s, mask) {
-  // s = Math.round(s);
   s = even(s);
-  // s = s - s % 10
   let img = grafio(name + '.' + s);
-  if (img === undefined || img === null)
-    img = grafio(name);
+
+  if (img === undefined || img === null) {
+    img = grafio(name + '.200')
+  }
+
   if (img === undefined || img === null) {
     img = questionmark;
-    // drawTxt(name, 0, 0, '#897f0e');
+    // drawTxt(name, 0, 0, '#897f0e',);
   }
   if (mask != undefined) {
     let arr = [img]
@@ -277,7 +293,8 @@ function drawImg(name, x, y) {
   drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s);
 }
 
-function drawImgNormal(name, x, y, mask) {
+function drawImgNormal(name, x, y, mask, animate) {
+
   let img
   mask = false
   if (mask && mask.length > 0)
@@ -285,7 +302,7 @@ function drawImgNormal(name, x, y, mask) {
   else
     img = getImg(name, dh);
 
-  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
 }
 
 function drawSpoil(name, x, y) {
@@ -300,7 +317,7 @@ function drawStatus(name, x, y) {
   let p = dh / 10;
   let s = dh + 2 * p;
   let img = getImg(name + '.stt', s);
-  drawImageEven(img, x * dh - p + shiftX, y * dh - p * 2 + shiftY, s, s);
+  drawImageEven(img, x * dh - p + shiftX, y * dh - p * 2 + shiftY, s, s, true);
 }
 
 function drawField(name, x, y, mask) {
@@ -320,9 +337,10 @@ function drawField(name, x, y, mask) {
 // }
 function drawTrail(name, x, y) {
   let img = getImg(name + '.trl', dh);
-  ctx.drawImage(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
 }
 function drawAkt(name, x, y, right) {
+  let ctx = ctxAnimated;
   let p = 0;
   let s = even(dh + 2 * p);
   img = getImg(name + '.akt', s);
@@ -333,7 +351,7 @@ function drawAkt(name, x, y, right) {
   if (right)
     ctx.globalAlpha = 0.8
   ctx.shadowBlur = 0;
-  drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s);
+  drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s, true);
   ctx.restore();
   // ctx.globalCompositeOperation = 'destination-in';
 
@@ -349,20 +367,37 @@ function drawLife(quantity, x, y) {
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
 
+
+function drawSticker(name, x, y, team,) {
+  let color = false
+  if (team == 1) color = 'team1Ready'
+  if (team == 2) color = 'team2Ready'
+  if (team == 3) color = 'team3';
+
+  let size = dh * 0.6
+  img = getImg(name + '.unit' + '.' + color, size);
+
+  x = x + 0.2
+  y = y + 0.4
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, size, size, true);
+}
+
 function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
-  let color = false;
+  let ctx = animate ? ctxAnimated : ctxStatic
+  let color = false
   if (!data.chooseteam && data.bonus == 'ready') {
-    if (team == 2 && isReady) color = 'rgba(255,0,0,1)';
-    if (team == 2 && !isReady) color = 'rgba(190,0,190,1)';
-    if (team == 1 && isReady && data.turn) color = 'rgba(255,255,255,1)';
-    if (team == 1 && isReady && !data.turn) color = 'rgba(30,190,40,1)';
-    if (team == 1 && !isReady) color = 'rgba(30,190,40,1)';
+    if (team == 2 && isReady) color = 'team2Ready'
+    if (team == 2 && !isReady) color = 'team2NotReady'
+    if (team == 1 && isReady && data.turn) color = 'team1Ready'
+    if (team == 1 && isReady && !data.turn) color = 'team1NotReady';
+    if (team == 1 && !isReady) color = 'team1NotReady';
   } else {
-    if (team == 1 && isReady) color = 'rgba(47, 0, 255,1)';
-    if (team == 2 && isReady) color = 'rgba(255, 149, 0,1)';
+    if (team == 1 && isReady) color = 'team1choose';
+    if (team == 2 && isReady) color = 'team2choose';
   }
-  if (isActive && team == 1) color = 'rgba(0,255,0,1)';
-  if (team == 3) color = 'rgba(255, 255, 0,1)';
+  if (isActive && team == 1) color = 'team1active';
+  if (team == 3) color = 'team3';
+
   let px = 0;
   let py = 0;
   if (ws && hs) {
@@ -374,18 +409,13 @@ function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
   let h = dh + 2 * py;
   let img
   if (!animate)
-    img = getImg(name, h);
+    img = getImg(name + '.unit' + '.' + color, h);
   else
-    img = getImg(name, (h + w) / 2);
+    img = getImg(name + '.unit' + '.' + color, (h + w) / 2);
   // let w = img.width * (h / img.height);
   if (m) {
     let df = () => {
-      if (!animate)
-        drawImageEven(img, (x * dh - px + shiftX) * -1 - w, (y * dh - 0.1 * dh - py * 2 + shiftY), w, h);
-      else
-        ctx.drawImage(img, (x * dh - px + shiftX) * -1 - w, (y * dh - 0.1 * dh - py * 2 + shiftY), w, h);
-
-
+      drawImageEven(img, (x * dh - px + shiftX) * -1 - w, (y * dh - 0.1 * dh - py * 2 + shiftY), w, h, animate);
     }
     ctx.save();
     ctx.scale(-1, 1);
@@ -397,10 +427,8 @@ function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
 
   } else {
     let df = () => {
-      if (!animate)
-        drawImageEven(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h));
-      else
-        ctx.drawImage(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h));
+
+      drawImageEven(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h), animate);
 
 
     }
@@ -427,10 +455,10 @@ function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
 //
 // }
 
-function drawSize(name, x, y, w, h) {
-  img = getImg(name, w)
+function drawSize(name, x, y, w, h, animate) {
+  img = getImg(name, w * dh)
   // ctx.drawImage(img, 0, 0, img.width, img.height/2 ,x * dh + shiftX, y * dh + shiftY, dh*2 , dh );
-  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h);
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h, animate);
 }
 
 // function drawWeb(name, x, y, w, h) {
@@ -470,6 +498,10 @@ function initGrafio() {
         render();
       };
       img.src = url + ".png";
+      img.onerror = function () {
+        console.log("Error: Image not found: ");
+        console.log(url);
+      };
       imgs.set(url, img);
       return null;
     }

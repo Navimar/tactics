@@ -57,9 +57,9 @@ function inputMouse() {
   //   }
   // }, false);
 
-  canvas.addEventListener("touchstart", e => {
+  canvasAnimated.addEventListener("touchstart", e => {
     mobile = true;
-    mousePos = getTouchPos(canvas, e);
+    mousePos = getTouchPos(canvasAnimated, e);
     setMouseCell()
 
     tapTime = local.time;
@@ -67,8 +67,8 @@ function inputMouse() {
     // drawImgNormal('tap', mouseCell.x, mouseCell.y);
     e.preventDefault();
   }, false);
-  canvas.addEventListener("touchend", e => {
-    mousePos = getTouchPos(canvas, e);
+  canvasAnimated.addEventListener("touchend", e => {
+    mousePos = getTouchPos(canvasAnimated, e);
     setMouseCell()
 
     tapDown = false;
@@ -77,20 +77,20 @@ function inputMouse() {
     }
 
   }, false);
-  canvas.addEventListener("touchcancel", e => {
+  canvasAnimated.addEventListener("touchcancel", e => {
 
   }, false);
-  canvas.addEventListener("touchmove", e => {
+  canvasAnimated.addEventListener("touchmove", e => {
 
   }, false);
 
-  canvas.addEventListener("mousedown", e => {
+  canvasAnimated.addEventListener("mousedown", e => {
     // alert(window.orientation);
 
     switch (e.which) {
       case 1:
         //Left Mouse button pressed.
-        mousePos = getMousePos(canvas, e);
+        mousePos = getMousePos(canvasAnimated, e);
         setMouseCell()
 
         mouseDown = true;
@@ -99,7 +99,7 @@ function inputMouse() {
       case 2:
         break;
       case 3:
-        mousePos = getMousePos(canvas, e);
+        mousePos = getMousePos(canvasAnimated, e);
         setMouseCell()
 
         mouseDown = true;
@@ -110,12 +110,12 @@ function inputMouse() {
         alert('You have a wierd mouse!');
     }
   }, false);
-  canvas.addEventListener("mouseup", e => {
+  canvasAnimated.addEventListener("mouseup", e => {
     mouseDown = false;
-    mousePos = getMousePos(canvas, e);
+    mousePos = getMousePos(canvasAnimated, e);
   }, false);
-  canvas.addEventListener("mousemove", e => {
-    mousePos = getMousePos(canvas, e);
+  canvasAnimated.addEventListener("mousemove", e => {
+    mousePos = getMousePos(canvasAnimated, e);
     setMouseCell()
   }, false);
 }

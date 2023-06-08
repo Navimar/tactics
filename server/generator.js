@@ -49,6 +49,10 @@ exports.new = (rank, ai) => {
   let points = en.allPoints();
   points = _.sampleSize(points, 81);
 
+
+  // data.field[points[0].x][points[0].y] = 'ground'
+  // data.field[points[1].x][points[1].y] = 'ground'
+
   let defground = 1
   let defgrass = 1
   let defsky = 0
@@ -56,6 +60,40 @@ exports.new = (rank, ai) => {
   let n = 999
   let grasspower = 10000
   let groundpower = 10000
+
+
+  let dir = 1
+  let terrain = ['ground', 'ground', 'grass', 'grass']
+  terrain = _.sampleSize(terrain, terrain.length);
+
+  data.field[4 + dir][4] = terrain[0]
+  data.field[4 - dir][4] = terrain[1]
+  data.field[4][4 + dir] = terrain[2]
+  data.field[4][4 - dir] = terrain[3]
+  terrain = _.sampleSize(terrain, terrain.length);
+
+  data.field[1 + dir][1] = terrain[0]
+  data.field[1][1 - dir] = terrain[1]
+  data.field[1][1 + dir] = terrain[2]
+  data.field[1 - dir][1] = terrain[3]
+  terrain = _.sampleSize(terrain, terrain.length);
+
+  data.field[7 + dir][1] = terrain[0]
+  data.field[7 - dir][1] = terrain[1]
+  data.field[7][1 + dir] = terrain[2]
+  data.field[7][1 - dir] = terrain[3]
+  terrain = _.sampleSize(terrain, terrain.length);
+
+  data.field[1 + dir][7] = terrain[0]
+  data.field[1 - dir][7] = terrain[1]
+  data.field[1][7 + dir] = terrain[2]
+  data.field[1][7 - dir] = terrain[3]
+  terrain = _.sampleSize(terrain, terrain.length);
+
+  data.field[7 + dir][7] = terrain[0]
+  data.field[7 - dir][7] = terrain[1]
+  data.field[7][7 + dir] = terrain[2]
+  data.field[7][7 - dir] = terrain[3]
 
   points.forEach(p => {
     if (data.field[p.x][p.y] == 'none') {
@@ -83,10 +121,10 @@ exports.new = (rank, ai) => {
       if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == 'mountain') mountain += n;
       if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == 'mountain') mountain += n;
 
-      // if (ground > grass)
-      //   grass = 0
-      // if (ground < grass)
-      //   ground = 0
+      if (ground > grass)
+        grass = 0
+      if (ground < grass)
+        ground = 0
 
       let r = _.random(ground + grass + sky + mountain - 1)
       if (r < ground)
@@ -100,64 +138,119 @@ exports.new = (rank, ai) => {
     }
   });
 
+  // let makeflag = (px, py, team) => {
+  //   let dir = _.random(1) * -2 + 1
+  //   if (py < 4)
+  //     dir = +1
+  //   if (py > 4)
+  //     dir = -1
+
+  //   let i = 0
+  //   while (
+  //     data.field[px][py].slice(0, -1) == 'team'
+  //     || data.field[px][py + 1].slice(0, -1) == 'team'
+  //     || data.field[px][py - 1].slice(0, -1) == 'team'
+  //     || data.field[px - 1][py].slice(0, -1) == 'team'
+  //     || data.field[px + 1][py].slice(0, -1) == 'team'
+  //     || (
+  //       data.field[px][py + 1] == data.field[px][py]
+  //       && data.field[px][py - 1] == data.field[px][py]
+  //       && data.field[px - 1][py] == data.field[px][py]
+  //       && data.field[px + 1][py] == data.field[px][py]
+  //       && i++ < 25
+  //     )
+  //   ) {
+  //     py += 1 * dir
+  //     if (py >= 7 || py <= 1) {
+  //       dir *= -1
+  //     }
+  //   }
+  //   data.field[px][py] = 'team' + team;
+
+  //   if (py <= 5)
+  //     dir = -1
+  //   else dir = 1
+  //   return { x: px, y: py, dir }
+  // }
   let makeflag = (px, py, team) => {
-    let dir = _.random(1) * -2 + 1
-    if (py < 4)
-      dir = +1
-    if (py > 4)
-      dir = -1
-
-    let i = 0
-    while (
-      data.field[px][py].slice(0, -1) == 'team'
-      || data.field[px][py + 1].slice(0, -1) == 'team'
-      || data.field[px][py - 1].slice(0, -1) == 'team'
-      || data.field[px - 1][py].slice(0, -1) == 'team'
-      || data.field[px + 1][py].slice(0, -1) == 'team'
-      || (
-        data.field[px][py + 1] == data.field[px][py]
-        && data.field[px][py - 1] == data.field[px][py]
-        && data.field[px - 1][py] == data.field[px][py]
-        && data.field[px + 1][py] == data.field[px][py]
-        && i++ < 25
-      )
-    ) {
-      py += 1 * dir
-      if (py >= 7 || py <= 1) {
-        dir *= -1
-      }
-    }
-    data.field[px][py] = 'team' + team;
-
-    if (py <= 5)
-      dir = -1
-    else dir = 1
-    return { x: px, y: py, dir }
+    data.field[px][py] = 'team' + team
+    return { x: px, y: py, dir: 0 }
   }
-
   let bluearr = []
   let orangearr = []
   makeflag(4, 4, _.random(1) + 1);
   up = makeflag(1, 1, 1);
   bluearr.push({ x: up.x, y: up.y });
   bluearr.push({ x: up.x - 1, y: up.y });
-  bluearr.push({ x: up.x, y: up.y + up.dir });
+  bluearr.push({ x: up.x, y: up.y + -1 });
   up = makeflag(1, 7, 1);
   bluearr.push({ x: up.x, y: up.y });
   bluearr.push({ x: up.x - 1, y: up.y });
-  bluearr.push({ x: up.x, y: up.y + up.dir });
+  bluearr.push({ x: up.x, y: up.y + 1 });
   up = makeflag(7, 1, 2);
-  orangearr.push({ x: up.x, y: up.y + up.dir });
+  orangearr.push({ x: up.x, y: up.y - 1 });
   orangearr.push({ x: up.x + 1, y: up.y });
   orangearr.push({ x: up.x, y: up.y });
   up = makeflag(7, 7, 2);
-  orangearr.push({ x: up.x, y: up.y + up.dir });
+  orangearr.push({ x: up.x, y: up.y + 1 });
   orangearr.push({ x: up.x + 1, y: up.y });
   orangearr.push({ x: up.x, y: up.y });
 
+  const pointsnearteam = [
+    [4 + dir, 4],
+    [4 - dir, 4],
+    [4, 4 + dir],
+    [4, 4 - dir],
+    [1 + dir, 1],
+    [1, 1 - dir],
+    [1, 1 + dir],
+    [1 - dir, 1],
+    [7 + dir, 1],
+    [7 - dir, 1],
+    [7, 1 + dir],
+    [7, 1 - dir],
+    [1 + dir, 7],
+    [1 - dir, 7],
+    [1, 7 + dir],
+    [1, 7 - dir],
+    [7 + dir, 7],
+    [7 - dir, 7],
+    [7, 7 + dir],
+    [7, 7 - dir]
+  ];
+
+  pointsnearteam.forEach(point => {
+    const [x, y] = point;
+    let cell = data.field[x][y];
+    // Only check if the cell is 'ground' or 'grass'
+    if (cell == 'ground' || cell == 'grass') {
+      let similarCells = 0;
+      // Array of directions to check (up, down, left, right)
+      let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+      // Check all neighboring cells
+      for (let i = 0; i < directions.length; i++) {
+        let nx = directions[i][0];
+        let ny = directions[i][1];
+        // Check bounds
+        if (x + nx >= 0 && x + nx < 9 && y + ny >= 0 && y + ny < 9) {
+          let neighborCell = data.field[x + nx][y + ny];
+          if (neighborCell == cell) similarCells++;
+        }
+      }
+      // If there is not another similar cell around this point, change its type
+      if (similarCells == 0) {
+        data.field[x][y] = (cell == 'ground') ? 'grass' : 'ground';
+      }
+    }
+  });
+
+
   if (!ai) {
-    // bluearr[0].tp = 'aerostat'
-    // orangearr[0].tp = 'aerostat'
+    bluearr[0].tp = 'aerostat'
+    orangearr[0].tp = 'aerostat'
+    orangearr[1].tp = 'headcrab'
+    bluearr[1].tp = 'headcrab'
+
     points = []
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
@@ -191,18 +284,12 @@ exports.new = (rank, ai) => {
     bluearr[3].tp = barraks[3]
     bluearr[4].tp = barraks[4]
     bluearr[5].tp = barraks[5]
-    bluearr[6].tp = barraks[6]
-    bluearr[7].tp = barraks[7]
-    // bluearr[8].tp = barraks[8]
     orangearr[1].tp = 'firebat'
     orangearr[2].tp = 'firebat'
     orangearr[3].tp = 'firebat'
     orangearr[0].tp = 'firebat'
     orangearr[4].tp = 'firebat'
     orangearr[5].tp = 'firebat'
-    orangearr[6].tp = 'lover'
-    orangearr[7].tp = 'firebat'
-    // orangearr[8].tp = 'firebat'
   }
 
   bluearr.forEach(e => {

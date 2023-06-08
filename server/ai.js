@@ -3,8 +3,6 @@
 const game = require('./game');
 const _ = require('lodash');
 const en = require('./engine');
-const { sortBy } = require('lodash');
-
 
 exports.go = (gm, number) => {
   if (gm.turn == number) {
@@ -26,6 +24,7 @@ exports.go = (gm, number) => {
 
     let zcn = 0;
     gm.unit.forEach(u => {
+      u = { ...u }
       if (u.team == number) {
         if (u.tp == 'firebat') {
           zcn++;
@@ -74,7 +73,7 @@ exports.go = (gm, number) => {
     let tries = 0
     let tp = 'firebat'
     if (zcn > 15)
-      tp = 'teleporter';
+      tp = 'base';
     while (gm.gold[number - 1] >= 5 && tries < 10) {
       tries++
       let x = 8

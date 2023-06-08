@@ -17,6 +17,7 @@ module.exports = (game, unit, akt) => {
       game.deadPool.splice(i, 1);
     }
     for (let i = game.appearPool.length; i--; i > 0) {
+      // console.log(game.appearPool[i])
       if (_.isFunction(meta[game.appearPool[i].tp].onAppear)) {
         meta[game.appearPool[i].tp].onAppear(wrapper(game, game.appearPool[i], { x: game.appearPool[i].x, y: game.appearPool[i].y, unit: game.appearPool[i] }));
       }
@@ -33,7 +34,8 @@ module.exports = (game, unit, akt) => {
     rules.capture(game);
     rules.fireend(game);
     rules.wormportal(game);
-    rules.flagwin(game);
+    if (!game.ai)
+      rules.flagwin(game);
   } while (game.deadPool.length > 0);
   // rules.dead(game);
 }

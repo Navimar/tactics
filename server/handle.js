@@ -127,7 +127,7 @@ exports.bot = (ctx, bot) => {
     send.bot(id, 'Игра успешно создана!', bot);
     send.gamelist(id, p, bot);
   }
-  // else if (text == '/mission') {
+  // else if (text == '/single') {
   //   p.game.push(game.new(p, p, 'ai'))
   //   send.bot(id, 'Игра успешно создана!', bot);
   //   send.gamelist(id, p, bot);

@@ -135,7 +135,17 @@ exports.data = (game, order) => {
         m: u.m,
         x: u.x,
         y: u.y,
-        sticker: u.sticker ? meta[u.sticker.tp].img : false,
+        sticker: u.sticker ? {
+          img: meta[u.sticker.tp].img,
+          color: (() => {
+            if (player == 1) return u.sticker.team;
+            if (player == 2) return (() => {
+              if (u.sticker.team == 1) { return 2 } else
+                if (u.sticker.team == 2) { return 1 } else
+                  return u.sticker.team;
+            })();
+          })()
+        } : false,
         akt: u.akt,
         color: (() => {
           if (player == 1) return u.team;
