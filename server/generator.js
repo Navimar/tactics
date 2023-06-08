@@ -246,10 +246,10 @@ exports.new = (rank, ai) => {
 
 
   if (!ai) {
-    bluearr[0].tp = 'aerostat'
-    orangearr[0].tp = 'aerostat'
-    orangearr[1].tp = 'headcrab'
-    bluearr[1].tp = 'headcrab'
+    // bluearr[0].tp = 'aerostat'
+    // orangearr[0].tp = 'aerostat'
+    // orangearr[1].tp = 'headcrab'
+    // bluearr[1].tp = 'headcrab'
 
     points = []
     for (let y = 0; y < 9; y++) {
