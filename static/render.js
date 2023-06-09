@@ -28,18 +28,18 @@ let renderanimated = (diff) => {
     if (diff) {
         let fps = (parseInt(1000 / diff)).toString()
         let y = 0
-        if (fps < 30)
+        if (fps < 25)
             drawTxt('fps ' + fps, 0, y, "#000000", undefined, undefined, true);
         if (quality < 100)
             drawTxt('quality ' + quality, 0, y += 0.5, "#000000", undefined, undefined, true);
         // drawTxt('wait ' + wait, 8, y += 0.5, "#000000", undefined, undefined, true);
         // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
-        if (wait > 100) {
+        if (wait > 50) {
             if (fps <= 25 && quality >= 15)
-                quality -= 5
+                quality -= 2
             if (fps > 50) {
-                quality += 5
+                quality += 2
                 if (quality > 100)
                     quality = 100
             }
@@ -139,20 +139,23 @@ let renderpanel = () => {
 
         if (data.bonus == 'choose') {
             drawSize('choose', c[0][0], c[0][1], 2, 2)
-        } else if (data.bonus == 'wait') {
+        }
+        else if (data.bonus == 'wait') {
             drawSize('wait', c[0][0], c[0][1], 2, 2)
         }
         else if (data.turn) {
             drawSize('turn', c[0][0], c[0][1], 2, 2)
-        } else {
+        }
+        else if (!data.turn) {
             drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
         }
-        if (data.win == 'win') {
+        else if (data.win == 'win') {
             drawSize('win', c[0][0], c[0][1], 2, 2)
         }
-        if (data.win == 'defeat') {
+        else (data.win == 'defeat') {
             drawSize('defeat', c[0][0], c[0][1], 2, 2)
         }
+
 
         // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
         // drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
@@ -210,9 +213,9 @@ let renderunit = (x, y, diff) => {
         if (data.field[x][y] == 'grass' || data.field[x][y] == 'team1' || data.field[x][y] == 'team2')
             groundsize = 56
 
-        if (!data.order || u.x != data.order.akt.x || u.y != data.order.akt.y) {
+        if ((!data.order || u.x != data.order.akt.x || u.y != data.order.akt.y) || (u.progress && u.progress > 1000)) {
             let sizeadd = 0
-            if ((u.isReady || u.isActive) && u.color == 1)
+            if ((u.isReady || u.isActive) && data.turn && u.color == 1)
                 sizeadd = local.cadr * 20 / 1000;
             // else
             //   sizeadd = local.cadr * 8 / 1000;

@@ -183,7 +183,7 @@ exports.endgame = (game, winner, words) => {
     else
       send.bot(game.players[0].id, words[0] + ' Ваш ранг теперь: ' + game.players[0].rank + ' (' + dif0 + ')', bot);
     if (dif1 == 0)
-      send.bot(game.players[1].id, words[1] + ' Ваш ранг не изменился: ' + game.players[1].rank);
+      send.bot(game.players[1].id, words[1] + ' Ваш ранг не изменился: ' + game.players[1].rank, bot);
     else
       send.bot(game.players[1].id, words[1] + ' Ваш ранг теперь: ' + game.players[1].rank + ' (' + dif1 + ')', bot);
   }

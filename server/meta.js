@@ -16,35 +16,35 @@ exports.warrior = {
   },
 }
 
-exports.archer = {
-  name: 'Лучник', description: 'Ходит или стреляет. Наносит рану. Третья рана уничтожает юнита.',
-  weight: 100,
-  rank: 0,
-  class: 'norm',
-  life: 3,
-  img: 'archer',
-  akt: (akt) => {
-    let akts = []
-    let points = en.allPoints();
-    points = points.filter(pt => {
-      if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
-        return true
-    });
-    points.forEach((pt) => {
-      let u = en.unitInPoint(akt.game, pt.x, pt.y)
-      if (u && u != akt.me && akt.me.energy == 3)
-        akts.push({
-          x: pt.x,
-          y: pt.y,
-          img: 'wound',
-        })
-    });
-    return akts.concat(akt.move())
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-}
+// exports.archer = {
+//   name: 'Лучник', description: 'Ходит или стреляет. Наносит рану. Третья рана уничтожает юнита.',
+//   weight: 100,
+//   rank: 0,
+//   class: 'norm',
+//   life: 3,
+//   img: 'archer',
+//   akt: (akt) => {
+//     let akts = []
+//     let points = en.allPoints();
+//     points = points.filter(pt => {
+//       if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy)
+//         return true
+//     });
+//     points.forEach((pt) => {
+//       let u = en.unitInPoint(akt.game, pt.x, pt.y)
+//       if (u && u != akt.me && akt.me.energy == 3)
+//         akts.push({
+//           x: pt.x,
+//           y: pt.y,
+//           img: 'wound',
+//         })
+//     });
+//     return akts.concat(akt.move())
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+// }
 
 exports.fish = {
   name: 'Рыба', description: 'Не может ходить, только плавает. В воде может ходить сквозь юнитов. Наносит рану как воин.',
@@ -203,7 +203,7 @@ exports.base = {
   },
 }
 exports.merchant = {
-  name: 'Продавец', description: 'пока не придумал',
+  name: 'Продавец', description: 'Съедает юнита, но его хозяин получает 5 золота',
   weight: 100,
   rank: 30,
   class: 'norm',
@@ -277,7 +277,7 @@ exports.firebat = {
 }
 
 exports.bomber = {
-  description: 'Прилепляет бомбу на юнита, потом исчезает. Юнит с прилепленной бомбой при смерти взырывается квадратом 3х3',
+  description: 'Прилепляет бомбу на юнита, потом исчезает. Юнит с прилепленной бомбой при смерти взрывается квадратом 3х3',
   name: 'Бомбер',
   weight: 100,
   rank: 80,
@@ -969,22 +969,11 @@ exports.bird = {
   class: 'norm',
   img: 'bird',
   akt: (akt) => {
-    let akts = [];
-    let points = en.allPoints();
-    points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
-    points.forEach((pt) => {
-      akts.push({
-        x: pt.x,
-        y: pt.y,
-        img: 'move',
-      })
-    });
-    akts.push({
+    return akt.move().concat({
       x: akt.me.x,
       y: akt.me.y,
       img: 'bird',
     });
-    return akts;
   },
   move: (wd) => {
     wd.go(wd.target.x, wd.target.y);
