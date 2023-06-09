@@ -11,6 +11,7 @@ questionmark.src = '/undefined.png';
 let dh = 0;
 let shiftX = 0;
 let shiftY = 0;
+let quality = 100
 
 let resize = (active) => {
   if (active)
@@ -20,8 +21,8 @@ let resize = (active) => {
 }
 
 function resizecanvas(canvas, ctx) {
-  const realWidth = window.innerWidth * window.devicePixelRatio;
-  const realHeight = window.innerHeight * window.devicePixelRatio;
+  const realWidth = window.innerWidth * window.devicePixelRatio * (quality / 100);
+  const realHeight = window.innerHeight * window.devicePixelRatio * (quality / 100);
   canvas.style.width = `${window.innerWidth}px`;
   canvas.style.height = `${window.innerHeight}px`;
   canvas.width = realWidth;

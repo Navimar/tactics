@@ -1,3 +1,4 @@
+let wait = 0
 
 let renderanimated = (diff) => {
 
@@ -24,8 +25,28 @@ let renderanimated = (diff) => {
     if (local.focus) {
         drawImg('focus', local.focus.x, local.focus.y)
     }
-    if (diff)
-        drawTxt('fps ' + (parseInt(1000 / diff)).toString(), 8, 0, "#000000", undefined, undefined, true);
+    if (diff) {
+        let fps = (parseInt(1000 / diff)).toString()
+        let y = 0
+        if (fps < 50)
+            drawTxt('fps ' + fps, 8, y, "#000000", undefined, undefined, true);
+        if (quality < 100)
+            drawTxt('quality ' + quality, 8, y += 0.5, "#000000", undefined, undefined, true);
+        // drawTxt('wait ' + wait, 8, y += 0.5, "#000000", undefined, undefined, true);
+        // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
+
+        if (wait > 100) {
+            if (fps < 45 && quality > 30)
+                quality -= 5
+            if (fps > 55) {
+                quality += 5
+                if (quality > 100)
+                    quality = 100
+            }
+            wait = 0
+        } else
+            wait++
+    }
     // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
 
 }
