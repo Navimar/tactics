@@ -137,7 +137,13 @@ let renderpanel = () => {
         if (local.frame > 0)
             drawSize('frame', c[3][0], c[3][1], 2, 2)
 
-        if (data.bonus == 'choose') {
+        if (data.win == 'win') {
+            drawSize('win', c[0][0], c[0][1], 2, 2)
+        }
+        else if (data.win == 'defeat') {
+            drawSize('defeat', c[0][0], c[0][1], 2, 2)
+        }
+        else if (data.bonus == 'choose') {
             drawSize('choose', c[0][0], c[0][1], 2, 2)
         }
         else if (data.bonus == 'wait') {
@@ -145,17 +151,9 @@ let renderpanel = () => {
         }
         else if (data.turn) {
             drawSize('turn', c[0][0], c[0][1], 2, 2)
-        }
-        else if (!data.turn) {
+        } else {
             drawSize('turnEnemy', c[0][0], c[0][1], 2, 2)
         }
-        else if (data.win == 'win') {
-            drawSize('win', c[0][0], c[0][1], 2, 2)
-        }
-        else (data.win == 'defeat') {
-            drawSize('defeat', c[0][0], c[0][1], 2, 2)
-        }
-
 
         // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
         // drawTxt(local.fisher[1] + '', c[0][0] + 1 + 0.15, c[0][1] + 0.4 + 0.15, '#f00')
