@@ -122,7 +122,7 @@ function inputMouse() {
 
 let setMouseCell = () => {
   mouseCell = {
-    x: Math.floor((mousePos.x - shiftX / window.devicePixelRatio) / dh * window.devicePixelRatio),
-    y: Math.floor((mousePos.y - shiftY / window.devicePixelRatio) / dh * window.devicePixelRatio)
+    x: Math.floor((mousePos.x - shiftX / (window.devicePixelRatio * (quality / 100))) / dh * (window.devicePixelRatio * (quality / 100))),
+    y: Math.floor((mousePos.y - shiftY / (window.devicePixelRatio * (quality / 100))) / dh * (window.devicePixelRatio * (quality / 100)))
   }
 }
