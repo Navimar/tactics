@@ -21,13 +21,13 @@ exports.find = (p, bot) => {
             // console.log(queue[0]);
             player.list().forEach(e => {
                 if (p.id == e.id)
-                    send.bot(p.id, "Вы ищите игру", bot);
+                    send.bot(p.id, "Вы ищете игру", bot);
                 else if (e.subscribe)
                     send.bot(e.id, "Игрок с рангом " + p.rank + " ищет игру, нажмите /find, чтобы присоединиться к игре! (/subscribe, чтобы больше не получать уведомлений)", bot);
             });
         }
     } else {
-        send.bot(p.id, "Вы уже ищите игру", bot);
+        send.bot(p.id, "Вы уже ищете игру", bot);
     }
 }
 exports.cancel = (p, bot) => {

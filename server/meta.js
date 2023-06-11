@@ -1055,7 +1055,7 @@ exports.worm = {
   akt: (akt) => {
     let akts = [];
     let points = en.allPoints();
-    // points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
+    points = points.filter(pt => en.isOccupied(akt.game, pt.x, pt.y) && (pt.x != akt.me.x || pt.y != akt.me.y))
     points.forEach((pt) => {
       akts.push({
         x: pt.x,

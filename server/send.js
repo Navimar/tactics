@@ -136,7 +136,7 @@ exports.data = (game, order) => {
         x: u.x,
         y: u.y,
         sticker: u.sticker ? {
-          img: meta[u.sticker.tp].img,
+          img: _.isFunction(meta[u.sticker.tp].img) ? meta[u.sticker.tp].img(wrapper(game, u, u)) : meta[u.sticker.tp].img,
           color: (() => {
             if (player == 1) return u.sticker.team;
             if (player == 2) return (() => {

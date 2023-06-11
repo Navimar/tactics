@@ -37,12 +37,12 @@ let renderanimated = (diff) => {
 
         if (wait > 50) {
             if (fps <= 25 && quality >= 15)
-                quality -= 2
-            if (fps > 50) {
-                quality += 2
-                if (quality > 100)
-                    quality = 100
-            }
+                quality -= 5
+            // if (fps > 50) {
+            //     quality += 2
+            //     if (quality > 100)
+            //         quality = 100
+            // }
             wait = 0
         } else
             wait++
@@ -211,7 +211,7 @@ let renderunit = (x, y, diff) => {
         if (data.field[x][y] == 'grass' || data.field[x][y] == 'team1' || data.field[x][y] == 'team2')
             groundsize = 56
 
-        if ((!data.order || u.x != data.order.akt.x || u.y != data.order.akt.y) || (u.progress && u.progress > 1000)) {
+        if ((!data.order || data.order.img == 'worm' || u.x != data.order.akt.x || u.y != data.order.akt.y) || (u.progress && u.progress > 1000)) {
             let sizeadd = 0
             if ((u.isReady || u.isActive) && data.turn && u.color == 1)
                 sizeadd = local.cadr * 20 / 1000;
@@ -231,8 +231,9 @@ let renderunit = (x, y, diff) => {
                     // if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
                     drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
                 }
-            if (u.sticker)
+            if (u.sticker) {
                 drawSticker(u.sticker.img, x, y, u.sticker.color)
+            }
             u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
 
         } else if (data.order.akt.img == 'move') {
@@ -252,11 +253,10 @@ let renderunit = (x, y, diff) => {
             drawProp(u.img, xd, yd, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
             if (data.field[x][y] == 'water')
                 drawImgNormal('drawn', xd, yd, fieldmask[x][y], true);
-
             if (u.sticker)
                 drawSticker(u.sticker.img, x, y, u.sticker.color)
             u.status.forEach(stt => drawStatus(stt, xd, yd, u.m, u.color, u.isReady, u.isActive));
-        } else {
+        } else if (data.order.akt.img != 'worm') {
             console.log(data.order.akt.img)
             if (!u.progress)
                 u.progress = 0;
@@ -278,7 +278,10 @@ let renderunit = (x, y, diff) => {
             u.status.forEach(stt => drawStatus(stt, dx, dy, u.m, u.color, u.isReady, u.isActive));
             if (u.sticker)
                 drawSticker(u.sticker.img, x, y, u.sticker.color)
-
+        } else {
+            drawProp(u.img, x, y, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
+            if (data.field[x][y] == 'water')
+                drawImgNormal('drawn', xd, yd, fieldmask[x][y], true);
         }
 
         if (data.field[x][y] == 'water' && (!u.progress || u.progress > 1000))
