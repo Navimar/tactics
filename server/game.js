@@ -291,8 +291,8 @@ exports.endturn = (game, p) => {
     }
 
     if (!game.sandbox)
-      send.gamelist(game.players[game.turn - 1].id, game.players[game.turn - 1], bot);
-    // send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
+      // send.gamelist(game.players[game.turn - 1].id, game.players[game.turn - 1], bot);
+      send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
   }
 }
 
