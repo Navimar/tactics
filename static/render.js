@@ -1,4 +1,4 @@
-let wait = 0
+let fps = 60
 
 let renderanimated = (diff) => {
 
@@ -16,36 +16,31 @@ let renderanimated = (diff) => {
     }
     renderakt();
     rendertrail();
-
+    if (data.bonus == 'choose')
+        renderpanel();
     if (!socket.connected)
         tip('Разорвано соединение с сервером...', 3, 3, '#F00', 5, 200);
-
 
     rendertip();
     if (local.focus) {
         drawImg('focus', local.focus.x, local.focus.y)
     }
     if (diff) {
-        let fps = (parseInt(1000 / diff)).toString()
+        fps = parseInt(((1000 / diff) + fps * 10) / 11)
         let y = 0
-        if (fps < 25)
+        if (fps <= 30)
             drawTxt('fps ' + fps, 0, y, "#000000", undefined, undefined, true);
         if (quality < 100)
             drawTxt('quality ' + quality, 0, y += 0.5, "#000000", undefined, undefined, true);
-        // drawTxt('wait ' + wait, 8, y += 0.5, "#000000", undefined, undefined, true);
+        // drawTxt('local.seconds ' + local.seconds, 0, y += 0.5, "#000000", undefined, undefined, true);
+        // drawTxt('local.lastclick ' + local.lastclick, 0, y += 0.5, "#000000", undefined, undefined, true);
+
         // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
-        if (wait > 50) {
-            if (fps <= 25 && quality >= 15)
-                quality -= 5
-            // if (fps > 50) {
-            //     quality += 2
-            //     if (quality > 100)
-            //         quality = 100
-            // }
-            wait = 0
-        } else
-            wait++
+        if (fps <= 30 && quality >= 55) {
+            quality -= 1
+        }
+
     }
     // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
 
@@ -64,8 +59,8 @@ let render = () => {
             drawBackground('edgeWait');
         }
     }
-
-    renderpanel();
+    if (data.bonus != 'choose')
+        renderpanel();
     for (let y = 0; y < 9; y++) {
         for (let x = 0; x < 9; x++) {
             renderfield(x, y)
@@ -106,15 +101,16 @@ let renderpanel = () => {
     }
 
     if (data.bonus == 'choose') {
+        let sizeadd = local.cadr * 20 / 1000;
         let i = 0;
         for (let fx = -2; fx < 0; fx++) {
             for (let fy = 0; fy < 9; fy++) {
                 if (orientation == 'h') {
-                    drawImgNormal('bonus', fy, fx)
-                    drawTxt(("0" + i).slice(-2), fy + 0.20, fx + 0.20, '#000', 170)
+                    drawProp('bonus', fy, fx, 1 + sizeadd, 1 - sizeadd)
+                    drawTxt(("0" + i).slice(-2), fy + 0.25, fx + 0.15, '#000', 170)
                 } else {
-                    drawImgNormal('bonus', fx, fy)
-                    drawTxt(("0" + i).slice(-2), fx + 0.24, fy + 0.30, '#000', 170)
+                    drawProp('bonus', fx, fy, 1 + sizeadd, 1 - sizeadd)
+                    drawTxt(("0" + i).slice(-2), fx + 0.25, fy + 0.15, '#000', 170)
                 }
                 i++
             }
@@ -213,30 +209,29 @@ let renderunit = (x, y, diff) => {
 
         if ((!data.order || data.order.img == 'worm' || u.x != data.order.akt.x || u.y != data.order.akt.y) || (u.progress && u.progress > 1000)) {
             let sizeadd = 0
-            if ((u.isReady || u.isActive) && data.turn && u.color == 1)
+            if (((u.isReady || u.isActive) && data.turn && u.color == 1 && !data.chooseteam) || (data.chooseteam && data.bonus != 'choose' && u.color != 3))
                 sizeadd = local.cadr * 20 / 1000;
             // else
             //   sizeadd = local.cadr * 8 / 1000;
             if (data.field[x][y] == 'ground') {
                 // if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
-                drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+                drawPropUnit(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
             }
             else
                 if (data.field[x][y] == 'water') {
                     // if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
-                    drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+                    drawPropUnit(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
                     drawImgNormal('drawn', x, y, fieldmask[x][y], true);
                 }
                 else {
                     // if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
-                    drawProp(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
+                    drawPropUnit(u.img, u.x, u.y, u.m, u.color, u.isReady, u.isActive, groundsize - sizeadd, groundsize + sizeadd, true);
                 }
             if (u.sticker) {
                 drawSticker(u.sticker.img, x, y, u.sticker.color)
             }
             u.status.forEach(stt => drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive));
-
-        } else if (data.order.akt.img == 'move') {
+        } else if (data.order.akt.img == 'move' || data.order.akt.img == 'fly' || data.order.akt.img == 'take') {
             console.log(data.order.unit.x, u.x, data.order.akt.img)
             let progress
 
@@ -250,11 +245,14 @@ let renderunit = (x, y, diff) => {
             let xd = (u.x * (progress / 500) + data.order.unit.x * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 150
             let yd = (u.y * (progress / 500) + data.order.unit.y * ((1000 - progress) / 500)) / 2 - Math.sin(progress / 25) / 45
             if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
-            drawProp(u.img, xd, yd, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
+            drawPropUnit(u.img, xd, yd, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
             if (data.field[x][y] == 'water')
                 drawImgNormal('drawn', xd, yd, fieldmask[x][y], true);
             if (u.sticker)
-                drawSticker(u.sticker.img, x, y, u.sticker.color)
+                if (data.order.akt.img == 'take')
+                    drawSticker(u.sticker.img, x, y, u.sticker.color)
+                else
+                    drawSticker(u.sticker.img, xd, yd, u.sticker.color)
             u.status.forEach(stt => drawStatus(stt, xd, yd, u.m, u.color, u.isReady, u.isActive));
         } else if (data.order.akt.img != 'worm') {
             console.log(data.order.akt.img)
@@ -272,14 +270,14 @@ let renderunit = (x, y, diff) => {
             dx = u.x + (easing * (Math.cos(progress * 0.1) + Math.cos(progress * 0.3115))) / 40;
             dy = u.y + (easing * (Math.sin(progress * 0.05) + Math.sin(progress * 0.057113))) / 40;
             if (u.isReady == undefined || u.isActive == undefined) console.log(u, 'why?')
-            drawProp(u.img, dx, dy, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true)
+            drawPropUnit(u.img, dx, dy, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true)
             if (data.field[x][y] == 'water')
                 drawImgNormal('drawn', dx, dy, fieldmask[x][y], true);
             u.status.forEach(stt => drawStatus(stt, dx, dy, u.m, u.color, u.isReady, u.isActive));
             if (u.sticker)
                 drawSticker(u.sticker.img, x, y, u.sticker.color)
         } else {
-            drawProp(u.img, x, y, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
+            drawPropUnit(u.img, x, y, u.m, u.color, u.isReady, u.isActive, groundsize, groundsize, true);
             if (data.field[x][y] == 'water')
                 drawImgNormal('drawn', xd, yd, fieldmask[x][y], true);
         }

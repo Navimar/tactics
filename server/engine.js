@@ -25,6 +25,13 @@ en.inField = (x, y) => {
   if (x >= 0 && x < 9 && y < 9 && y >= 0) return true
 }
 
+en.oppositeTeam = (team) => {
+  let t = team
+  if (t != 3)
+    t = 3 - t;
+  return t
+}
+
 en.isNear4 = (x1, y1, x2, y2) => {
   let dx = Math.abs(x1 - x2)
   let dy = Math.abs(y1 - y2)

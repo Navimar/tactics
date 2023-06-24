@@ -80,6 +80,11 @@ module.exports = (game, me) => {
           let u = en.unitInPoint(game, pt.x, pt.y)
           if (u && u.team != game.turn) return true;
         });
+      } else if (who == 'enemy') {
+        points = points.filter(pt => {
+          let u = en.unitInPoint(game, pt.x, pt.y)
+          if (u && u.team != game.turn && u.team != 3) return true;
+        });
       } else if (who == 'notneutral') {
         points = points.filter(pt => {
           let u = en.unitInPoint(game, pt.x, pt.y)

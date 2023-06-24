@@ -28,7 +28,6 @@ exports.gamelist = (id, p, bot) => {
     else if (e.sandbox)
       text += 'Песочница: '
     else {
-      console.log(e.bonus, e.chooseteam)
       if ((e.bonus[1] == null && e.players[0].id) || (e.bonus[2] == null && e.players[1].id)) {
         text += 'НОВАЯ ИГРА!!! ';
       }
@@ -43,7 +42,6 @@ exports.gamelist = (id, p, bot) => {
   else
     text = `Список активных игр:\n` + text
   bot.telegram.sendMessage(id, text)
-
 };
 
 exports.loginError = (socket, error) => {

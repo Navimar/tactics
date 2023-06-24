@@ -44,6 +44,7 @@ function resizecanvas(canvas, ctx) {
   shiftY = (canvas.height - dh * 9) / 2;
   // ctx.fillStyle = "rgb(0,0,0)";
   // ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   dh = even(dh);
 }
 
@@ -383,7 +384,7 @@ function drawSticker(name, x, y, team,) {
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, size, size, true);
 }
 
-function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
+function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
   let ctx = animate ? ctxAnimated : ctxStatic
   let color = false
   if (!data.chooseteam && data.bonus == 'ready') {
@@ -415,46 +416,32 @@ function drawProp(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
     img = getImg(name + '.unit' + '.' + color, (h + w) / 2);
   // let w = img.width * (h / img.height);
   if (m) {
-    let df = () => {
-      drawImageEven(img, (x * dh - px + shiftX) * -1 - w, (y * dh - 0.1 * dh - py * 2 + shiftY), w, h, animate);
-    }
     ctx.save();
     ctx.scale(-1, 1);
-    if (color) {
-      drawShadow(df, color);
-    }
+    drawImageEven(img, (x * dh - px + shiftX) * -1 - w, (y * dh - 0.1 * dh - py * 2 + shiftY), w, h, animate);
     ctx.restore();
-    df();
-
   } else {
-    let df = () => {
-
-      drawImageEven(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h), animate);
-
-
-    }
-    ctx.save();
-    if (color) {
-      drawShadow(df, color);
-    }
-    ctx.restore();
-    df();
-    // ctx.drawImage(img, x * dh - p + shiftX, y * dh - p, w, h);
-
+    drawImageEven(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h), animate);
   }
 }
+function drawProp(name, x, y, ws, hs, animate) {
+  let px = 0;
+  let py = 0;
+  if (ws && hs) {
+    px = ((dh / 1000) * ws);
+    py = ((dh / 1000) * hs);
+  }
 
+  let w = dh + 2 * px;
+  let h = dh + 2 * py;
+  let img
+  if (!animate)
+    img = getImg(name, h);
+  else
+    img = getImg(name, (h + w) / 2);
+  drawImageEven(img, (x * dh - px + shiftX), (y * dh - 0.1 * dh - py * 2 + shiftY), (w), (h), animate);
 
-
-
-
-// function animate(i, x, y, fx, fy, p) {
-//     let dx = fx + (x - fx) * p / 100;
-//     let dy = fy + (y - fy) * p / 100;
-//     drawImg("from", x, y);
-//     drawImg(i, dx, dy);
-//
-// }
+}
 
 function drawSize(name, x, y, w, h, animate) {
   img = getImg(name, w * dh)

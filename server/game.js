@@ -155,10 +155,10 @@ let updateAkts = (game) => {
     onAkt.stazis(game, u);
     onAkt.teleporter(game, u);
     // onAkt.flower(game, u);
-    // if (u.akt.length == 0) {
-    //   u.isReady = false;
-    //   u.isActive = false;
-    // }
+    if (u.akt.length == 0 && u.isActive) {
+      u.isReady = false;
+      u.isActive = false;
+    }
   });
 }
 exports.endgame = (game, winner, words) => {
@@ -291,7 +291,8 @@ exports.endturn = (game, p) => {
     }
 
     if (!game.sandbox)
-      send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
+      send.gamelist(game.players[game.turn - 1].id, game.players[game.turn - 1], bot);
+    // send.bot(game.players[game.turn - 1].id, 'Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play', bot);
   }
 }
 

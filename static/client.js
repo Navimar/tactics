@@ -3,6 +3,7 @@ let mobile = false;
 let local = {
   time: 0,
   seconds: 0,
+  lastclick: 0,
   akt: [],
   focus: false,
   fisher: [999, 999],
@@ -123,6 +124,7 @@ window.onload = function () {
   render();
   inputMouse();
   inputServer();
+  onStep(0);
   step(new Date().getTime());
   login();
   renderhtml();
@@ -142,8 +144,8 @@ function step(lastTime) {
   let time = new Date().getTime();
   let timeDiff = time - lastTime;
   lastTime = time;
-
-  onStep(timeDiff);
+  if (!document.hidden)
+    onStep(timeDiff);
   // setTimeout(function () {
   requestAnimationFrame(function () {
     step(lastTime);
@@ -183,6 +185,11 @@ let onStep = (diff) => {
     }
     if (!data.bonus && local.fisher[0] != '' && local.fisher[0] == 30) {
       tip('Вы не успеваете закончить ход. Ход будет передан сопернику через 30 секунд!', 3, 3, '#F00', 5, 200);
+      render();
+    };
+    if (data.turn && data.bonus != 'choose' && !data.chooseteam && local.seconds >= local.lastclick + 45) {
+      local.lastclick = local.seconds
+      tip('Не забывайте передать ход сопернику', 3, 3, '#F00', 5, 200);
       render();
     };
     // if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
@@ -285,7 +292,7 @@ let clickOnAkt = () => {
       blocked = true;
       local.sandclock = { x: local.build.x, y: local.build.y }
     } else {
-      tip('Нажмите на юнита, какого вы хотите построить', mouseCell.x, mouseCell.y, '#005500')
+      tip('Нажмите на юнита, чтобы построить такого же', mouseCell.x, mouseCell.y, '#005500')
     }
   }
   else if (!data.turn) {
@@ -294,11 +301,11 @@ let clickOnAkt = () => {
   else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
     tip('Я гриб!', mouseCell.x, mouseCell.y, '#333')
   }
+  else if (local.unit && data.chooseteam) {
+    tip('Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!', mouseCell.x, mouseCell.y, '#333')
+  }
   else if (local.unit && local.unit.color != 1) {
-    if (data.chooseteam) {
-      tip('Это нейтрал. Выберите синию или рыжую команду', mouseCell.x, mouseCell.y, '#333')
-    } else
-      tip('Это юнит соперника! Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
+    tip('Это юнит соперника! Ходите юнитами с белой обводкой!!!', mouseCell.x, mouseCell.y, '#333')
   }
   else if (local.unit) {
     tip('Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!', mouseCell.x, mouseCell.y, '#333')
@@ -308,6 +315,7 @@ let clickOnAkt = () => {
 }
 
 let onMouseDown = () => {
+  local.lastclick = local.seconds;
   if (!socket.connected) {
     tip('Подключение к серверу...', 3, 3, '#FF0', 5, 200);
     login();
@@ -415,7 +423,10 @@ let onMouseDown = () => {
           else if (local.unit)
             clickOnAkt()
           else
-            tip('Выделите юнита с белой обводкой и ходите им!', 3, 3, '#000', 5, 120);
+            if (data.chooseteam)
+              tip('Выделите синиго или рыжего юнита. И ходите им!', mouseCell.x, mouseCell.y, '#333')
+            else
+              tip('Выделите юнита с белой обводкой и ходите им!', 3, 3, '#000', 5, 120);
 
           // let arr = [];
           // data.unit.forEach((u) => {
@@ -452,6 +463,7 @@ let onMouseDown = () => {
 }
 
 let onMouseDownRight = () => {
+  local.lastclick = local.seconds;
   if (!data.history) {
     local.tip = false;
     nextunit = 0;
