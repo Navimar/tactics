@@ -1,121 +1,126 @@
-const _ = require('lodash');
-const en = require('./engine');
+const _ = require("lodash");
+const en = require("./engine");
 
 module.exports = (game, me) => {
   return {
     me,
     game,
     near: () => {
-      return en.near(me.x, me.y)
+      return en.near(me.x, me.y);
     },
     freemove: () => {
-      let akts = []
+      let akts = [];
       let points = [{ x: me.x, y: me.y }];
 
       _.times(me.energy, () => {
         points.forEach((pt) => {
-          let near = en.near(pt.x, pt.y)
-          near = near.filter(np => {
-            return !en.isOccupied(game, np.x, np.y)
+          let near = en.near(pt.x, pt.y);
+          near = near.filter((np) => {
+            return !en.isOccupied(game, np.x, np.y);
           });
-          points = points.concat(near)
+          points = points.concat(near);
         });
-      })
+      });
       points = removeDuplicates(points);
-      points = points.filter(pt => !en.isOccupied(game, pt.x, pt.y))
+      points = points.filter((pt) => !en.isOccupied(game, pt.x, pt.y));
 
       points.forEach((pt) => {
         akts.push({
           x: pt.x,
           y: pt.y,
-          img: 'fly',
-        })
+          img: "fly",
+        });
       });
       return akts;
     },
     move: () => {
-      let akts = []
-      let points = [{ x: me.x, y: me.y }];
+      let akts = [];
+      let pointsSet = new Set([`${me.x},${me.y}`]);
 
       _.times(me.energy, () => {
-        points.forEach((pt) => {
-          let near = en.near(pt.x, pt.y)
-          near = near.filter(np => {
-            let nf = en.fieldInPoint(game, np.x, np.y)
-            let pf = en.fieldInPoint(game, pt.x, pt.y)
-            return !en.isOccupied(game, np.x, np.y) && (nf == pf || _.includes(['team1', 'team2', 'water'], nf) || _.includes(['team1', 'team2', 'water'], pf))
+        let newPoints = [];
+        pointsSet.forEach((ptStr) => {
+          let [x, y] = ptStr.split(",").map(Number);
+          let near = en.near(x, y);
+          near.forEach((np) => {
+            let npStr = `${np.x},${np.y}`;
+            if (!pointsSet.has(npStr)) {
+              let nf = en.fieldInPoint(game, np.x, np.y);
+              let pf = en.fieldInPoint(game, x, y);
+              if (
+                !en.isOccupied(game, np.x, np.y) &&
+                (nf === pf ||
+                  _.includes(["team1", "team2", "water"], nf) ||
+                  _.includes(["team1", "team2", "water"], pf))
+              ) {
+                newPoints.push(npStr);
+              }
+            }
           });
-          points = points.concat(near)
         });
-        // points = points.filter(pt =>
-
-        // )
-        // points = points.filter(pt => {
-        //   let f = en.fieldInPoint(game, pt.x, pt.y)
-        //   // return (f == en.fieldInPoint(game, me.x, me.y) || f.slice(0, -1) == 'team');
-        // })
-      })
-      points = removeDuplicates(points);
-      points = points.filter(pt => !en.isOccupied(game, pt.x, pt.y))
-
-      points.forEach((pt) => {
-        akts.push({
-          x: pt.x,
-          y: pt.y,
-          img: 'move',
-        })
+        newPoints.forEach((npStr) => pointsSet.add(npStr));
       });
+
+      pointsSet.forEach((ptStr) => {
+        let [x, y] = ptStr.split(",").map(Number);
+        if (!en.isOccupied(game, x, y)) {
+          akts.push({
+            x: x,
+            y: y,
+            img: "move",
+          });
+        }
+      });
+
       return akts;
     },
     hand: (img, who) => {
-      let akts = []
+      let akts = [];
       let points = en.near(me.x, me.y);
-      if (who == 'ally') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      if (who == "ally") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (u && u.team == me.team) return true;
         });
-      } else if (who == 'notally') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      } else if (who == "notally") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (u && u.team != game.turn) return true;
         });
-      } else if (who == 'enemy') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      } else if (who == "enemy") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (u && u.team != game.turn && u.team != 3) return true;
         });
-      } else if (who == 'notneutral') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      } else if (who == "notneutral") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (u && u.team != 3) return true;
         });
-      } else if (who == 'neutral') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      } else if (who == "neutral") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (u && u.team == 3) return true;
         });
-      } else if (who == 'free') {
-        points = points.filter(pt => {
-          let u = en.unitInPoint(game, pt.x, pt.y)
+      } else if (who == "free") {
+        points = points.filter((pt) => {
+          let u = en.unitInPoint(game, pt.x, pt.y);
           if (!u) return true;
         });
       } else {
-        points = points.filter(pt =>
-          en.isOccupied(game, pt.x, pt.y)
-        );
+        points = points.filter((pt) => en.isOccupied(game, pt.x, pt.y));
       }
       points.forEach((pt) => {
         akts.push({
           x: pt.x,
           y: pt.y,
           img,
-        })
+        });
       });
-      return akts
+      return akts;
     },
-  }
-}
+  };
+};
 
 function removeDuplicates(arr) {
   const result = [];
@@ -125,8 +130,11 @@ function removeDuplicates(arr) {
     if (duplicatesIndices.includes(index)) return;
     result.push(current);
     // Сравниваем каждый элемент в массиве после текущего
-    for (let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++) {
-
+    for (
+      let comparisonIndex = index + 1;
+      comparisonIndex < arr.length;
+      comparisonIndex++
+    ) {
       const comparison = arr[comparisonIndex];
       const currentKeys = Object.keys(current);
       const comparisonKeys = Object.keys(comparison);
@@ -149,7 +157,6 @@ function removeDuplicates(arr) {
         }
       }
       if (valuesEqual) duplicatesIndices.push(comparisonIndex);
-
     } // Конец цикла
   });
   return result;
