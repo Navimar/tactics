@@ -344,7 +344,7 @@ function drawTrail(name, x, y) {
   let img = getImg(name + ".trl", dh);
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
 }
-function drawAkt(name, x, y, right) {
+function drawAkt(name, x, y) {
   let ctx = ctxAnimated;
   let p = 0;
   let s = even(dh + 2 * p);
@@ -353,7 +353,7 @@ function drawAkt(name, x, y, right) {
   ctx.shadowColor = "rgba(0,0,0,0.3)";
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
-  if (right) ctx.globalAlpha = 0.8;
+  // if (right) ctx.globalAlpha = 0.8;
   ctx.shadowBlur = 0;
   drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s, true);
   ctx.restore();

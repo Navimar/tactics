@@ -10,8 +10,8 @@ const colors = {
   team2NotReady: Jimp.rgbaToInt(190, 0, 190, 255),
   team1Ready: Jimp.rgbaToInt(255, 255, 255, 255),
   team1NotReady: Jimp.rgbaToInt(30, 190, 40, 255),
-  team1choose: Jimp.rgbaToInt(47, 0, 255, 255),
-  team2choose: Jimp.rgbaToInt(255, 149, 0, 255),
+  // team1choose: Jimp.rgbaToInt(47, 0, 255, 255),
+  // team2choose: Jimp.rgbaToInt(255, 149, 0, 255),
   team1active: Jimp.rgbaToInt(0, 255, 0, 255),
   team3: Jimp.rgbaToInt(255, 255, 0, 255),
 };

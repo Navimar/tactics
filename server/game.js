@@ -28,10 +28,10 @@ exports.new = (p1, p2, ai) => {
 
 let creategame = (p1, p2, id, ai) => {
   let leftturns = 30;
-  let chooseteam = true;
   let turn = p1.rank > p2.rank ? 2 : 1;
   let sandbox = false;
   let bonus = [null, null, null];
+  bonus = [null, 0, 0];
   if (p1 == p2) {
     sandbox = true;
   }
@@ -62,7 +62,7 @@ let creategame = (p1, p2, id, ai) => {
     sticker: [],
     spoil: [],
     finished: false,
-    chooseteam,
+    chooseteam: false,
     id,
     sandbox,
     ai,
@@ -87,65 +87,66 @@ exports.order = (game, orderUnit, akt) => {
     fisher(game);
     game.trail = [];
     let unit = en.unitInPoint(game, orderUnit.x, orderUnit.y);
-    if (akt.img == "build") {
-      game.unit.forEach((u) => {
-        if (u.team == game.turn)
-          if (u.energy < 3 && u.isReady) {
-            wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-            //onTire
-            rules.frog(game);
-            rules.aerostat(game);
-          }
-      });
-      let newu = wrapper(game, orderUnit, {
-        x: orderUnit.x,
-        y: orderUnit.y,
-        unit: orderUnit,
-      }).addUnit(orderUnit, akt.x, akt.y, game.turn);
-      if (newu) {
-        game.gold[game.turn - 1] -= 5;
-        newu.isReady = false;
-      }
-    } else {
-      if (unit && unit.isReady) {
-        if (game.chooseteam) addbonus(game, unit);
+    // if (akt.img == "build") {
+    //   game.unit.forEach((u) => {
+    //     if (u.team == game.turn)
+    //       if (u.energy < 3 && u.isReady) {
+    //         wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+    //         //onTire
+    //         rules.frog(game);
+    //         rules.aerostat(game);
+    //       }
+    //   });
+    //   let newu = wrapper(game, orderUnit, {
+    //     x: orderUnit.x,
+    //     y: orderUnit.y,
+    //     unit: orderUnit,
+    //   }).addUnit(orderUnit, akt.x, akt.y, game.turn);
+    //   if (newu) {
+    //     game.gold[game.turn - 1] -= 5;
+    //     newu.isReady = false;
+    //   }
+    // }
+    // else {
+    if (unit && unit.isReady) {
+      if (game.chooseteam) addbonus(game, unit);
 
-        game.unit.forEach((u) => {
-          u.isActive = false;
-          if (u.energy < 3 && u != unit && u.isReady) {
-            wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-            //onTire
-            rules.frog(game);
-            rules.aerostat(game);
-          }
-        });
-        unit.isActive = true;
-        if (unit.x - akt.x > 0) {
-          unit.m = true;
-        } else if (unit.x - akt.x < 0) {
-          unit.m = false;
+      game.unit.forEach((u) => {
+        u.isActive = false;
+        if (u.energy < 3 && u != unit && u.isReady) {
+          wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+          //onTire
+          rules.frog(game);
+          rules.aerostat(game);
         }
-        if (_.isFunction(meta[unit.tp][akt.img])) {
-          meta[unit.tp][akt.img](
-            wrapper(game, unit, {
-              x: akt.x,
-              y: akt.y,
-              unit: en.unitInPoint(game, akt.x, akt.y),
-            }),
-            akt.data,
-          );
-        } else if (_.isFunction(action[akt.img]))
-          action[akt.img](
-            wrapper(game, unit, {
-              x: akt.x,
-              y: akt.y,
-              unit: en.unitInPoint(game, akt.x, akt.y),
-            }),
-            akt.data,
-          );
-        else console.log("unkonwn akt", akt.img);
+      });
+      unit.isActive = true;
+      if (unit.x - akt.x > 0) {
+        unit.m = true;
+      } else if (unit.x - akt.x < 0) {
+        unit.m = false;
       }
+      if (_.isFunction(meta[unit.tp][akt.img])) {
+        meta[unit.tp][akt.img](
+          wrapper(game, unit, {
+            x: akt.x,
+            y: akt.y,
+            unit: en.unitInPoint(game, akt.x, akt.y),
+          }),
+          akt.data,
+        );
+      } else if (_.isFunction(action[akt.img]))
+        action[akt.img](
+          wrapper(game, unit, {
+            x: akt.x,
+            y: akt.y,
+            unit: en.unitInPoint(game, akt.x, akt.y),
+          }),
+          akt.data,
+        );
+      else console.log("unkonwn akt", akt.img);
     }
+    // }
     //onOrder
     onOrder(game, unit, akt);
     updateAkts(game);
@@ -249,23 +250,23 @@ exports.rematch = (gm) => {
 };
 
 exports.endturn = (game, p) => {
-  // function cnFlag() {
-  //   let flag = [0, 0];
-  //   for (let x = 0; x < 9; x++) {
-  //     for (let y = 0; y < 9; y++) {
-  //       if (game.field[x][y] == "team1") {
-  //         if (game.turn - 1 == 0) game.trail.push({ img: "gold", x, y });
-  //         flag[0]++;
-  //       }
-  //       if (game.field[x][y] == "team2") {
-  //         if (game.turn - 1 == 1) game.trail.push({ img: "gold", x, y });
-  //         flag[1]++;
-  //       }
-  //     }
-  //   }
-  //   game.gold[game.turn - 1] += flag[game.turn - 1];
-  //   return flag;
-  // }
+  function cnFlag() {
+    let flag = [0, 0];
+    for (let x = 0; x < 9; x++) {
+      for (let y = 0; y < 9; y++) {
+        if (game.field[x][y] == "team1") {
+          // if (game.turn - 1 == 0) game.trail.push({ img: "gold", x, y });
+          flag[0]++;
+        }
+        if (game.field[x][y] == "team2") {
+          // if (game.turn - 1 == 1) game.trail.push({ img: "gold", x, y });
+          flag[1]++;
+        }
+      }
+    }
+    // game.gold[game.turn - 1] += flag[game.turn - 1];
+    return flag;
+  }
 
   if (game && !game.finished) {
     game.unit.forEach((u) => {

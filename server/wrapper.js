@@ -144,5 +144,10 @@ module.exports = (game, me, target) => {
       }
       game.trail.push({ img: "polymorph", x, y });
     },
+    terraform: (x, y, terrain) => {
+      console.log(game.field[x][y]);
+      if (game.field[x][y].slice(0, -1) != "team") game.field[x][y] = terrain;
+      console.log(game.field[x][y]);
+    },
   };
 };

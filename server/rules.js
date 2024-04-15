@@ -71,14 +71,14 @@ exports.worm = (game) => {
       if (en.isAlive(game, game.spoil[i].data.worm)) {
         if (game.spoil[i].data.worm != unit) {
           en.death(game, unit);
-          en.addSpoil(
-            game,
-            "wormportal",
-            game.spoil[i].data.worm.x,
-            game.spoil[i].data.worm.y,
-            { worm: game.spoil[i].data.worm },
-            3,
-          );
+          // en.addSpoil(
+          //   game,
+          //   "wormportal",
+          //   game.spoil[i].data.worm.x,
+          //   game.spoil[i].data.worm.y,
+          //   { worm: game.spoil[i].data.worm },
+          //   3,
+          // );
           en.move(
             game,
             game.spoil[i].data.worm,
@@ -212,7 +212,7 @@ exports.egg = (game) => {
 };
 
 exports.airdropBirth = (game) => {
-  let tp = "flower";
+  let tp = "mashroom";
 
   // Проверяем, есть ли в game.unit юниты с типом "base" и team равным game.turn
   const hasBaseUnitOfCurrentTurn = game.unit.some(
@@ -230,7 +230,7 @@ exports.airdropBirth = (game) => {
       game.spoil[i].name === "airdrop" &&
       !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
     ) {
-      const team = tp === "flower" ? 3 : game.turn; // Используем game.turn для "base"
+      const team = tp === "mashroom" ? 3 : game.turn; // Используем game.turn для "base"
       en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, team);
       game.spoil.splice(i, 1);
     }
@@ -272,7 +272,8 @@ exports.landmineexplosion = (game) => {
 
 exports.frog = (game) => {
   game.unit.forEach((u) => {
-    // u.status.remove('frog')
+    u.status.remove("frog");
+    u.status.remove("frog2");
     if (u.tp == "frog") u.data.lastjump = false;
   });
 };
@@ -310,6 +311,9 @@ exports.spill = (game) => {
   let ok = true;
   for (let x = 0; x < 9; x++) {
     for (let y = 0; y < 9; y++) {
+      // if (game.leftturns <= 15) {
+      //   if (game.field[x][y] == "ground") game.field[x][y] = "water";
+      // } else
       if (game.field[x][y] == "water") game.field[x][y] = "ground";
     }
   }
@@ -422,6 +426,7 @@ exports.slime = (game) => {
     });
   });
 };
+
 exports.lover = (game) => {
   let lover = false;
   game.unit.forEach((u) => {
@@ -491,7 +496,7 @@ exports.airdrop = (game) => {
 
   // Combine the list of units and spoils into a single array
   const combinedPoints = game.unit.concat(
-    game.spoil.filter((s) => s.type === "airdrop"),
+    game.spoil.filter((s) => s.name === "airdrop"),
   );
 
   // Find the point with the maximum minimum distance to all combined points

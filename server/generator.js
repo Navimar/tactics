@@ -1,8 +1,10 @@
 const meta = require("./meta");
-const rules = require("./rules");
+
 const en = require("./engine");
 
 const _ = require("lodash");
+
+const START_UNIT = "base";
 
 exports.new = (rank, ai) => {
   rank = 9999;
@@ -258,34 +260,38 @@ exports.new = (rank, ai) => {
   });
 
   if (!ai) {
-    bluearr[0].tp = "base";
-    orangearr[0].tp = "base";
-    // orangearr[1].tp = 'base'
-    // bluearr[1].tp = 'base'
+    bluearr[0].tp = START_UNIT;
+    orangearr[0].tp = START_UNIT;
 
     points = [];
+    let leftPoints = [];
+    let rightPoints = [];
+
+    // Разделяем точки на левую и правую половину
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
-        if (
-          data.field[x][y].slice(0, -1) != "team"
-          //   && data.field[x + 1] && data.field[x + 1][y].slice(0, -1) != 'team'
-          //   && data.field[x - 1] && data.field[x - 1][y].slice(0, -1) != 'team'
-          //   && data.field[x][y + 1] && data.field[x][y + 1].slice(0, -1) != 'team'
-          //   && data.field[x][y - 1] && data.field[x][y - 1].slice(0, -1) != 'team'
-        )
-          points.push({ x, y });
+        if (data.field[x][y].slice(0, -1) != "team") {
+          if (x < 4) {
+            leftPoints.push({ x, y });
+          } else if (x > 4) {
+            rightPoints.push({ x, y });
+          }
+        }
       }
     }
-    points = _.sampleSize(points, 6);
+
+    // Выбираем равное количество точек из каждой половины
+    let halfPointsCount = 3; // половина от общего количества точек, которое вы хотите добавить
+    points = _.sampleSize(leftPoints, halfPointsCount).concat(
+      _.sampleSize(rightPoints, halfPointsCount),
+    );
+
+    // Добавляем центральную точку
     points.push({ x: 4, y: 4 });
 
-    let wc = 0;
-    points.forEach((e, i) => {
-      data.unit.push(makeUnit("flower", e.x, e.y, 3));
-      // if (i == 0)
-      //   data.unit.push(makeUnit('mashroom', e.x, e.y, 3));
-      // else
-      //   data.unit.push(makeUnit(_.sample(neutral), e.x, e.y, 3));
+    // Добавляем грибы в выбранные точки
+    points.forEach((point) => {
+      data.unit.push(makeUnit("mashroom", point.x, point.y, 3));
     });
   } else {
     barraks = _.shuffle(barraks);

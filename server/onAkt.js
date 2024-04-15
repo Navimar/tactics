@@ -4,19 +4,22 @@ const akter = require("./akter");
 const { unitInPoint } = require("./engine");
 
 exports.slime = (game, u) => {
-  // game.unit.forEach(u => {
-  u.akt = u.akt.filter((a) => {
-    if (
-      u.status.includes("slime") &&
-      (a.img == "move" || a.img == "fly" || a.img == "take")
-    ) {
-      return false;
-    } else {
-      return true;
-    }
-  });
-  // });
+  if (u.status.includes("slime")) {
+    u.akt = u.akt.filter((a) => {
+      if (a.img == "move" || a.img == "fly" || a.img == "take") {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    u.akt.push({
+      x: u.x,
+      y: u.y,
+      img: "kill",
+    });
+  }
 };
+
 exports.telepath = (game, u) => {
   // game.unit.forEach(u => {
   u.akt = u.akt.filter((a) => {
