@@ -86,9 +86,7 @@ player.setKey = (p) => {
   return token;
 };
 player.link = (p, game) => {
-  return (
-    process.env.IP + ":" + process.env.PORT + "/?id=" + p.id + "&key=" + player.setKey(p) + "u"
-  );
+  return process.env.DOMAIN + "/?id=" + p.id + "&key=" + player.setKey(p) + "u";
 };
 
 player.clear = (p, gameid) => {
