@@ -1,20 +1,31 @@
-const fs = require('fs');
+const fs = require("fs");
 const sha = require("sha256");
-const config = require('../config/config.js');
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const playerArr = [];
 
-let player = {}
+let player = {};
 player.register = (id, username) => {
-  let p = { id, rank: 0, socket: new Map, key: false, game: [], username, lastsocket: 0, subscribe: true }
-  fs.readFile('data/' + p.id, 'utf8', function (err, data) {
+  let p = {
+    id,
+    rank: 0,
+    socket: new Map(),
+    key: false,
+    game: [],
+    username,
+    lastsocket: 0,
+    subscribe: true,
+  };
+  fs.readFile("data/" + p.id, "utf8", function (err, data) {
     if (data) {
       p.rank = parseInt(data);
     }
   });
   playerArr.push(p);
   return p;
-}
+};
 player.byId = (id) => {
   for (let p of playerArr) {
     if (p.id == id) {
@@ -22,44 +33,42 @@ player.byId = (id) => {
     }
   }
   return false;
-}
+};
 player.number = (gm, p) => {
-  let n = 1
-  if (gm.players[0].id != p.id)
-    n = 2
-  return n
-}
+  let n = 1;
+  if (gm.players[0].id != p.id) n = 2;
+  return n;
+};
 
 player.list = () => {
   return playerArr;
-}
+};
 
 player.stop = (p) => {
   return (p.subscribe = !p.subscribe);
-}
+};
 
 player.addSocket = (p, gameid, socket) => {
   p.socket.set(gameid, socket);
-}
+};
 
 player.wins = (winner, loser) => {
-  winner.rank = Math.ceil(winner.rank + loser.rank * 3 / 100 * (1 - winner.rank / 30000) + 1)
-  loser.rank = Math.floor(loser.rank * 97 / 100);
-  fs.writeFile('data/' + winner.id, winner.rank.toString(), function (err) {
+  winner.rank = Math.ceil(winner.rank + ((loser.rank * 3) / 100) * (1 - winner.rank / 30000) + 1);
+  loser.rank = Math.floor((loser.rank * 97) / 100);
+  fs.writeFile("data/" + winner.id, winner.rank.toString(), function (err) {
     if (err) throw err;
   });
-  fs.writeFile('data/' + loser.id, loser.rank.toString(), function (err) {
+  fs.writeFile("data/" + loser.id, loser.rank.toString(), function (err) {
     if (err) throw err;
   });
-}
+};
 
 player.bySocket = (socket, gameid) => {
   for (let p of playerArr) {
-    if (p.socket.get(gameid) == socket)
-      return p;
+    if (p.socket.get(gameid) == socket) return p;
   }
-  return false
-}
+  return false;
+};
 
 player.setSocket = (id, socket) => {
   for (let p of playerArr) {
@@ -69,7 +78,7 @@ player.setSocket = (id, socket) => {
     }
   }
   playerArr.push({ id, socket });
-}
+};
 
 player.setKey = (p) => {
   const token = GenerateToken();
@@ -77,15 +86,16 @@ player.setKey = (p) => {
   return token;
 };
 player.link = (p, game) => {
-  return (config.ip + ":" + config.port + "/?id=" + p.id + "&key=" + player.setKey(p) + 'u')
-}
+  return (
+    process.env.IP + ":" + process.env.PORT + "/?id=" + p.id + "&key=" + player.setKey(p) + "u"
+  );
+};
 
 player.clear = (p, gameid) => {
   for (g in p.game) {
-    if (p.game[g].id == gameid)
-      p.game.splice(g, 1);
+    if (p.game[g].id == gameid) p.game.splice(g, 1);
   }
-}
+};
 
 function GenerateToken(stringLength) {
   // set the length of the string
@@ -93,8 +103,72 @@ function GenerateToken(stringLength) {
     stringLength = 35;
   }
   // list containing characters for the random string
-  let stringArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'];
-
+  let stringArray = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "!",
+    "?",
+  ];
 
   let rndString = "";
 

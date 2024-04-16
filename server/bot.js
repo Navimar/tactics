@@ -1,6 +1,10 @@
-const Telegraf = require('telegraf');
-const config = require('../config/config.js');
-const bot = new Telegraf(config.botkey);
+const Telegraf = require("telegraf");
+
+const dotenv = require("dotenv");
+
+dotenv.config();
+
+const bot = new Telegraf(process.env.BOTKEY);
 
 bot.launch();
 

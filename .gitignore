@@ -4,6 +4,7 @@ imglib
 data
 package.json
 package-lock.json
-config/config.js
 asset/
 img.nosync/
+.env
+.env.prod

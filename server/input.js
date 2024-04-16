@@ -2,14 +2,14 @@
 const bot = require('./bot');
 const time = require('./time');
 
-const config = require('../config/config.js');
+
 const handle = require('./handle');
 
 const input = {};
-
+const speed=1
 let dtLoop = Date.now();
 
-let tickLengthMs = 1000 / config.speed;
+let tickLengthMs = 1000 /speed;
 
 /* gameLoop related variables */
 // timestamp of each loop
@@ -32,7 +32,7 @@ var aVerySlowFunction = function (milliseconds) {
 };
 
 input.tick = () => {
-    tickLengthMs = 1000 / config.speed;
+    tickLengthMs = 1000 / speed;
     let now = Date.now();
     actualTicks++;
     if (previousTick + tickLengthMs <= now) {

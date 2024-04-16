@@ -96,49 +96,33 @@ exports.new = (rank, ai) => {
       let grass = defgrass;
       let mountain = defmountain;
       let sky = defsky;
-      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "ground")
-        ground += groundpower;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "ground")
-        ground += groundpower;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "ground")
-        ground += groundpower;
-      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "ground")
-        ground += groundpower;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "ground") ground += groundpower;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "ground") ground += groundpower;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "ground") ground += groundpower;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "ground") ground += groundpower;
 
-      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "grass")
-        grass += grasspower;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "grass")
-        grass += grasspower;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "grass")
-        grass += grasspower;
-      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "grass")
-        grass += grasspower;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "grass") grass += grasspower;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "grass") grass += grasspower;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "grass") grass += grasspower;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "grass") grass += grasspower;
 
       if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "sky") sky += n;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "sky")
-        sky += n;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "sky")
-        sky += n;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "sky") sky += n;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "sky") sky += n;
       if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "sky") sky += n;
 
-      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "mountain")
-        mountain += n;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "mountain")
-        mountain += n;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "mountain")
-        mountain += n;
-      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "mountain")
-        mountain += n;
+      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "mountain") mountain += n;
+      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "mountain") mountain += n;
+      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "mountain") mountain += n;
+      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "mountain") mountain += n;
 
       if (ground > grass) grass = 0;
       if (ground < grass) ground = 0;
 
       let r = _.random(ground + grass + sky + mountain - 1);
       if (r < ground) data.field[p.x][p.y] = "ground";
-      else if (r >= ground && r < ground + grass)
-        data.field[p.x][p.y] = "grass";
-      else if (r >= ground + grass && r < ground + grass + sky)
-        data.field[p.x][p.y] = "sky";
+      else if (r >= ground && r < ground + grass) data.field[p.x][p.y] = "grass";
+      else if (r >= ground + grass && r < ground + grass + sky) data.field[p.x][p.y] = "sky";
       else if (r >= ground + grass + sky && r < ground + grass + sky + mountain)
         data.field[p.x][p.y] = "mountain";
     }
@@ -283,7 +267,7 @@ exports.new = (rank, ai) => {
     // Выбираем равное количество точек из каждой половины
     let halfPointsCount = 3; // половина от общего количества точек, которое вы хотите добавить
     points = _.sampleSize(leftPoints, halfPointsCount).concat(
-      _.sampleSize(rightPoints, halfPointsCount),
+      _.sampleSize(rightPoints, halfPointsCount)
     );
 
     // Добавляем центральную точку

@@ -65,8 +65,7 @@ exports.fish = {
       let points = en.allPoints();
       points = points.filter((pt) => {
         if (
-          Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <=
-            akt.me.energy &&
+          Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy &&
           !en.unitInPoint(akt.game, pt.x, pt.y) &&
           (akt.game.field[pt.x][pt.y] == "water" ||
             akt.game.field[pt.x][pt.y].slice(0, -1) == "team")
@@ -195,53 +194,49 @@ exports.headcrab = {
 //   },
 // };
 
-exports.hoplite = {
-  name: "Обратный гоплит",
-  description:
-    "Обратный гоплит. Бросает себя вместо копья. Подберите копье, чтобы броситься снова.",
-  weight: 100,
-  rank: 0,
-  class: "norm",
-  life: 3,
-  img: (wd) => {
-    let img = "hoplite";
-    if (wd.me.data.spear) img = "hoplite2";
-    return img;
-  },
-  akt: (akt) => {
-    let akts = [];
-    if (!akt.me.data.spear) {
-      let points = en.allPoints();
-      points = points.filter((pt) => {
-        if (
-          Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <=
-          akt.me.energy
-        )
-          return true;
-      });
-      points.forEach((pt) => {
-        let u = en.unitInPoint(akt.game, pt.x, pt.y);
-        if (u && u != akt.me && akt.me.energy == 3)
-          akts.push({
-            x: pt.x,
-            y: pt.y,
-            img: "hoplite",
-          });
-      });
-    }
-    return akts.concat(akt.move());
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  hoplite: (wd) => {
-    wd.me.data.spear = true;
-    wd.spoil("spear", wd.me.x, wd.me.y, false, 3);
-    wd.kill();
-    wd.go(wd.target.x, wd.target.y);
-    wd.tire();
-  },
-};
+// exports.hoplite = {
+//   name: "Обратный гоплит",
+//   description:
+//     "Обратный гоплит. Бросает себя вместо копья. Подберите копье, чтобы броситься снова.",
+//   weight: 100,
+//   rank: 0,
+//   class: "norm",
+//   life: 3,
+//   img: (wd) => {
+//     let img = "hoplite";
+//     if (wd.me.data.spear) img = "hoplite2";
+//     return img;
+//   },
+//   akt: (akt) => {
+//     let akts = [];
+//     if (!akt.me.data.spear) {
+//       let points = en.allPoints();
+//       points = points.filter((pt) => {
+//         if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy) return true;
+//       });
+//       points.forEach((pt) => {
+//         let u = en.unitInPoint(akt.game, pt.x, pt.y);
+//         if (u && u != akt.me && akt.me.energy == 3)
+//           akts.push({
+//             x: pt.x,
+//             y: pt.y,
+//             img: "hoplite",
+//           });
+//       });
+//     }
+//     return akts.concat(akt.move());
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   hoplite: (wd) => {
+//     wd.me.data.spear = true;
+//     wd.spoil("spear", wd.me.x, wd.me.y, false, 3);
+//     wd.kill();
+//     wd.go(wd.target.x, wd.target.y);
+//     wd.tire();
+//   },
+// };
 
 exports.base = {
   name: "незаполнено",
@@ -268,29 +263,28 @@ exports.base = {
   // },
 };
 
-// exports.merchant = {
-//   name: "Продавец",
-//   description: "Съедает юнита, но его хозяин получает 5 золота",
-//   weight: 100,
-//   rank: 30,
-//   class: "norm",
-//   life: 3,
-//   img: "merchant",
-//   akt: (akt) => {
-//     return akt.move().concat(akt.hand("trade"));
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-//   trade: (wd) => {
-//     wd.kill();
-//     if (wd.target.unit.team != 3) {
-//       wd.game.trail.push({ img: "gold", x: wd.target.x, y: wd.target.y });
-//       wd.game.gold[wd.target.unit.team - 1] += 5;
-//     }
-//     wd.tire();
-//   },
-// };
+exports.merchant = {
+  name: "Продавец",
+  description: "Съедает юнита, но его хозяин получает 5 золота",
+  weight: 100,
+  rank: 30,
+  class: "norm",
+  life: 3,
+  img: "merchant",
+  akt: (akt) => {
+    return akt.move().concat(akt.hand("trade"));
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  trade: (wd) => {
+    wd.disappear();
+    let u = wd.addUnit("box", wd.target.x, wd.target.y, wd.target.unit.team);
+    u.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team };
+
+    wd.tire();
+  },
+};
 
 // exports.chicken = {
 //   name: "Уменьшитель",
@@ -378,45 +372,44 @@ exports.firebat = {
 //   }
 // }
 
-// exports.teleporter = {
-//   description: 'Оглушает',
-//   name: 'Телепортер',
-//   weight: 100,
-//   rank: 80,
-//   class: 'warrior',
-//   life: 3,
-//   img: 'teleporter',
-//   akt: (akt) => {
-//     let arr = akt.move()
-//     let far = akt.hand('teleporter')
-//     if (far) {
-//       far = far.filter(e => {
-//         if (en.unitInPoint(akt.game, e.x, e.y).status == 'teleporter')
-//           return false
-//         return true
-//       });
-//       arr = arr.concat(far)
-//     }
-//     return arr
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-//   teleporter: (wd) => {
-//     wd.addStatus('teleporter');
-//     wd.tire();
-// let tx = wd.target.x
-// let ty = wd.target.y
-// let mx = wd.me.x
-// let my = wd.me.y
-// wd.me.x = tx
-// wd.me.y = ty
-// wd.me.m = !wd.me.m
-// wd.target.unit.x = mx
-// wd.target.unit.y = my
-// wd.target.unit.m = !wd.target.unit.m
-//   }
-// }
+exports.teleporter = {
+  description: "Оглушает",
+  name: "Телепортер",
+  weight: 100,
+  rank: 80,
+  class: "warrior",
+  life: 3,
+  img: "teleporter",
+  akt: (akt) => {
+    let arr = akt.move();
+    let far = akt.hand("teleporter");
+    if (far) {
+      far = far.filter((e) => {
+        if (en.unitInPoint(akt.game, e.x, e.y).status == "teleporter") return false;
+        return true;
+      });
+      arr = arr.concat(far);
+    }
+    return arr;
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  teleporter: (wd) => {
+    wd.addStatus("teleporter");
+    wd.tire();
+    let tx = wd.target.x;
+    let ty = wd.target.y;
+    let mx = wd.me.x;
+    let my = wd.me.y;
+    wd.me.x = tx;
+    wd.me.y = ty;
+    wd.me.m = !wd.me.m;
+    wd.target.unit.x = mx;
+    wd.target.unit.y = my;
+    wd.target.unit.m = !wd.target.unit.m;
+  },
+};
 
 exports.staziser = {
   description:
@@ -434,8 +427,7 @@ exports.staziser = {
     wd.walk();
   },
   stazis: (wd) => {
-    if (wd.target.unit.status.includes("stazis"))
-      wd.target.unit.status.remove("stazis");
+    if (wd.target.unit.status.includes("stazis")) wd.target.unit.status.remove("stazis");
     else wd.addStatus("stazis");
     wd.tire();
   },
@@ -508,11 +500,7 @@ exports.aerostat = {
     let akts = [];
     let points = en.allPoints();
     points = points.filter((pt) => {
-      if (
-        Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <=
-        akt.me.energy
-      )
-        return true;
+      if (Math.abs(pt.x - akt.me.x) + Math.abs(pt.y - akt.me.y) <= akt.me.energy) return true;
     });
     points.forEach((pt) => {
       let u = en.unitInPoint(akt.game, pt.x, pt.y);
@@ -552,7 +540,7 @@ exports.aerostat = {
     wd.flywalk();
     if (wd.me.data.drop) {
       if (wd.me.sticker) {
-        en.addUnit(wd.game, wd.me.sticker.tp, x, y, wd.me.sticker.team, 3);
+        en.addUnit(wd.game, wd.me.sticker.tp, x, y, wd.me.sticker.team);
         wd.me.sticker = false;
       }
     }
@@ -824,25 +812,25 @@ exports.zombie = {
 //   // }
 // }
 
-// exports.box = {
-//   name: 'Коробка',
-//   description: 'В коробке кто-то прячется',
-//   // neutral: true,
-//   rank: 0,
-//   weight: 100,
-//   class: 'neutral',
-//   life: 3,
-//   img: 'box',
-//   akt: (akt) => {
-//     return akt.move();
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-//   onDeath: (wd) => {
-//     wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, wd.me.team)
-//   }
-// }
+exports.box = {
+  name: "Коробка",
+  description: "В коробке кто-то прячется",
+  // neutral: true,
+  rank: 0,
+  weight: 100,
+  class: "none",
+  life: 3,
+  img: "bush",
+  akt: (akt) => {
+    return [
+      {
+        x: akt.me.x,
+        y: akt.me.y,
+        img: "kill",
+      },
+    ];
+  },
+};
 
 exports.mashroom = {
   name: "Гриб",
@@ -857,14 +845,11 @@ exports.mashroom = {
     let akts = [];
     let points = en.allPoints();
     points = points.filter(
-      (pt) =>
-        en.isOccupied(akt.game, pt.x, pt.y) &&
-        (pt.x != akt.me.x || pt.y != akt.me.y),
+      (pt) => en.isOccupied(akt.game, pt.x, pt.y) && (pt.x != akt.me.x || pt.y != akt.me.y)
     );
     points.forEach((pt) => {
       let tp = en.unitInPoint(akt.game, pt.x, pt.y)?.tp;
-      if (tp != "mashroom" && tp != "base")
-        akts.push({ x: pt.x, y: pt.y, img: "change" });
+      if (tp != "mashroom" && tp != "base") akts.push({ x: pt.x, y: pt.y, img: "change" });
       else akts.push({ x: pt.x, y: pt.y, img: "random" });
     });
     return akts;
@@ -965,7 +950,7 @@ exports.pusher = {
         wd.target.x + x * z,
         wd.target.y + y * z,
         wd.target.x + x * (z + 1),
-        wd.target.y + y * (z + 1),
+        wd.target.y + y * (z + 1)
       );
     }
     wd.go(wd.target.x, wd.target.y);
@@ -974,8 +959,7 @@ exports.pusher = {
 };
 exports.fountain = {
   name: "Фонтан",
-  description:
-    "Разливает воду по низине в которой находится. Превращает юнитов в рыб",
+  description: "Разливает воду по низине в которой находится. Превращает юнитов в рыб",
   // neutral: true,
   rank: 70,
   class: "norm",
@@ -1033,8 +1017,7 @@ exports.telepath = {
 };
 exports.spliter = {
   name: "Расщипитель",
-  description:
-    "Разделяет юнита на два. Обе половины нестабильны и вскоре исчезают",
+  description: "Разделяет юнита на два. Обе половины нестабильны и вскоре исчезают",
   weight: 100,
   rank: 145,
   class: "norm",
@@ -1054,7 +1037,7 @@ exports.spliter = {
       wd.target.unit.tp,
       wd.target.x + (wd.target.x - wd.me.x),
       wd.target.y + (wd.target.y - wd.me.y),
-      wd.target.unit.team,
+      wd.target.unit.team
     );
     // let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
     if (u) u.status.push("spliter");
@@ -1146,8 +1129,7 @@ exports.bird = {
 
 exports.plant = {
   name: "незаполнено",
-  description:
-    "Выращивает себе нейтрального друга в любой точке поле, не умеет ходить",
+  description: "Выращивает себе нейтрального друга в любой точке поле, не умеет ходить",
   weight: 50,
   life: 3,
   rank: 60,
@@ -1156,7 +1138,10 @@ exports.plant = {
   akt: (akt) => {
     let akts = [];
     let points = en.allPoints();
-    points = points.filter((pt) => !en.isOccupied(akt.game, pt.x, pt.y));
+    points = points.filter(
+      (pt) =>
+        akt.game.field[pt.x][pt.y].slice(0, -1) != "team" && !en.isOccupied(akt.game, pt.x, pt.y)
+    );
     points.forEach((pt) => {
       akts.push({
         x: pt.x,
@@ -1164,6 +1149,7 @@ exports.plant = {
         img: "plant",
       });
     });
+
     return akts;
   },
   // move: (wd) => {
@@ -1191,7 +1177,7 @@ exports.worm = {
 
     // Находим все spoil с именем 'wormportal' и data.worm, равным akt.me
     const wormportalSpoils = akt.game.spoil.filter(
-      (s) => s.name === "wormportal" && s.data.worm === akt.me,
+      (s) => s.name === "wormportal" && s.data.worm === akt.me
     );
 
     // Фильтруем точки, исключая 'team', текущую позицию и места с wormportalSpoils
@@ -1199,7 +1185,7 @@ exports.worm = {
       (pt) =>
         akt.game.field[pt.x][pt.y].slice(0, -1) != "team" &&
         (pt.x != akt.me.x || pt.y != akt.me.y) &&
-        !wormportalSpoils.some((s) => s.x === pt.x && s.y === pt.y),
+        !wormportalSpoils.some((s) => s.x === pt.x && s.y === pt.y)
     );
 
     // Создание актов для отфильтрованных точек
@@ -1241,10 +1227,7 @@ exports.rocket = {
   img: (wd) => {
     let img = "rocket";
     for (i = wd.game.spoil.length; i--; i > 0) {
-      if (
-        wd.game.spoil[i].name == "rockettarget" &&
-        wd.game.spoil[i].data.unit == wd.me
-      ) {
+      if (wd.game.spoil[i].name == "rockettarget" && wd.game.spoil[i].data.unit == wd.me) {
         if (wd.game.spoil[i].data.timer == 3) img = "rocket3";
         if (wd.game.spoil[i].data.timer == 2) img = "rocket2";
         if (wd.game.spoil[i].data.timer == 1) img = "rocket1";
@@ -1260,10 +1243,7 @@ exports.rocket = {
     // points = points.filter(pt => !en.isOccupied(akt.game, pt.x, pt.y))
     let f = true;
     for (i = akt.game.spoil.length; i--; i > 0) {
-      if (
-        akt.game.spoil[i].name == "rockettarget" &&
-        akt.game.spoil[i].data.unit == akt.me
-      ) {
+      if (akt.game.spoil[i].name == "rockettarget" && akt.game.spoil[i].data.unit == akt.me) {
         f = false;
       }
     }
@@ -1278,13 +1258,7 @@ exports.rocket = {
     return akts;
   },
   rocket: (wd) => {
-    wd.spoil(
-      "rockettarget",
-      wd.target.x,
-      wd.target.y,
-      { unit: wd.me, timer: 3 },
-      wd.game.turn,
-    );
+    wd.spoil("rockettarget", wd.target.x, wd.target.y, { unit: wd.me, timer: 3 }, wd.game.turn);
     wd.tire();
   },
 };
@@ -1374,12 +1348,7 @@ exports.kicker = {
           i++;
         }
         for (z = i; z--; z < 0) {
-          wd.teleport(
-            newX + x * z,
-            newY + y * z,
-            newX + x * (z + 1),
-            newY + y * (z + 1),
-          );
+          wd.teleport(newX + x * z, newY + y * z, newX + x * (z + 1), newY + y * (z + 1));
         }
         wd.move(newX, newY);
         break;
@@ -1461,8 +1430,7 @@ exports.slime = {
 
 exports.bear = {
   name: "незаполнено",
-  description:
-    "Перекидывает юнита через себя и давит бедолагу оказавщегося на месте приземления",
+  description: "Перекидывает юнита через себя и давит бедолагу оказавщегося на месте приземления",
   rank: 20,
   weight: 100,
   class: "norm",
@@ -1512,15 +1480,9 @@ exports.frog = {
     points = points.filter((pt) => {
       let x = 2 * pt.x - akt.me.x;
       let y = 2 * pt.y - akt.me.y;
-      if (
-        akt.me.data.lastjump &&
-        pt.x == akt.me.data.lastjump.x &&
-        pt.y == akt.me.data.lastjump.y
-      )
+      if (akt.me.data.lastjump && pt.x == akt.me.data.lastjump.x && pt.y == akt.me.data.lastjump.y)
         return false;
-      return (
-        en.isOccupied(akt.game, pt.x, pt.y) && !en.isOccupied(akt.game, x, y)
-      );
+      return en.isOccupied(akt.game, pt.x, pt.y) && !en.isOccupied(akt.game, x, y);
     });
     points.forEach((pt) => {
       akts.push({

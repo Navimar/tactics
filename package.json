@@ -3,6 +3,7 @@
 	"scripts": {},
 	"dependencies": {
 		"@types/node-telegram-bot-api": "^0.57.6",
+		"dotenv": "^16.4.5",
 		"express": "^4.17.1",
 		"jimp": "^0.22.8",
 		"lodash": "^4.17.15",

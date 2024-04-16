@@ -32,105 +32,15 @@ let data = {
   spoil: [],
   gold: [11, 11],
   field: [
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
-    [
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-    ],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
+    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
   ],
   unit: [
     {
@@ -235,7 +145,7 @@ window.addEventListener(
     clearTimeout(resizeId);
     resizeId = setTimeout(doneResizing, 500);
   },
-  true,
+  true
 );
 
 function doneResizing() {
@@ -286,7 +196,7 @@ let onStep = (diff) => {
         3,
         "#F00",
         5,
-        200,
+        200
       );
       render();
     }
@@ -341,6 +251,7 @@ let onUpdate = (val) => {
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
   // console.log('dataturn',data.turn)
+  console.log("data.order", data.order);
   if (local.turn == false && data.turn == true) {
     tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 250);
     local.turn = data.turn;
@@ -370,8 +281,7 @@ let getUnit = (x, y) => {
   return data.unit.find((u) => x == u.x && y == u.y);
 };
 let getAkt = (x, y) => {
-  if (local.unit && local.unit.akt)
-    return local.unit.akt.find((a) => x == a.x && y == a.y);
+  if (local.unit && local.unit.akt) return local.unit.akt.find((a) => x == a.x && y == a.y);
 };
 
 let clickOnAkt = () => {
@@ -398,12 +308,7 @@ let clickOnAkt = () => {
       blocked = true;
       local.sandclock = { x: local.build.x, y: local.build.y };
     } else {
-      tip(
-        "Нажмите на юнита, чтобы построить такого же",
-        mouseCell.x,
-        mouseCell.y,
-        "#005500",
-      );
+      tip("Нажмите на юнита, чтобы построить такого же", mouseCell.x, mouseCell.y, "#005500");
     }
   } else if (!data.turn) {
     tip("Сейчас ход соперника", mouseCell.x, mouseCell.y, "#005500");
@@ -414,21 +319,16 @@ let clickOnAkt = () => {
       "Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!",
       mouseCell.x,
       mouseCell.y,
-      "#333",
+      "#333"
     );
   } else if (local.unit && local.unit.color != 1) {
-    tip(
-      "Это юнит соперника! Ходите юнитами с белой обводкой!!!",
-      mouseCell.x,
-      mouseCell.y,
-      "#333",
-    );
+    tip("Это юнит соперника! Ходите юнитами с белой обводкой!!!", mouseCell.x, mouseCell.y, "#333");
   } else if (local.unit) {
     tip(
       "Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!",
       mouseCell.x,
       mouseCell.y,
-      "#333",
+      "#333"
     );
   }
   console.log("on alt false");
@@ -442,14 +342,8 @@ let onMouseDown = () => {
     login();
   } else if (data.history) {
     if (
-      (mouseCell.y >= -2 &&
-        mouseCell.y < 0 &&
-        mouseCell.x >= 6 &&
-        mouseCell.x <= 7) ||
-      (mouseCell.x >= -2 &&
-        mouseCell.x < 0 &&
-        mouseCell.y >= 6 &&
-        mouseCell.y <= 7)
+      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
+      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7)
     ) {
       // if (data.finished) {
       // rematch();
@@ -459,10 +353,7 @@ let onMouseDown = () => {
       showframe(data.frame + 1);
     }
   } else if (data.bonus == "choose") {
-    if (
-      (mouseCell.y > -3 && mouseCell.y < 0) ||
-      (mouseCell.x > -3 && mouseCell.x < 0)
-    ) {
+    if ((mouseCell.y > -3 && mouseCell.y < 0) || (mouseCell.x > -3 && mouseCell.x < 0)) {
       let b;
       if (mouseCell.x < 0) b = (mouseCell.x + 2) * 9 + mouseCell.y;
       if (mouseCell.y < 0) b = (mouseCell.y + 2) * 9 + mouseCell.x;
@@ -472,16 +363,11 @@ let onMouseDown = () => {
         "Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.",
         mouseCell.x,
         mouseCell.y,
-        "#222",
+        "#222"
       );
     }
   } else if (data.bonus == "wait") {
-    tip(
-      "Соперник еще выбирает бонус. Подождите",
-      mouseCell.x,
-      mouseCell.y,
-      "#222",
-    );
+    tip("Соперник еще выбирает бонус. Подождите", mouseCell.x, mouseCell.y, "#222");
   } else {
     local.tip = false;
     if (
@@ -492,14 +378,8 @@ let onMouseDown = () => {
         surrender();
       }
     } else if (
-      (mouseCell.y >= -2 &&
-        mouseCell.y < 0 &&
-        mouseCell.x >= 4 &&
-        mouseCell.x <= 5) ||
-      (mouseCell.x >= -2 &&
-        mouseCell.x < 0 &&
-        mouseCell.y >= 4 &&
-        mouseCell.y <= 5)
+      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 4 && mouseCell.x <= 5) ||
+      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 4 && mouseCell.y <= 5)
     ) {
       if (local.unit) tip(local.unit.description, 3, 3, "#000", 5, 120);
       else if (local.build)
@@ -509,7 +389,7 @@ let onMouseDown = () => {
           3,
           "#000",
           5,
-          120,
+          120
         );
       else
         tip(
@@ -518,24 +398,14 @@ let onMouseDown = () => {
           3,
           "#000",
           5,
-          120,
+          120
         );
     } else if (
-      (mouseCell.y >= -2 &&
-        mouseCell.y < 0 &&
-        mouseCell.x >= 6 &&
-        mouseCell.x <= 7) ||
-      (mouseCell.x >= -2 &&
-        mouseCell.x < 0 &&
-        mouseCell.y >= 6 &&
-        mouseCell.y <= 7)
+      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
+      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7)
     ) {
       if (local.frame > 0) showframe(data.keyframe);
-    } else if (
-      data.bonus == "ready" &&
-      data.win != "win" &&
-      data.win != "defeat"
-    ) {
+    } else if (data.bonus == "ready" && data.win != "win" && data.win != "defeat") {
       let wise = false;
       if (
         ((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) ||
@@ -544,14 +414,8 @@ let onMouseDown = () => {
       ) {
         endturn();
       } else if (
-        (mouseCell.y >= -2 &&
-          mouseCell.y < 0 &&
-          mouseCell.x >= 2 &&
-          mouseCell.x < 4) ||
-        (mouseCell.x >= -2 &&
-          mouseCell.x < 0 &&
-          mouseCell.y >= 2 &&
-          mouseCell.y < 4)
+        (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 2 && mouseCell.x < 4) ||
+        (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 2 && mouseCell.y < 4)
       ) {
         let arr = [];
         data.unit.forEach((u) => {
@@ -576,8 +440,7 @@ let onMouseDown = () => {
             let txt =
               "Если вместо выделения вы хотите отдать приказ — нажмите ПРАВОЙ кнопкной мыши!!!";
             if (mobile)
-              txt =
-                "Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!";
+              txt = "Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!";
             tip(txt, mouseCell.x, mouseCell.y, "#550000");
             leftclickcn = 0;
             wise = true;
@@ -605,21 +468,8 @@ let onMouseDown = () => {
           // else
           if (local.unit) clickOnAkt();
           else if (data.chooseteam)
-            tip(
-              "Выделите синиго или рыжего юнита. И ходите им!",
-              mouseCell.x,
-              mouseCell.y,
-              "#333",
-            );
-          else
-            tip(
-              "Выделите юнита с белой обводкой и ходите им!",
-              3,
-              3,
-              "#000",
-              5,
-              120,
-            );
+            tip("Выделите синиго или рыжего юнита. И ходите им!", mouseCell.x, mouseCell.y, "#333");
+          else tip("Выделите юнита с белой обводкой и ходите им!", 3, 3, "#000", 5, 120);
 
           // let arr = [];
           // data.unit.forEach((u) => {
@@ -644,19 +494,14 @@ let onMouseDown = () => {
       // local.akt = [];
       if (local.unit && local.unit.color == 3 && !local.unit.canMove) {
         // local.unit = false;
-        tip(
-          "Это нейтральный юнит. Выбери другого",
-          mouseCell.x,
-          mouseCell.y,
-          "#050",
-        );
+        tip("Это нейтральный юнит. Выбери другого", mouseCell.x, mouseCell.y, "#050");
       }
       if (local.unit && !local.unit.isReady && !wise) {
         tip(
           "Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой",
           mouseCell.x,
           mouseCell.y,
-          "#050",
+          "#050"
         );
       }
     }

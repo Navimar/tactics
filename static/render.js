@@ -14,28 +14,15 @@ let renderanimated = (diff) => {
   renderakt();
   rendertrail();
   if (data.bonus == "choose") renderpanel();
-  if (!socket.connected)
-    tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
+  if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
 
   rendertip();
-  if (local.focus) {
-    drawImg("focus", local.focus.x, local.focus.y);
-  }
   if (diff) {
     fps = parseInt((1000 / diff + fps * 10) / 11);
     let y = 0;
-    if (fps <= 30)
-      drawTxt("fps " + fps, 0, y, "#000000", undefined, undefined, true);
+    if (fps <= 30) drawTxt("fps " + fps, 0, y, "#000000", undefined, undefined, true);
     if (quality < 100)
-      drawTxt(
-        "quality " + quality,
-        0,
-        (y += 0.5),
-        "#000000",
-        undefined,
-        undefined,
-        true,
-      );
+      drawTxt("quality " + quality, 0, (y += 0.5), "#000000", undefined, undefined, true);
     // drawTxt('local.seconds ' + local.seconds, 0, y += 0.5, "#000000", undefined, undefined, true);
     // drawTxt('local.lastclick ' + local.lastclick, 0, y += 0.5, "#000000", undefined, undefined, true);
 
@@ -176,179 +163,122 @@ let renderpanel = () => {
   }
 };
 
-let renderunit = (x, y, diff) => {
-  let u = data.unit.filter((u) => u.x == x && u.y == y)[0];
-  if (!u) return;
-  let groundsize = 0;
-
-  if (
-    data.field[x][y] == "grass" ||
-    data.field[x][y] == "team1" ||
-    data.field[x][y] == "team2"
-  )
-    groundsize = 56;
-
-  if (
-    !data.order ||
-    data.order.img == "worm" ||
-    u.x != data.order.akt.x ||
-    u.y != data.order.akt.y ||
-    (u.progress && u.progress > 1000)
-  ) {
-    let sizeadd = 0;
-    if (
-      ((u.isReady || u.isActive) &&
-        data.turn &&
-        u.color == 1 &&
-        !data.chooseteam) ||
-      (data.chooseteam && data.bonus != "choose" && u.color != 3)
-    )
-      sizeadd = (local.cadr * 20) / 1000;
-
-    drawPropUnit(
-      u.img,
-      u.x,
-      u.y,
-      u.m,
-      u.color,
-      u.isReady,
-      u.isActive,
-      groundsize - sizeadd,
-      groundsize + sizeadd,
-      true,
-    );
-
-    // Дополнительное действие для "water"
-    if (data.field[x][y] == "water") {
-      drawImgNormal("drawn", x, y, fieldmask[x][y], true);
-    }
-    if (u.sticker) {
-      drawSticker(u.sticker.img, x, y, u.sticker.color);
-    }
-    u.status.forEach((stt) =>
-      drawStatus(stt, u.x, u.y, u.m, u.color, u.isReady, u.isActive),
-    );
-  } else if (
-    data.order.akt.img == "move" ||
-    data.order.akt.img == "fly" ||
-    data.order.akt.img == "take"
-  ) {
-    console.log(data.order.unit.x, u.x, data.order.akt.img);
-    let progress;
-
-    if (!u.progress) u.progress = 0;
-    u.progress += diff;
-    if (u.progress > 1000) progress = 1000;
-    else progress = u.progress;
-    let xd =
-      (u.x * (progress / 500) + data.order.unit.x * ((1000 - progress) / 500)) /
-        2 -
-      Math.sin(progress / 25) / 150;
-    let yd =
-      (u.y * (progress / 500) + data.order.unit.y * ((1000 - progress) / 500)) /
-        2 -
-      Math.sin(progress / 25) / 45;
-    if (u.isReady == undefined || u.isActive == undefined)
-      console.log(u, "why?");
-    drawPropUnit(
-      u.img,
-      xd,
-      yd,
-      u.m,
-      u.color,
-      u.isReady,
-      u.isActive,
-      groundsize,
-      groundsize,
-      true,
-    );
-    if (data.field[x][y] == "water")
-      drawImgNormal("drawn", xd, yd, fieldmask[x][y], true);
-    if (u.sticker)
-      if (data.order.akt.img == "take")
-        drawSticker(u.sticker.img, x, y, u.sticker.color);
-      else drawSticker(u.sticker.img, xd, yd, u.sticker.color);
-    u.status.forEach((stt) =>
-      drawStatus(stt, xd, yd, u.m, u.color, u.isReady, u.isActive),
-    );
-  } else if (data.order.akt.img != "worm") {
-    console.log(data.order.akt.img);
-    if (!u.progress) u.progress = 0;
-    u.progress += diff;
-    if (u.progress > 500) progress = 0;
-    else progress = u.progress;
-    let dx = 0;
-    let dy = 0;
-    let easingCoef = progress / 1000;
-    var easing = Math.pow(easingCoef - 1, 3) + 1;
-    dx =
-      u.x +
-      (easing * (Math.cos(progress * 0.1) + Math.cos(progress * 0.3115))) / 40;
-    dy =
-      u.y +
-      (easing * (Math.sin(progress * 0.05) + Math.sin(progress * 0.057113))) /
-        40;
-    if (u.isReady == undefined || u.isActive == undefined)
-      console.log(u, "why?");
-    drawPropUnit(
-      u.img,
-      dx,
-      dy,
-      u.m,
-      u.color,
-      u.isReady,
-      u.isActive,
-      groundsize,
-      groundsize,
-      true,
-    );
-    if (data.field[x][y] == "water")
-      drawImgNormal("drawn", dx, dy, fieldmask[x][y], true);
-    u.status.forEach((stt) =>
-      drawStatus(stt, dx, dy, u.m, u.color, u.isReady, u.isActive),
-    );
-    if (u.sticker) drawSticker(u.sticker.img, x, y, u.sticker.color);
-  } else {
-    drawPropUnit(
-      u.img,
+const drawUnit = (unit, x, y, sizeAdd, cropPercent = 0) => {
+  sizeAdd = sizeAdd ? sizeAdd : 0;
+  const groundSize = ["grass", "team1", "team2"].includes(data.field[unit.x][unit.y]) ? 56 : 0;
+  if (cropPercent > 0)
+    drawPropUnitCropped(
+      unit.img,
       x,
       y,
-      u.m,
-      u.color,
-      u.isReady,
-      u.isActive,
-      groundsize,
-      groundsize,
+      unit.m,
+      unit.color,
+      unit.isReady,
+      unit.isActive,
+      groundSize - sizeAdd,
+      groundSize + sizeAdd,
       true,
+      cropPercent
     );
-    if (data.field[x][y] == "water")
-      drawImgNormal("drawn", xd, yd, fieldmask[x][y], true);
+  else
+    drawPropUnit(
+      unit.img,
+      x,
+      y,
+      unit.m,
+      unit.color,
+      unit.isReady,
+      unit.isActive,
+      groundSize - sizeAdd,
+      groundSize + sizeAdd,
+      true
+    );
+  if (local.unit == unit) drawImg("focus", x, y, true);
+
+  if (data.field[unit.x][unit.y] === "water")
+    drawImgNormal("drawn", x, y, fieldmask[unit.x][unit.y], true);
+
+  if (unit.sticker) drawSticker(unit.sticker.img, x, y, unit.sticker.color);
+
+  unit.status.forEach((stt) =>
+    drawStatus(stt, x, y, unit.m, unit.color, unit.isReady, unit.isActive)
+  );
+};
+
+const renderunit = (x, y, diff) => {
+  let unit = data.unit.find((unit) => unit.x === x && unit.y === y);
+  if (!unit) return;
+
+  const amItarget =
+    data?.order?.akt?.img && unit.x === data.order.akt.x && unit.y === data.order.akt.y;
+  // const amIhero = u == local.unit;
+
+  // console.log(data.trail);
+
+  if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "addunit")) {
+    animateAdd(unit, diff);
+    return;
+  }
+  if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "polymorph")) {
+    animatePolymorph(unit, diff);
+    return;
+  }
+  if (amItarget && ["move", "take"].includes(data.order.akt.img)) {
+    animateWalk(unit, diff);
+    return;
+  }
+  if (amItarget && ["fly"].includes(data.order.akt.img)) {
+    animateFlight(unit, diff);
+    return;
+  }
+  if (amItarget && ["teleport"].includes(data.order.akt.img)) {
+    animateTeleport(unit, diff);
+    return;
+  }
+  if (
+    data.order?.unit?.tp != "worm" &&
+    data?.order?.unit?.x == unit.x &&
+    data?.order?.unit?.y == unit.y &&
+    isAdjacent(unit.x, unit.y, data?.order?.akt?.x, data?.order?.akt?.y)
+  ) {
+    animatePunch(unit, diff); // Анимация "punch" для героя, когда цель рядом
+    return;
   }
 
-  if (data.field[x][y] == "water" && (!u.progress || u.progress > 1000))
-    drawImgNormal("drawn", x, y, fieldmask[x][y]);
+  if (amItarget && !["worm", "random", "change"].includes(data.order.akt.img)) {
+    animateShake(unit, diff);
+    return;
+  }
+  if (
+    (((unit.isReady || unit.isActive) && data.turn && unit.color === 1 && !data.chooseteam) ||
+      (data.chooseteam && data.bonus !== "choose" && unit.color !== 3)) &&
+    !local.unit
+  ) {
+    animateBreath(unit, diff);
+    return;
+  }
+  drawUnit(unit, unit.x, unit.y);
 };
+
+// const shouldRenderNormally = (u) => {
+//   return (
+//     !data.order ||
+//     data.order.img === "worm" ||
+//     u.x !== data.order.akt.x ||
+//     u.y !== data.order.akt.y ||
+//     (u.progress && u.progress > 1000)
+//   );
+// };
 
 let renderfield = (x, y) => {
   let v = 0;
   drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
   if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
-    drawImgNormal(
-      "ns" + data.field[x][y - 1] + data.field[x][y],
-      x,
-      y - 0.5,
-      fieldmask[x][y],
-    );
+    drawImgNormal("ns" + data.field[x][y - 1] + data.field[x][y], x, y - 0.5, fieldmask[x][y]);
   if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
-    drawImgNormal(
-      "we" + data.field[x - 1][y] + data.field[x][y],
-      x - 0.5,
-      y,
-      fieldmask[x][y],
-    );
+    drawImgNormal("we" + data.field[x - 1][y] + data.field[x][y], x - 0.5, y, fieldmask[x][y]);
   if (data.turn)
-    if (data.field[x][y] == "team1" && data.gold[0] >= local.cost)
-      drawImg("canBuild", x, y);
+    if (data.field[x][y] == "team1" && data.gold[0] >= local.cost) drawImg("canBuild", x, y);
 };
 
 let renderspoil = (x, y) => {
@@ -360,9 +290,9 @@ let renderspoil = (x, y) => {
 let renderakt = () => {
   if (local.unit?.akt) {
     local.unit.akt.forEach((a) => {
-      drawAkt(a.img, a.x, a.y);
+      sizeAdd = (local.cadr * 20) / 1000;
+      drawAkt(a.img, a.x, a.y, a.x - sizeAdd, a.y + sizeAdd);
     });
-    drawImg("focus", local.unit.x, local.unit.y);
   }
   //   else if (local.build) {
   //     data.unit.forEach((u) => drawAkt("build", u.x, u.y));
@@ -381,13 +311,5 @@ let rendertrail = () => {
 };
 let rendertip = () => {
   if (local.tip && local.tip.dur > 0)
-    drawTxt(
-      local.tip.text,
-      local.tip.x,
-      local.tip.y,
-      local.tip.color,
-      local.tip.size,
-      false,
-      true,
-    );
+    drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.size, false, true);
 };

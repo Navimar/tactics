@@ -19,10 +19,8 @@ let resize = (active) => {
 };
 
 function resizecanvas(canvas, ctx) {
-  const realWidth =
-    window.innerWidth * window.devicePixelRatio * (quality / 100);
-  const realHeight =
-    window.innerHeight * window.devicePixelRatio * (quality / 100);
+  const realWidth = window.innerWidth * window.devicePixelRatio * (quality / 100);
+  const realHeight = window.innerHeight * window.devicePixelRatio * (quality / 100);
   canvas.style.width = `${window.innerWidth}px`;
   canvas.style.height = `${window.innerHeight}px`;
   canvas.width = realWidth;
@@ -97,14 +95,7 @@ function drawTxt(txt, x, y, color, size, font, animate) {
 
   // drawBubble(x, y, px, py);
 
-  function wrapText(
-    context,
-    text,
-    marginLeft,
-    marginTop,
-    maxWidth,
-    lineHeight,
-  ) {
+  function wrapText(context, text, marginLeft, marginTop, maxWidth, lineHeight) {
     let lines = 1;
     let originalmarginttop = marginTop;
     function dt(line) {
@@ -153,7 +144,7 @@ function drawTxt(txt, x, y, color, size, font, animate) {
         x * dh + shiftX - maxWidth * 0.02,
         y * dh + shiftY,
         maxWidth,
-        lineHeight * lines * 1.1,
+        lineHeight * lines * 1.1
       );
       ctx.globalAlpha = 1.0;
     }
@@ -288,11 +279,11 @@ function getImg(name, s, mask) {
   }
 }
 
-function drawImg(name, x, y) {
+function drawImg(name, x, y, animate) {
   let p = dh / 10;
   let s = dh + 2 * p;
   let img = getImg(name, s);
-  drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s);
+  drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s, animate);
 }
 
 function drawImgNormal(name, x, y, mask, animate) {
@@ -327,13 +318,7 @@ function drawField(name, x, y, mask) {
   if (mask[1] > 0.5) {
     ctx.save();
     ctx.scale(-1, 1);
-    drawImageEven(
-      img,
-      (x * dh - p + shiftX) * -1 - w,
-      y * dh - p + shiftY,
-      w,
-      h,
-    );
+    drawImageEven(img, (x * dh - p + shiftX) * -1 - w, y * dh - p + shiftY, w, h);
     ctx.restore();
   } else {
     drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, w, h);
@@ -344,20 +329,31 @@ function drawTrail(name, x, y) {
   let img = getImg(name + ".trl", dh);
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
 }
-function drawAkt(name, x, y) {
+
+function drawAkt(name, x, y, ws, hs) {
   let ctx = ctxAnimated;
   let p = 0;
   let s = even(dh + 2 * p);
   img = getImg(name + ".akt", s);
   ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.3)";
-  ctx.shadowOffsetX = 3;
-  ctx.shadowOffsetY = 3;
-  // if (right) ctx.globalAlpha = 0.8;
-  ctx.shadowBlur = 0;
-  drawImageEven(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s, true);
+  // ctx.shadowColor = "rgba(0,0,0,0.3)";
+  // ctx.shadowOffsetX = 3;
+  // ctx.shadowOffsetY = 3;
+  // ctx.shadowBlur = 0;
+
+  let px = 0;
+  let py = 0;
+  if (ws && hs) {
+    px = (dh / 1000) * ws;
+    py = (dh / 1000) * hs;
+  }
+
+  let w = dh + 2 * px;
+  let h = dh + 2 * py;
+  drawImageEven(img, x * dh - px + shiftX, y * dh - py * 2 + shiftY, w, h, true);
   ctx.restore();
-  // ctx.globalCompositeOperation = 'destination-in';
+
+  // drawImageEven(img, x * dh - px + shiftX, y * dh - 0.1 * dh - py * 2 + shiftY, w, h, animate);
 }
 
 function drawLife(quantity, x, y) {
@@ -384,8 +380,7 @@ function drawSticker(name, x, y, team) {
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, size, size, true);
 }
 
-function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
-  let ctx = animate ? ctxAnimated : ctxStatic;
+function determineColor(team, isReady, isActive) {
   let color = false;
   if (!data.chooseteam && data.bonus == "ready") {
     if (team == 2 && isReady) color = "team2Ready";
@@ -399,6 +394,12 @@ function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
   }
   if (isActive && team == 1) color = "team1active";
   if (team == 3) color = "team3";
+  return color;
+}
+
+function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
+  let ctx = animate ? ctxAnimated : ctxStatic;
+  let color = determineColor(team, isReady, isActive); // Смотрите определение функции ниже
 
   let px = 0;
   let py = 0;
@@ -409,33 +410,65 @@ function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
 
   let w = dh + 2 * px;
   let h = dh + 2 * py;
+
   let img;
   if (!animate) img = getImg(name + ".unit" + "." + color, h);
   else img = getImg(name + ".unit" + "." + color, (h + w) / 2);
-  // let w = img.width * (h / img.height);
+
+  let newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY;
+
   if (m) {
     ctx.save();
     ctx.scale(-1, 1);
-    drawImageEven(
+    drawImageEven(img, (x * dh - px + shiftX) * -1 - w, newYOffset, w, h, animate);
+    ctx.restore();
+  } else {
+    drawImageEven(img, x * dh - px + shiftX, newYOffset, w, h, animate);
+  }
+}
+
+function drawPropUnitCropped(name, x, y, m, team, isReady, isActive, ws, hs, animate, cropPercent) {
+  let ctx = animate ? ctxAnimated : ctxStatic;
+  let color = determineColor(team, isReady, isActive); // Смотрите определение функции ниже
+
+  let px = 0;
+  let py = 0;
+  if (ws && hs) {
+    px = (dh / 1000) * ws;
+    py = (dh / 1000) * hs;
+  }
+
+  let w = dh + 2 * px;
+  let h = dh + 2 * py;
+  let cropStartY = (h * cropPercent) / 100;
+  let croppedH = h - cropStartY;
+
+  let img;
+  if (!animate) img = getImg(name + ".unit" + "." + color, h);
+  else img = getImg(name + ".unit" + "." + color, (h + w) / 2);
+
+  let newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY;
+
+  if (m) {
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(
       img,
-      (x * dh - px + shiftX) * -1 - w,
-      y * dh - 0.1 * dh - py * 2 + shiftY,
+      0,
+      -cropStartY,
       w,
-      h,
-      animate,
+      croppedH,
+      (x * dh - px + shiftX) * -1 - w,
+      newYOffset,
+      w,
+      croppedH
     );
     ctx.restore();
   } else {
-    drawImageEven(
-      img,
-      x * dh - px + shiftX,
-      y * dh - 0.1 * dh - py * 2 + shiftY,
-      w,
-      h,
-      animate,
-    );
+    ctx.drawImage(img, 0, -cropStartY, w, croppedH, x * dh - px + shiftX, newYOffset, w, croppedH);
   }
 }
+
 function drawProp(name, x, y, ws, hs, animate) {
   let px = 0;
   let py = 0;
@@ -449,14 +482,7 @@ function drawProp(name, x, y, ws, hs, animate) {
   let img;
   if (!animate) img = getImg(name, h);
   else img = getImg(name, (h + w) / 2);
-  drawImageEven(
-    img,
-    x * dh - px + shiftX,
-    y * dh - 0.1 * dh - py * 2 + shiftY,
-    w,
-    h,
-    animate,
-  );
+  drawImageEven(img, x * dh - px + shiftX, y * dh - 0.1 * dh - py * 2 + shiftY, w, h, animate);
 }
 
 function drawSize(name, x, y, w, h, animate) {
