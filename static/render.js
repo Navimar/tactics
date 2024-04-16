@@ -22,14 +22,22 @@ let renderanimated = (diff) => {
     let y = 0;
     if (fps <= 30) drawTxt("fps " + fps, 0, y, "#000000", undefined, undefined, true);
     if (quality < 100)
-      drawTxt("quality " + quality, 0, (y += 0.5), "#000000", undefined, undefined, true);
+      drawTxt(
+        "quality " + Math.ceil(quality),
+        0,
+        (y += 0.5),
+        "#000000",
+        undefined,
+        undefined,
+        true
+      );
     // drawTxt('local.seconds ' + local.seconds, 0, y += 0.5, "#000000", undefined, undefined, true);
     // drawTxt('local.lastclick ' + local.lastclick, 0, y += 0.5, "#000000", undefined, undefined, true);
 
     // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
     if (fps <= 30 && quality >= 55) {
-      quality -= 1;
+      quality -= 0.1;
     }
   }
   // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);

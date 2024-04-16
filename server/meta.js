@@ -372,44 +372,44 @@ exports.firebat = {
 //   }
 // }
 
-exports.teleporter = {
-  description: "Оглушает",
-  name: "Телепортер",
-  weight: 100,
-  rank: 80,
-  class: "warrior",
-  life: 3,
-  img: "teleporter",
-  akt: (akt) => {
-    let arr = akt.move();
-    let far = akt.hand("teleporter");
-    if (far) {
-      far = far.filter((e) => {
-        if (en.unitInPoint(akt.game, e.x, e.y).status == "teleporter") return false;
-        return true;
-      });
-      arr = arr.concat(far);
-    }
-    return arr;
-  },
-  move: (wd) => {
-    wd.walk();
-  },
-  teleporter: (wd) => {
-    wd.addStatus("teleporter");
-    wd.tire();
-    let tx = wd.target.x;
-    let ty = wd.target.y;
-    let mx = wd.me.x;
-    let my = wd.me.y;
-    wd.me.x = tx;
-    wd.me.y = ty;
-    wd.me.m = !wd.me.m;
-    wd.target.unit.x = mx;
-    wd.target.unit.y = my;
-    wd.target.unit.m = !wd.target.unit.m;
-  },
-};
+// exports.teleporter = {
+//   description: "Оглушает",
+//   name: "Телепортер",
+//   weight: 100,
+//   rank: 80,
+//   class: "warrior",
+//   life: 3,
+//   img: "teleporter",
+//   akt: (akt) => {
+//     let arr = akt.move();
+//     let far = akt.hand("teleporter");
+//     if (far) {
+//       far = far.filter((e) => {
+//         if (en.unitInPoint(akt.game, e.x, e.y).status == "teleporter") return false;
+//         return true;
+//       });
+//       arr = arr.concat(far);
+//     }
+//     return arr;
+//   },
+//   move: (wd) => {
+//     wd.walk();
+//   },
+//   teleporter: (wd) => {
+//     wd.addStatus("teleporter");
+//     wd.tire();
+//     let tx = wd.target.x;
+//     let ty = wd.target.y;
+//     let mx = wd.me.x;
+//     let my = wd.me.y;
+//     wd.me.x = tx;
+//     wd.me.y = ty;
+//     wd.me.m = !wd.me.m;
+//     wd.target.unit.x = mx;
+//     wd.target.unit.y = my;
+//     wd.target.unit.m = !wd.target.unit.m;
+//   },
+// };
 
 exports.staziser = {
   description:
