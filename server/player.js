@@ -85,9 +85,9 @@ player.setKey = (p) => {
   p.key = sha(token);
   return token;
 };
-player.link = (p, game) => {
-  return process.env.DOMAIN + "/?id=" + p.id + "&key=" + player.setKey(p) + "u";
-};
+// player.link = (p, game) => {
+//   return process.env.DOMAIN + "/?id=" + p.id + "&key=" + player.setKey(p) + "u";
+// };
 
 player.clear = (p, gameid) => {
   for (g in p.game) {

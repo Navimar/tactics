@@ -35,8 +35,7 @@ exports.gamelist = (id, p, bot) => {
         text += "ВАШ ХОД!!! ";
       text += e.players[0].id + " vs " + e.players[1].id + " ";
     }
-    text +=
-      process.env.IP + ":" + process.env.PORT + "/?id=" + id + "&key=" + key + "u" + "&game=" + e.id + "\n";
+    text += process.env.DOMAIN + "/?id=" + id + "&key=" + key + "u" + "&game=" + e.id + "\n";
   });
   if (text == "")
     text = "Нет активных игр\n/sandbox чтобы играть самому с собой\n/find чтобы найти соперника";
