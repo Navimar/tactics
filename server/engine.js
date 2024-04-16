@@ -106,7 +106,7 @@ en.makeUnit = (tp, x, y, team) => {
     status: [],
     akt: [],
     isReady: true,
-    energy: 3,
+    energy: meta[tp].maxenergy || 3,
     tp,
     m,
     x,
@@ -139,10 +139,7 @@ en.move = (game, unit, x, y) => {
         unit.x = x;
         unit.y = y;
       } else {
-        require("./send").logicerror(
-          game,
-          "move cell is busy " + unit.x + " " + unit.y,
-        );
+        require("./send").logicerror(game, "move cell is busy " + unit.x + " " + unit.y);
       }
     } else {
       en.disappear(game, unit);

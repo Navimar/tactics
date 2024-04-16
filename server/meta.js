@@ -660,6 +660,7 @@ exports.zombie = {
   rank: 50,
   class: "norm",
   life: 3,
+  maxenergy: 1,
   img: "zombie",
   akt: (akt) => {
     return akt.move().concat(akt.hand("zombie"));

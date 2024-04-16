@@ -113,7 +113,7 @@ exports.order = (game, orderUnit, akt) => {
 
       game.unit.forEach((u) => {
         u.isActive = false;
-        if (u.energy < 3 && u != unit && u.isReady) {
+        if (u.energy < (meta[u.tp].maxenergy || 3) && u != unit && u.isReady) {
           wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
           //onTire
           rules.frog(game);
@@ -133,7 +133,7 @@ exports.order = (game, orderUnit, akt) => {
             y: akt.y,
             unit: en.unitInPoint(game, akt.x, akt.y),
           }),
-          akt.data,
+          akt.data
         );
       } else if (_.isFunction(action[akt.img]))
         action[akt.img](
@@ -142,7 +142,7 @@ exports.order = (game, orderUnit, akt) => {
             y: akt.y,
             unit: en.unitInPoint(game, akt.x, akt.y),
           }),
-          akt.data,
+          akt.data
         );
       else console.log("unkonwn akt", akt.img);
     }
@@ -197,35 +197,25 @@ exports.endgame = (game, winner, words) => {
       send.bot(
         game.players[0].id,
         words[0] + " Ваш ранг не изменился: " + game.players[0].rank,
-        bot,
+        bot
       );
     else
       send.bot(
         game.players[0].id,
-        words[0] +
-          " Ваш ранг теперь: " +
-          game.players[0].rank +
-          " (" +
-          dif0 +
-          ")",
-        bot,
+        words[0] + " Ваш ранг теперь: " + game.players[0].rank + " (" + dif0 + ")",
+        bot
       );
     if (dif1 == 0)
       send.bot(
         game.players[1].id,
         words[1] + " Ваш ранг не изменился: " + game.players[1].rank,
-        bot,
+        bot
       );
     else
       send.bot(
         game.players[1].id,
-        words[1] +
-          " Ваш ранг теперь: " +
-          game.players[1].rank +
-          " (" +
-          dif1 +
-          ")",
-        bot,
+        words[1] + " Ваш ранг теперь: " + game.players[1].rank + " (" + dif1 + ")",
+        bot
       );
   }
   player.clear(game.players[0], game.id);
@@ -270,7 +260,7 @@ exports.endturn = (game, p) => {
 
   if (game && !game.finished) {
     game.unit.forEach((u) => {
-      u.energy = 3;
+      u.energy = meta[u.tp].maxenergy || 3;
       u.isReady = true;
     });
     game.leftturns--;
@@ -304,12 +294,12 @@ exports.endturn = (game, p) => {
     rules.aerostat(game);
     rules.landmine(game);
     rules.egg(game);
-    rules.airdropBirth(game);
     rules.rockettarget(game);
     rules.fireBurn(game);
     rules.firestt(game);
     rules.splitOnEndturn(game);
     rules.worm(game);
+    rules.airdropBirth(game);
     rules.airdrop(game);
     // rules.drill(game)
 
@@ -329,7 +319,7 @@ exports.endturn = (game, p) => {
       send.bot(
         game.players[game.turn - 1].id,
         "Ваш ход!\nЕсли потеряли ссылку на игру вызовите команду /play",
-        bot,
+        bot
       );
   }
 };

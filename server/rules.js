@@ -79,12 +79,7 @@ exports.worm = (game) => {
           //   { worm: game.spoil[i].data.worm },
           //   3,
           // );
-          en.move(
-            game,
-            game.spoil[i].data.worm,
-            game.spoil[i].x,
-            game.spoil[i].y,
-          );
+          en.move(game, game.spoil[i].data.worm, game.spoil[i].x, game.spoil[i].y);
         }
       }
       game.spoil.splice(i, 1);
@@ -94,10 +89,7 @@ exports.worm = (game) => {
 
 exports.wormportal = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
-    if (
-      game.spoil[i].name == "wormportal" &&
-      !en.isAlive(game, game.spoil[i].data.worm)
-    )
+    if (game.spoil[i].name == "wormportal" && !en.isAlive(game, game.spoil[i].data.worm))
       game.spoil.splice(i, 1);
   }
 };
@@ -107,44 +99,18 @@ exports.rockettarget = (game) => {
     if (game.spoil[i].name == "rockettarget") {
       if (game.spoil[i].data.timer == 0) {
         let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y);
-        if (
-          en.isAlive(game, game.spoil[i].data.unit) &&
-          game.spoil[i].data.unit.tp == "rocket"
-        ) {
+        if (en.isAlive(game, game.spoil[i].data.unit) && game.spoil[i].data.unit.tp == "rocket") {
           if (game.spoil[i].data.unit != unit) {
             en.death(game, unit);
-            en.move(
-              game,
-              game.spoil[i].data.unit,
-              game.spoil[i].x,
-              game.spoil[i].y,
-            );
+            en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
             en.death(game, game.spoil[i].data.unit);
             for (let xx = -1; xx <= 1; xx++) {
               for (let yy = -1; yy <= 1; yy++) {
                 if (en.inField(game.spoil[i].x + xx, game.spoil[i].y + yy)) {
-                  if (
-                    game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] ==
-                    "grass"
-                  )
-                    game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] =
-                      "ground";
-                  en.death(
-                    game,
-                    en.unitInPoint(
-                      game,
-                      game.spoil[i].x + xx,
-                      game.spoil[i].y + yy,
-                    ),
-                  );
-                  en.addSpoil(
-                    game,
-                    "fire",
-                    game.spoil[i].x + xx,
-                    game.spoil[i].y + yy,
-                    false,
-                    3,
-                  );
+                  if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == "grass")
+                    game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = "ground";
+                  en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
+                  en.addSpoil(game, "fire", game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
                 }
               }
             }
@@ -160,13 +126,7 @@ exports.rockettarget = (game) => {
 exports.landmine = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
     if (game.spoil[i].name == "landmine" && game.spoil[i].team == game.turn) {
-      en.addUnit(
-        game,
-        "landmine",
-        game.spoil[i].x,
-        game.spoil[i].y,
-        game.spoil[i].team,
-      );
+      en.addUnit(game, "landmine", game.spoil[i].x, game.spoil[i].y, game.spoil[i].team);
       game.spoil.splice(i, 1);
     }
   }
@@ -190,10 +150,7 @@ exports.fireBurn = (game) => {
 
 exports.egg = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
-    if (
-      game.spoil[i].name == "egg" &&
-      !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
-    ) {
+    if (game.spoil[i].name == "egg" && !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)) {
       // let tp
       // do {
       // 	tp = _.sample(Object.keys(meta));
@@ -203,7 +160,7 @@ exports.egg = (game) => {
         game.spoil[i].data.tp,
         game.spoil[i].x,
         game.spoil[i].y,
-        game.spoil[i].data.team,
+        game.spoil[i].data.team
       );
       // en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, game.spoil[i].data.team);
       game.spoil.splice(i, 1);
@@ -212,20 +169,13 @@ exports.egg = (game) => {
 };
 
 exports.airdropBirth = (game) => {
-  let tp = "mashroom";
-
-  // Проверяем, есть ли в game.unit юниты с типом "base" и team равным game.turn
-  const hasBaseUnitOfCurrentTurn = game.unit.some(
-    (unit) => unit.tp === "base" && unit.team == game.turn,
-  );
-
-  // Если таких юнитов нет, меняем tp на "base"
-  if (!hasBaseUnitOfCurrentTurn) {
-    // console.log("hasBaseUnitOfCurrentTurn", hasBaseUnitOfCurrentTurn);
-    tp = "base";
-  }
-
   for (let i = game.spoil.length - 1; i >= 0; i--) {
+    let tp = "mashroom";
+
+    // Если таких юнитов нет, меняем tp на "base"
+    if (!game.unit.some((unit) => unit.tp === "base" && unit.team == game.turn)) {
+      tp = "base";
+    }
     if (
       game.spoil[i].name === "airdrop" &&
       !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
@@ -257,13 +207,7 @@ exports.landmineexplosion = (game) => {
       let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y);
       if (u) {
         en.death(game, u);
-        en.addUnit(
-          game,
-          "landmine",
-          game.spoil[i].x,
-          game.spoil[i].y,
-          game.spoil[i].team,
-        );
+        en.addUnit(game, "landmine", game.spoil[i].x, game.spoil[i].y, game.spoil[i].team);
         game.spoil.splice(i, 1);
       }
     }
@@ -319,8 +263,7 @@ exports.spill = (game) => {
   }
   game.unit.forEach((unit) => {
     if (unit.tp == "fountain")
-      if (game.field[unit.x][unit.y] == "ground")
-        game.field[unit.x][unit.y] = "water";
+      if (game.field[unit.x][unit.y] == "ground") game.field[unit.x][unit.y] = "water";
   });
   while (ok) {
     ok = false;
@@ -380,14 +323,7 @@ exports.bomber = (wd) => {
 
 exports.drop = (wd) => {
   if (wd.me.sticker) {
-    en.addUnit(
-      wd.game,
-      wd.me.sticker.tp,
-      wd.me.x,
-      wd.me.y,
-      wd.me.sticker.team,
-      3,
-    );
+    en.addUnit(wd.game, wd.me.sticker.tp, wd.me.x, wd.me.y, wd.me.sticker.team, 3);
   }
 };
 
@@ -495,9 +431,7 @@ exports.airdrop = (game) => {
   };
 
   // Combine the list of units and spoils into a single array
-  const combinedPoints = game.unit.concat(
-    game.spoil.filter((s) => s.name === "airdrop"),
-  );
+  const combinedPoints = game.unit.concat(game.spoil.filter((s) => s.name === "airdrop"));
 
   // Find the point with the maximum minimum distance to all combined points
   let maxDistance = 0;
