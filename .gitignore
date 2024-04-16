@@ -8,3 +8,4 @@ asset/
 img.nosync/
 .env
 .env.prod
+assets/*

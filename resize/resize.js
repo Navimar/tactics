@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const Jimp = require("jimp");
 
-const input = "../img/";
-const output = "../img.nosync/";
+const input = "img/";
+const output = "img.nosync/";
 
 const colors = {
   team2Ready: Jimp.rgbaToInt(255, 0, 0, 255),
@@ -27,53 +27,29 @@ const lresize = async (size, file) => {
       let imgOriginal = img.clone();
       let imgBordered = img.clone();
       let imgColored = img.clone();
-      imgColored.scan(
-        0,
-        0,
-        img.bitmap.width,
-        img.bitmap.height,
-        function (x, y, idx) {
-          const isTransparent = this.bitmap.data[idx + 3] === 0;
-          if (!isTransparent) {
-            const { r, g, b, a } = Jimp.intToRGBA(colors[color]);
-            // Set red channel
-            this.bitmap.data[idx] = r;
-            // Set green channel
-            this.bitmap.data[idx + 1] = g;
-            // Set blue channel
-            this.bitmap.data[idx + 2] = b;
-            // Set alpha channel (optional)
-            this.bitmap.data[idx + 3] = a;
-          }
-        },
-      );
+      imgColored.scan(0, 0, img.bitmap.width, img.bitmap.height, function (x, y, idx) {
+        const isTransparent = this.bitmap.data[idx + 3] === 0;
+        if (!isTransparent) {
+          const { r, g, b, a } = Jimp.intToRGBA(colors[color]);
+          // Set red channel
+          this.bitmap.data[idx] = r;
+          // Set green channel
+          this.bitmap.data[idx + 1] = g;
+          // Set blue channel
+          this.bitmap.data[idx + 2] = b;
+          // Set alpha channel (optional)
+          this.bitmap.data[idx + 3] = a;
+        }
+      });
 
       imgBordered
-        .blit(
-          imgColored,
-          (height / 100) * borderweight,
-          (height / 100) * borderweight,
-        )
-        .blit(
-          imgColored,
-          (-height / 100) * borderweight,
-          (-height / 100) * borderweight,
-        )
-        .blit(
-          imgColored,
-          (+height / 100) * borderweight,
-          (-height / 100) * borderweight,
-        )
-        .blit(
-          imgColored,
-          (-height / 100) * borderweight,
-          (+height / 100) * borderweight,
-        )
+        .blit(imgColored, (height / 100) * borderweight, (height / 100) * borderweight)
+        .blit(imgColored, (-height / 100) * borderweight, (-height / 100) * borderweight)
+        .blit(imgColored, (+height / 100) * borderweight, (-height / 100) * borderweight)
+        .blit(imgColored, (-height / 100) * borderweight, (+height / 100) * borderweight)
         .blit(imgOriginal, 0, 0)
         .resize(size, size, Jimp.RESIZE_LANCZOS);
-      await imgBordered.writeAsync(
-        output + name + "." + color + "." + size + ".png",
-      );
+      await imgBordered.writeAsync(output + name + "." + color + "." + size + ".png");
       console.log(name + "." + color + "." + size + ".png");
     }
   } else {
@@ -135,10 +111,7 @@ const cleanupOutputDir = (inputFilesBaseNames) => {
       }
 
       // Удаляем файл, если его нет в inputFilesBaseNames
-      if (
-        !inputFilesBaseNames.has(baseName) &&
-        !inputFilesBaseNames.has(extendedBaseName)
-      ) {
+      if (!inputFilesBaseNames.has(baseName) && !inputFilesBaseNames.has(extendedBaseName)) {
         // console.log(
         //   inputFilesBaseNames,
         //   baseName,
@@ -146,8 +119,7 @@ const cleanupOutputDir = (inputFilesBaseNames) => {
         // );
         // console.log(`Файл ${file} нужно удалить`);
         fs.unlink(path.join(output, file), (unlinkErr) => {
-          if (unlinkErr)
-            console.error(`Ошибка при удалении файла ${file}:`, unlinkErr);
+          if (unlinkErr) console.error(`Ошибка при удалении файла ${file}:`, unlinkErr);
           else console.log(`Файл ${file} удален`);
         });
       }
