@@ -172,10 +172,6 @@ exports.airdropBirth = (game) => {
   for (let i = game.spoil.length - 1; i >= 0; i--) {
     let tp = "mashroom";
 
-    // Если таких юнитов нет, меняем tp на "base"
-    if (!game.unit.some((unit) => unit.tp === "base" && unit.team == game.turn)) {
-      tp = "base";
-    }
     if (
       game.spoil[i].name === "airdrop" &&
       !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
@@ -184,6 +180,15 @@ exports.airdropBirth = (game) => {
       en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, team);
       game.spoil.splice(i, 1);
     }
+  }
+};
+
+exports.foxPolymoprh = (game) => {
+  let ulist = game.unit.filter((unit) => unit.team == game.turn);
+  if (!ulist.some((unit) => unit.tp === "base")) {
+    let newBase = _.sample(ulist);
+    newBase.tp = "base";
+    game.trail.push({ img: "polymorph", x: newBase.x, y: newBase.y });
   }
 };
 

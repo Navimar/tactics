@@ -264,6 +264,8 @@ exports.endturn = (game, p) => {
       u.isReady = true;
     });
     game.leftturns--;
+
+    //закончились ходы
     if (game.leftturns == 0) {
       let flag = cnFlag();
       if (flag[0] > flag[1]) {
@@ -271,14 +273,21 @@ exports.endturn = (game, p) => {
       } else {
         exports.endgame(game, 2);
       }
-    } else {
-      if (game.fisher[game.turn - 1] < 0) {
-        // game.winner = game.turn == 1 ? 2 : 1;
-        game.fisher[game.turn - 1] += 120;
-      } else {
-        game.fisher[game.turn - 1] += 120;
-      }
     }
+    //закончилисиь юниты
+    let team1isAlive = game.unit.some((unit) => unit.team === 1);
+    let team2isAlive = game.unit.some((unit) => unit.team === 2);
+    if (team1isAlive && !team2isAlive) exports.endgame(game, 1);
+    if (team2isAlive && !team1isAlive) exports.endgame(game, 2);
+    if (!team1isAlive && !team2isAlive) game.leftturns = 0;
+
+    if (game.fisher[game.turn - 1] < 0) {
+      // game.winner = game.turn == 1 ? 2 : 1;
+      game.fisher[game.turn - 1] += 120;
+    } else {
+      game.fisher[game.turn - 1] += 120;
+    }
+
     fisher(game);
 
     //onEndTurn
@@ -304,6 +313,8 @@ exports.endturn = (game, p) => {
     // rules.drill(game)
 
     onOrder(game);
+
+    rules.foxPolymoprh(game);
     if (game.ai && game.turn == 1) worldshift(game);
     updateAkts(game);
 

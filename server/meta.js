@@ -649,7 +649,6 @@ exports.aerostat = {
 //     wd.disappear(wd.target.unit);
 //     wd.flywalk();
 //     // wd.tire();
-
 //   },
 // }
 
@@ -669,12 +668,7 @@ exports.zombie = {
     wd.walk();
   },
   zombie: (wd) => {
-    if (
-      wd.target.unit.sticker
-      // &&
-      // wd.target.unit.sticker.tp == wd.me.tp &&
-      // wd.target.unit.sticker.team == wd.me.tea
-    ) {
+    if (wd.target.unit.sticker) {
       wd.kill(wd.target.unit);
     } else
       wd.target.unit.sticker = {
