@@ -64,14 +64,14 @@ const convert = async (file) => {
   let to = 220;
   let name = file.substring(0, file.length - 4);
   let fn = async () => {
+    for (let i = from; i < to; i += 1) {
+      await lresize(i, file); // Use await to ensure sequential execution of lresize()
+    }
     fs.copyFile(input + file, output + name + ".raw.png", (err) => {
       if (err) {
         console.error("Произошла ошибка при копировании файла:", err);
       }
     });
-    for (let i = from; i < to; i += 1) {
-      await lresize(i, file); // Use await to ensure sequential execution of lresize()
-    }
   };
 
   if (!fs.existsSync(output + name + ".raw.png")) {

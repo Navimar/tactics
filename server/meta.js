@@ -1043,7 +1043,7 @@ exports.spliter = {
 };
 exports.hatchery = {
   name: "незаполнено",
-  description: "пока не придумал",
+  description: "Рожает рыб",
   weight: 0,
   life: 3,
   rank: 160,
