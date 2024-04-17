@@ -126,6 +126,7 @@ exports.data = (game, order) => {
         isReady: u.isReady,
         life: u.life,
         description: meta[u.tp].description,
+        name: meta[u.tp].name,
         m: u.m,
         x: u.x,
         y: u.y,
@@ -147,7 +148,11 @@ exports.data = (game, order) => {
               })(),
             }
           : false,
-        akt: u.akt,
+        akt: (() => {
+          // if (u.team == player) return u.akt;
+          // else return [];
+          return u.akt;
+        })(),
         color: (() => {
           if (player == 1) return u.team;
           if (player == 2)

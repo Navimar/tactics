@@ -55,7 +55,7 @@ let drawImageEven = (img, x, y, w, h, animate) => {
 
 function drawBackground(name) {
   let s = dh;
-  let img = getImg(name, s);
+  let img = getImgRaw(name + ".bck", s);
   for (var tileX = 0; tileX < canvas.width; tileX += dh) {
     for (var tileY = 0; tileY < canvas.height; tileY += dh) {
       drawImageEven(img, tileX, tileY, dh, dh);
@@ -80,10 +80,11 @@ function drawBoard() {
   ctx.restore();
 }
 
-function drawTxt(txt, x, y, color, size, font, animate) {
+function drawTxt(txt, x, y, width, color, size, font, animate) {
   let ctx = animate ? ctxAnimated : ctxStatic;
   color = color || "#222";
   size = size || 100;
+  width = width || 0;
   size = dh * 0.24 * size * 0.01;
   font = font || "Verdana";
   font = size + "px " + font;
@@ -91,11 +92,13 @@ function drawTxt(txt, x, y, color, size, font, animate) {
   ctx.fillStyle = "white";
   ctx.textBaseline = "top";
 
-  wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * 4, 25);
+  wrapText(ctx, txt, x * dh + shiftX, y * dh + shiftY, dh * width, 25);
 
   // drawBubble(x, y, px, py);
 
   function wrapText(context, text, marginLeft, marginTop, maxWidth, lineHeight) {
+    marginLeft = marginLeft + 0.1 * dh;
+    // maxWidth = maxWidth - 0.1 * dh;
     let lines = 1;
     let originalmarginttop = marginTop;
     function dt(line) {
@@ -121,7 +124,7 @@ function drawTxt(txt, x, y, color, size, font, animate) {
       for (let n = 0; n < countWords; n++) {
         let testLine = line + words[n] + " ";
         let testWidth = context.measureText(testLine).width;
-        if (testWidth > maxWidth || words[n] === "\n") {
+        if (testWidth > maxWidth - 0.1 * dh || words[n] === "\n") {
           dt(line);
           if (words[n] === "\n") {
             line = words[n].slice(1);
@@ -138,14 +141,9 @@ function drawTxt(txt, x, y, color, size, font, animate) {
     };
     doit();
     if (lines > 1) {
-      ctx.globalAlpha = 0.4;
+      // ctx.globalAlpha = 0.4;
       ctx.fillStyle = "black";
-      ctx.fillRect(
-        x * dh + shiftX - maxWidth * 0.02,
-        y * dh + shiftY,
-        maxWidth,
-        lineHeight * lines * 1.1
-      );
+      ctx.fillRect(x * dh + shiftX, y * dh + shiftY, maxWidth, lineHeight * lines * 1.1);
       ctx.globalAlpha = 1.0;
     }
     marginTop = originalmarginttop;
@@ -250,6 +248,11 @@ let drawShadow = (df, color) => {
   df();
 };
 
+function getImgRaw(name) {
+  img = grafio(name + ".raw");
+  if (img === undefined || img === null) img = questionmark;
+  return img;
+}
 function getImg(name, s, mask) {
   s = even(s);
   let img = grafio(name + "." + s);
@@ -330,27 +333,29 @@ function drawTrail(name, x, y) {
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
 }
 
-function drawAkt(name, x, y, ws, hs) {
+function drawAkt(name, x, y, ws, hs, enemy) {
   let ctx = ctxAnimated;
-  let p = 0;
-  let s = even(dh + 2 * p);
-  img = getImg(name + ".akt", s);
-  ctx.save();
-  // ctx.shadowColor = "rgba(0,0,0,0.3)";
-  // ctx.shadowOffsetX = 3;
-  // ctx.shadowOffsetY = 3;
-  // ctx.shadowBlur = 0;
-
+  img = getImg(name + ".akt", dh);
+  if (enemy) {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.shadowColor = "rgba(255,0,0,1)";
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 0;
+  }
   let px = 0;
   let py = 0;
   if (ws && hs) {
     px = (dh / 1000) * ws;
     py = (dh / 1000) * hs;
   }
+  // console.log(px, py);
 
   let w = dh + 2 * px;
   let h = dh + 2 * py;
   drawImageEven(img, x * dh - px + shiftX, y * dh - py * 2 + shiftY, w, h, true);
+
   ctx.restore();
 
   // drawImageEven(img, x * dh - px + shiftX, y * dh - 0.1 * dh - py * 2 + shiftY, w, h, animate);
@@ -491,10 +496,9 @@ function drawSize(name, x, y, w, h, animate) {
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h, animate);
 }
 
-function drawPanel(name, x, y, w, h, animate) {
-  img = getImg(name + ".pnl", w * dh);
-  // ctx.drawImage(img, 0, 0, img.width, img.height/2 ,x * dh + shiftX, y * dh + shiftY, dh*2 , dh );
-  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h, animate);
+function drawPanel(name, x, y, w, h) {
+  img = getImgRaw(name + ".pnl");
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh * w, dh * h, false);
 }
 
 // function drawWeb(name, x, y, w, h) {

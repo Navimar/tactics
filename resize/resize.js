@@ -52,6 +52,8 @@ const lresize = async (size, file) => {
       await imgBordered.writeAsync(output + name + "." + color + "." + size + ".png");
       console.log(name + "." + color + "." + size + ".png");
     }
+  } else if (file.includes(".pnl.png")) {
+  } else if (file.includes(".bck.png")) {
   } else {
     img.resize(size, size, Jimp.RESIZE_LANCZOS);
     await img.writeAsync(output + name + "." + size + ".png");

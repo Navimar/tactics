@@ -17,16 +17,19 @@ let renderanimated = (diff) => {
   if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
 
   rendertip();
+  renderdescription();
   if (diff) {
     fps = parseInt((1000 / diff + fps * 10) / 11);
     let y = 0;
-    if (fps <= 30) drawTxt("fps " + fps, 0, y, "#000000", undefined, undefined, true);
+    if (fps <= 30) drawTxt("fps " + fps, 0, y, 1, "#000000", undefined, undefined, true);
     if (quality < 100)
       drawTxt(
         "quality " + Math.ceil(quality),
         0,
         (y += 0.5),
+        1,
         "#000000",
+
         undefined,
         undefined,
         true
@@ -36,8 +39,8 @@ let renderanimated = (diff) => {
 
     // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
-    if (fps <= 30 && quality >= 55) {
-      // quality -= 0.1;
+    if (fps <= 30) {
+      quality = 50;
     }
   }
   // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
@@ -46,7 +49,7 @@ let renderanimated = (diff) => {
 let render = () => {
   resize();
 
-  if (data.history) drawBackground("history");
+  if (data.history) drawBackground("history.bck");
   else {
     if (data.turn == 1) {
       drawBackground("edgeTurn");
@@ -84,6 +87,11 @@ let renderpanel = () => {
     [-2, 8],
     [-2, 6],
     [-2, 4],
+    [9, 0],
+    [9, 2],
+    [9, 4],
+    [9, 6],
+    [9, 7],
   ];
   if (orientation == "h") {
     c.forEach((e) => e.reverse());
@@ -105,31 +113,31 @@ let renderpanel = () => {
       }
     }
   } else {
-    drawSize("help", c[4][0], c[4][1], 2, 2);
+    drawPanel("abyss", c[4][0], c[4][1], 2, 2);
 
     if (data.finished) {
       // drawSize('frame', c[3][0], c[3][1], 2, 2)
     } else {
       // drawSize('help', c[3][0], c[3][1], 2, 2)
       if (orientation == "w") {
-        drawSize("surrender", c[2][0], c[2][1], 2, 1);
-      } else drawSize("surrenderh", c[2][0], c[2][1], 1, 2);
+        drawPanel("surrender", c[2][0], c[2][1], 2, 1);
+      } else drawPanel("surrenderh", c[2][0], c[2][1], 1, 2);
     }
 
-    if (local.frame > 0) drawSize("frame", c[3][0], c[3][1], 2, 2);
+    if (local.frame > 0) drawPanel("frame", c[3][0], c[3][1], 2, 2);
 
     if (data.win == "win") {
-      drawSize("win", c[0][0], c[0][1], 2, 2);
+      drawPanel("win", c[0][0], c[0][1], 2, 2);
     } else if (data.win == "defeat") {
-      drawSize("defeat", c[0][0], c[0][1], 2, 2);
+      drawPanel("defeat", c[0][0], c[0][1], 2, 2);
     } else if (data.bonus == "choose") {
-      drawSize("choose", c[0][0], c[0][1], 2, 2);
+      drawPanel("choose", c[0][0], c[0][1], 2, 2);
     } else if (data.bonus == "wait") {
-      drawSize("wait", c[0][0], c[0][1], 2, 2);
+      drawPanel("wait", c[0][0], c[0][1], 2, 2);
     } else if (data.turn) {
-      drawSize("turn", c[0][0], c[0][1], 2, 2);
+      drawPanel("turn", c[0][0], c[0][1], 2, 2);
     } else {
-      drawSize("turnEnemy", c[0][0], c[0][1], 2, 2);
+      drawPanel("turnEnemy", c[0][0], c[0][1], 2, 2);
     }
 
     // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
@@ -155,20 +163,25 @@ let renderpanel = () => {
         arr.push(u);
       }
     });
-    drawSize("next", c[1][0], c[1][1], 2, 2);
+    drawPanel("next", c[1][0], c[1][1], 2, 2);
 
-    drawTxt(arr.length + "", c[1][0] + 0.15, c[1][1] + 1.6, "#222");
-    drawTxt(data.leftturns + "", c[0][0] + 1.5, c[0][1] + 0.1, "#222");
+    drawTxt(arr.length + "", c[1][0] + 0.15, c[1][1] + 1.6, 4, "#222");
+    drawTxt(data.leftturns + "", c[0][0] + 1.5, c[0][1] + 0.1, 4, "#222");
 
     let goldtext = data.gold[0] + "";
-    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, "#090");
-    drawTxt(data.gold[1] + "", c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, "#f00");
-    drawTxt(local.unitcn + "", c[1][0] + 1.6, c[1][1] + 0.3, "#222");
-    drawTxt(local.unitencn + "", c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, "#222");
+    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, 4, "#090");
+    drawTxt(data.gold[1] + "", c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, 4, "#f00");
+    drawTxt(local.unitcn + "", c[1][0] + 1.6, c[1][1] + 0.3, 4, "#222");
+    drawTxt(local.unitencn + "", c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, 4, "#222");
 
     // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
     // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
   }
+  drawPanel("abyss", c[5][0], c[5][1], 2, 2);
+  drawPanel("abyss", c[6][0], c[6][1], 2, 2);
+  drawPanel("abyss", c[7][0], c[7][1], 2, 2);
+  drawPanel("abyss", c[8][0], c[8][1], 2, 2);
+  drawPanel("abyss", c[9][0], c[9][1], 2, 2);
 };
 
 const drawUnit = (unit, x, y, sizeAdd, cropPercent = 0) => {
@@ -260,7 +273,7 @@ const renderunit = (x, y, diff) => {
   if (
     (((unit.isReady || unit.isActive) && data.turn && unit.color === 1 && !data.chooseteam) ||
       (data.chooseteam && data.bonus !== "choose" && unit.color !== 3)) &&
-    !local.unit
+    (local.unit.color != 1 || !local.unit.isReady)
   ) {
     animateBreath(unit, diff);
     return;
@@ -298,8 +311,10 @@ let renderspoil = (x, y) => {
 let renderakt = () => {
   if (local.unit?.akt) {
     local.unit.akt.forEach((a) => {
-      sizeAdd = (local.cadr * 20) / 1000;
-      drawAkt(a.img, a.x, a.y, a.x - sizeAdd, a.y + sizeAdd);
+      if (local.unit.color == 1) {
+        let sizeAdd = (local.cadr * 20) / 1000;
+        drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
+      } else if (local.unit.color == 2) drawAkt(a.img, a.x, a.y, a.x, a.y, true);
     });
   }
   //   else if (local.build) {
@@ -319,5 +334,31 @@ let rendertrail = () => {
 };
 let rendertip = () => {
   if (local.tip && local.tip.dur > 0)
-    drawTxt(local.tip.text, local.tip.x, local.tip.y, local.tip.color, local.tip.size, false, true);
+    drawTxt(
+      local.tip.text,
+      local.tip.x,
+      local.tip.y,
+      4,
+      local.tip.color,
+      local.tip.size,
+      false,
+      true
+    );
+};
+
+let renderdescription = () => {
+  let c = [9, 0];
+  let w = 2;
+  if (orientation == "h") {
+    c.reverse();
+    w = 9;
+  }
+
+  if (local.unit) {
+    let namecolor = "#006600";
+    if (local.unit.color == 2) namecolor = "#660000";
+    if (local.unit.color == 3) namecolor = "#666600";
+    drawTxt(local.unit.name, c[0], c[1], w, namecolor, 130, false, true);
+    drawTxt(local.unit.description, c[0], c[1] + 0.5, w, "#000000", 100, false, true);
+  }
 };

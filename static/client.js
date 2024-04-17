@@ -42,67 +42,7 @@ let data = {
     ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
     ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
   ],
-  unit: [
-    {
-      img: "barbarian",
-      status: [],
-      x: 5,
-      y: 3,
-      m: true,
-      isActive: false,
-      isReady: true,
-      life: 3,
-      color: 2,
-      akt: [
-        {
-          x: 4,
-          y: 3,
-          img: "move",
-        },
-        {
-          x: 3,
-          y: 3,
-          img: "move",
-        },
-      ],
-    },
-    {
-      status: [],
-      img: "zombie",
-      life: 2,
-      isActive: false,
-      isReady: true,
-      x: 5,
-      y: 4,
-      m: false,
-      color: 1,
-      akt: [
-        {
-          x: 4,
-          y: 5,
-          img: "convertor",
-        },
-      ],
-    },
-    {
-      status: [],
-      img: "aerostat",
-      life: 1,
-      x: 2,
-      isActive: false,
-      isReady: true,
-      y: 3,
-      m: false,
-      color: 2,
-      akt: [
-        {
-          x: 3,
-          y: 3,
-          img: "aerostat.drop",
-        },
-      ],
-    },
-  ],
+  unit: [],
 };
 let fieldmask = (() => {
   let arr = [];
@@ -253,14 +193,14 @@ let onUpdate = (val) => {
   // console.log('dataturn',data.turn)
   console.log("data.order", data.order);
   if (local.turn == false && data.turn == true) {
-    tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 250);
+    tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 240);
     local.turn = data.turn;
   }
   local.unitcn = 0;
   local.unitencn = 0;
 
   data.unit.forEach((u) => {
-    if (u.isActive && u.akt.length > 0) {
+    if (u.isActive && u.akt.length > 0 && u.color == 1) {
       local.unit = u;
     }
     if (u.color == 1) local.unitcn++;
@@ -451,6 +391,7 @@ let onMouseDown = () => {
           if (gu.color == 1 || !clickOnAkt()) {
             local.unit = gu;
             local.build = false;
+            // drawTxt("опиafsdfasd asdfasd asd asdfa сание", 3, 3, "ffffff", 32, false, true);
           }
         } else {
           // if (local.build && (mouseCell.x == local.build.x && mouseCell.y == local.build.y)) {
