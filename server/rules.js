@@ -187,8 +187,10 @@ exports.foxPolymoprh = (game) => {
   let ulist = game.unit.filter((unit) => unit.team == game.turn);
   if (!ulist.some((unit) => unit.tp === "base")) {
     let newBase = _.sample(ulist);
-    newBase.tp = "base";
-    game.trail.push({ img: "polymorph", x: newBase.x, y: newBase.y });
+    if (newBase) {
+      newBase.tp = "base";
+      game.trail.push({ img: "polymorph", x: newBase.x, y: newBase.y });
+    }
   }
 };
 
