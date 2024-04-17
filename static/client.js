@@ -200,7 +200,7 @@ let onUpdate = (val) => {
   local.unitencn = 0;
 
   data.unit.forEach((u) => {
-    if (u.isActive && u.akt.length > 0 && u.color == 1) {
+    if (u.isActive && u.akt.length > 0 && u.canMove) {
       local.unit = u;
     }
     if (u.color == 1) local.unitcn++;

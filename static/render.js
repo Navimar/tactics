@@ -273,9 +273,11 @@ const renderunit = (x, y, diff) => {
     return;
   }
   if (
-    (((unit.isReady || unit.isActive) && data.turn && unit.color === 1 && !data.chooseteam) ||
-      (data.chooseteam && data.bonus !== "choose" && unit.color !== 3)) &&
-    (local.unit.color != 1 || !local.unit.isReady)
+    (unit.isReady || unit.isActive) &&
+    data.turn &&
+    unit.canMove &&
+    !data.chooseteam &&
+    (!local.unit.canMove || !local.unit.isReady)
   ) {
     animateBreath(unit, diff);
     return;
@@ -313,16 +315,18 @@ let renderspoil = (x, y) => {
 let renderakt = () => {
   if (local.unit?.akt) {
     local.unit.akt.forEach((a) => {
-      if (local.unit.color == 1) {
+      if (local.unit.color == 3 && !local.unit.canMove) return;
+      if (local.unit.canMove) {
         let sizeAdd = (local.cadr * 20) / 1000;
         drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
-      } else if (local.unit.color == 2) drawAkt(a.img, a.x, a.y, a.x, a.y, true);
+        return;
+      }
+      if (!local.unit.canMove) {
+        drawAkt(a.img, a.x, a.y, a.x, a.y, true);
+        return;
+      }
     });
   }
-  //   else if (local.build) {
-  //     data.unit.forEach((u) => drawAkt("build", u.x, u.y));
-  //     drawImg("focus", local.build.x, local.build.y);
-  //   }
 };
 let rendertrail = () => {
   for (let y = 0; y < 9; y++) {
