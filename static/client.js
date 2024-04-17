@@ -225,6 +225,8 @@ let getAkt = (x, y) => {
 };
 
 let clickOnAkt = () => {
+  let gu = getUnit(mouseCell.x, mouseCell.y);
+
   if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
     local.order = getAkt(mouseCell.x, mouseCell.y);
     if (local.order) {
@@ -252,18 +254,19 @@ let clickOnAkt = () => {
     }
   } else if (!data.turn) {
     tip("Сейчас ход соперника", mouseCell.x, mouseCell.y, "#005500");
-  } else if (local.unit && local.unit.color == 3 && !local.unit.isReady) {
-    tip("Я гриб!", mouseCell.x, mouseCell.y, "#333");
-  } else if (local.unit && data.chooseteam) {
+  } else if (!gu && local.unit && local.unit.color == 2) {
+    tip("Это юнит соперника! Ходите юнитами с белой обводкой!!!", mouseCell.x, mouseCell.y, "#333");
+  } else if (!gu && local.unit && local.unit.color == 3 && !local.unit.canMove) {
+    // local.unit = false;
+    tip("Это нейтральный юнит. Ваши юниты имеют белую обводку", mouseCell.x, mouseCell.y, "#050");
+  } else if (!gu && local.unit && !local.unit.isReady) {
     tip(
-      "Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!",
+      "Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой",
       mouseCell.x,
       mouseCell.y,
-      "#333"
+      "#050"
     );
-  } else if (local.unit && local.unit.color != 1) {
-    tip("Это юнит соперника! Ходите юнитами с белой обводкой!!!", mouseCell.x, mouseCell.y, "#333");
-  } else if (local.unit) {
+  } else if (!gu && local.unit && local.unit.color == 1) {
     tip(
       "Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!",
       mouseCell.x,
@@ -391,7 +394,6 @@ let onMouseDown = () => {
           if (gu.color == 1 || !clickOnAkt()) {
             local.unit = gu;
             local.build = false;
-            // drawTxt("опиafsdfasd asdfasd asd asdfa сание", 3, 3, "ffffff", 32, false, true);
           }
         } else {
           // if (local.build && (mouseCell.x == local.build.x && mouseCell.y == local.build.y)) {
@@ -410,7 +412,15 @@ let onMouseDown = () => {
           if (local.unit) clickOnAkt();
           else if (data.chooseteam)
             tip("Выделите синиго или рыжего юнита. И ходите им!", mouseCell.x, mouseCell.y, "#333");
-          else tip("Выделите юнита с белой обводкой и ходите им!", 3, 3, "#000", 5, 120);
+          else
+            tip(
+              "Выделите юнита с белой обводкой и ходите им!",
+              mouseCell.x,
+              mouseCell.y,
+              "#000",
+              5,
+              100
+            );
 
           // let arr = [];
           // data.unit.forEach((u) => {
@@ -433,18 +443,6 @@ let onMouseDown = () => {
       }
       // local.focus = false;
       // local.akt = [];
-      if (local.unit && local.unit.color == 3 && !local.unit.canMove) {
-        // local.unit = false;
-        tip("Это нейтральный юнит. Выбери другого", mouseCell.x, mouseCell.y, "#050");
-      }
-      if (local.unit && !local.unit.isReady && !wise) {
-        tip(
-          "Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой",
-          mouseCell.x,
-          mouseCell.y,
-          "#050"
-        );
-      }
     }
   }
   render();

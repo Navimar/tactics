@@ -21,13 +21,13 @@ let renderanimated = (diff) => {
   if (diff) {
     fps = parseInt((1000 / diff + fps * 10) / 11);
     let y = 0;
-    if (fps <= 30) drawTxt("fps " + fps, 0, y, 1, "#000000", undefined, undefined, true);
+    if (fps <= 30) drawTxt("fps " + fps, 0, y, 4, "#000000", undefined, undefined, true);
     if (quality < 100)
       drawTxt(
         "quality " + Math.ceil(quality),
         0,
         (y += 0.5),
-        1,
+        4,
         "#000000",
 
         undefined,
@@ -165,23 +165,25 @@ let renderpanel = () => {
     });
     drawPanel("next", c[1][0], c[1][1], 2, 2);
 
-    drawTxt(arr.length + "", c[1][0] + 0.15, c[1][1] + 1.6, 4, "#222");
-    drawTxt(data.leftturns + "", c[0][0] + 1.5, c[0][1] + 0.1, 4, "#222");
+    drawTxt(arr.length + "", c[1][0] + 0.15, c[1][1] + 1.6, 1, "#222");
+    drawTxt(data.leftturns + "", c[0][0] + 1.5, c[0][1] + 0.1, 1, "#222");
 
     let goldtext = data.gold[0] + "";
-    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, 4, "#090");
-    drawTxt(data.gold[1] + "", c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, 4, "#f00");
-    drawTxt(local.unitcn + "", c[1][0] + 1.6, c[1][1] + 0.3, 4, "#222");
-    drawTxt(local.unitencn + "", c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, 4, "#222");
+    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, 1, "#090");
+    drawTxt(data.gold[1] + "", c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, 1, "#f00");
+    drawTxt(local.unitcn + "", c[1][0] + 1.6, c[1][1] + 0.3, 1, "#222");
+    drawTxt(local.unitencn + "", c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, 1, "#222");
 
     // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
     // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
   }
-  drawPanel("abyss", c[5][0], c[5][1], 2, 2);
-  drawPanel("abyss", c[6][0], c[6][1], 2, 2);
-  drawPanel("abyss", c[7][0], c[7][1], 2, 2);
-  drawPanel("abyss", c[8][0], c[8][1], 2, 2);
-  drawPanel("abyss", c[9][0], c[9][1], 2, 2);
+  if (orientation == "h") drawPanel("scrollh", 0, 9, 9, 2);
+  else drawPanel("scroll", 9, 0, 2, 9);
+
+  // drawPanel("abyss", c[6][0], c[6][1], 2, 2);
+  // drawPanel("abyss", c[7][0], c[7][1], 2, 2);
+  // drawPanel("abyss", c[8][0], c[8][1], 2, 2);
+  // drawPanel("abyss", c[9][0], c[9][1], 2, 2);
 };
 
 const drawUnit = (unit, x, y, sizeAdd, cropPercent = 0) => {
@@ -347,18 +349,16 @@ let rendertip = () => {
 };
 
 let renderdescription = () => {
-  let c = [9, 0];
-  let w = 2;
-  if (orientation == "h") {
-    c.reverse();
-    w = 9;
-  }
-
   if (local.unit) {
     let namecolor = "#006600";
     if (local.unit.color == 2) namecolor = "#660000";
     if (local.unit.color == 3) namecolor = "#666600";
-    drawTxt(local.unit.name, c[0], c[1], w, namecolor, 130, false, true);
-    drawTxt(local.unit.description, c[0], c[1] + 0.5, w, "#000000", 100, false, true);
+    if (orientation == "h") {
+      drawTxt(local.unit.name, 0.2, 9.2, 2, namecolor, 130, false, true);
+      drawTxt(local.unit.description, 0.2, 9.7, 8.55, "#000000", 100, false, true);
+    } else {
+      drawTxt(local.unit.name, 9, 0.2, 1.85, namecolor, 130, false, true);
+      drawTxt(local.unit.description, 9, 0.7, 1.85, "#000000", 100, false, true);
+    }
   }
 };

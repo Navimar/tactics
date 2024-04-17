@@ -140,12 +140,12 @@ function drawTxt(txt, x, y, width, color, size, font, animate) {
       }
     };
     doit();
-    if (lines > 1) {
-      // ctx.globalAlpha = 0.4;
-      ctx.fillStyle = "black";
-      ctx.fillRect(x * dh + shiftX, y * dh + shiftY, maxWidth, lineHeight * lines * 1.1);
-      ctx.globalAlpha = 1.0;
-    }
+    // if (lines > 1) {
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = "black";
+    ctx.fillRect(x * dh + shiftX, y * dh + shiftY, maxWidth, lineHeight * lines * 1.1);
+    ctx.globalAlpha = 1.0;
+    // }
     marginTop = originalmarginttop;
     doit();
   }
