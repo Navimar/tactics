@@ -90,7 +90,7 @@ exports.fish = {
 
 exports.headcrab = {
   name: "Мозгососка",
-  description: "Захватывает разум юнита, не может ходить",
+  description: "Захватывает разум юнитов",
   weight: 100,
   rank: 0,
   class: "norm",

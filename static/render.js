@@ -37,7 +37,7 @@ let renderanimated = (diff) => {
     // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
     if (fps <= 30 && quality >= 55) {
-      quality -= 0.1;
+      // quality -= 0.1;
     }
   }
   // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
