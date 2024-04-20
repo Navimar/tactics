@@ -314,8 +314,7 @@ exports.merchant = {
 // };
 
 exports.firebat = {
-  description:
-    "Жжот огоньком. У горящего юнита всего один ход, чтобы прыгнуть в воду, а иначе от него останется один только костер. Кто на костер встанет, тот и сам сгорит.",
+  description: "Поджигает. Горящий юнит в конце своего хода сгорает.",
   name: "Поджигатель",
   weight: 100,
   rank: 80,
@@ -487,8 +486,9 @@ exports.staziser = {
 // }
 
 exports.aerostat = {
-  description: "Возит юнитов. Юнит в трюме не может ничего делать, пока его не выгрузят.",
-  name: "Шар",
+  description:
+    "Загружает и разгружает юнитов. Юнит после разгрузки всегда здоров и может дейстовать, даже если уже ходил.",
+  name: "Медиэвак",
   weight: 100,
   rank: 100,
   class: "norm",
@@ -827,7 +827,7 @@ exports.box = {
 
 exports.mashroom = {
   name: "Гриб",
-  description: "Превращается в любого юнита на поле, кроме лисы",
+  description: "Превращается в любого юнита на поле, кроме Лисы",
   // neutral: true,
   rank: 0,
   weight: 100,
@@ -1040,7 +1040,7 @@ exports.spliter = {
 };
 exports.hatchery = {
   name: "Рыбашня",
-  description: "Кидается призрачными рыбами, которые исчезают в конце хода",
+  description: "Кидается призрачными рыбами, которые кусаются и исчезают в конце хода",
   weight: 0,
   life: 3,
   rank: 160,
@@ -1061,29 +1061,28 @@ exports.hatchery = {
     //   u.isReady = false;
   },
 };
-exports.bird = {
-  name: "Птицебомба",
-  description: "При смерти или по желанию взрывается квадратром 3х3 уничтожая и поджигая все",
+exports.bomb = {
+  name: "Бомба",
+  description: "Взрывается квадратром 3х3 уничтожая и поджигая все. Или ходит или взрывается.",
   weight: 100,
   rank: 10,
   life: 3,
   class: "norm",
-  img: "bird",
+  img: "bomb",
   akt: (akt) => {
-    return akt.move().concat({
-      x: akt.me.x,
-      y: akt.me.y,
-      img: "bird",
-    });
-  },
-  move: (wd) => {
-    wd.go(wd.target.x, wd.target.y);
-    wd.tire();
+    let aktarr = akt.move();
+    if (akt.me.energy == 3)
+      aktarr = aktarr.concat({
+        x: akt.me.x,
+        y: akt.me.y,
+        img: "bomb",
+      });
+    return aktarr;
   },
   onDeath: (wd) => {
-    this.bird.boom(wd);
+    this.bomb.bomb(wd);
   },
-  boom: (wd) => {
+  bomb: (wd) => {
     for (let xx = -1; xx <= 1; xx++) {
       for (let yy = -1; yy <= 1; yy++) {
         if (
@@ -1112,9 +1111,6 @@ exports.bird = {
     wd.spoil("fire", wd.me.x + 1, wd.me.y + 1, false, 3);
     wd.spoil("fire", wd.me.x, wd.me.y, false, 3);
     wd.tire();
-  },
-  bird: (wd) => {
-    this.bird.boom(wd);
   },
 };
 
@@ -1253,31 +1249,31 @@ exports.rocket = {
   },
 };
 
-exports.landmine = {
-  name: "Мина",
-  description: "Закапывается после каждого передвижения, убивает любого кто на нее наступит",
-  weight: 100,
-  rank: 115,
-  class: "norm",
-  life: 3,
-  img: "landmine",
-  akt: (akt) => {
-    let akts = akt.move();
-    akts.forEach((e) => (e.img = "landmine"));
-    akts = akts.filter((a) => {
-      let sarr = en.spoilInPoint(akt.game, a.x, a.y).filter((s) => {
-        return s.name == "landmine";
-      });
-      if (sarr.length > 0) return false;
-      return true;
-    });
-    return akts;
-  },
-  landmine: (wd) => {
-    wd.spoil("landmine", wd.target.x, wd.target.y, false, wd.me.team);
-    wd.disappear(wd.me.x, wd.me.y);
-  },
-};
+// exports.landmine = {
+//   name: "Мина",
+//   description: "Закапывается после каждого передвижения, убивает любого кто на нее наступит",
+//   weight: 100,
+//   rank: 115,
+//   class: "norm",
+//   life: 3,
+//   img: "landmine",
+//   akt: (akt) => {
+//     let akts = akt.move();
+//     akts.forEach((e) => (e.img = "landmine"));
+//     akts = akts.filter((a) => {
+//       let sarr = en.spoilInPoint(akt.game, a.x, a.y).filter((s) => {
+//         return s.name == "landmine";
+//       });
+//       if (sarr.length > 0) return false;
+//       return true;
+//     });
+//     return akts;
+//   },
+//   landmine: (wd) => {
+//     wd.spoil("landmine", wd.target.x, wd.target.y, false, wd.me.team);
+//     wd.disappear(wd.me.x, wd.me.y);
+//   },
+// };
 
 // exports.plantik = {
 //   name: 'незаполнено', description: 'пока не придумал',
@@ -1418,7 +1414,8 @@ exports.slime = {
 
 exports.bear = {
   name: "Мишка",
-  description: "Перекидывает юнита через себя и давит бедолагу оказавщегося на месте приземления",
+  description:
+    "Перебрасывает целевого юнита через себя и убивает юнита, находящегося на месте приземления",
   rank: 20,
   weight: 100,
   class: "norm",

@@ -274,12 +274,6 @@ exports.endturn = (game, p) => {
         exports.endgame(game, 2);
       }
     }
-    //закончилисиь юниты
-    let team1isAlive = game.unit.some((unit) => unit.team === 1);
-    let team2isAlive = game.unit.some((unit) => unit.team === 2);
-    if (team1isAlive && !team2isAlive) exports.endgame(game, 1);
-    if (team2isAlive && !team1isAlive) exports.endgame(game, 2);
-    if (!team1isAlive && !team2isAlive) game.leftturns = 0;
 
     if (game.fisher[game.turn - 1] < 0) {
       // game.winner = game.turn == 1 ? 2 : 1;
@@ -289,10 +283,6 @@ exports.endturn = (game, p) => {
     }
 
     fisher(game);
-
-    //onEndTurn
-    // rules.mine(game);
-    // cnFlag();
 
     game.turn = game.turn == 1 ? 2 : 1;
 
@@ -310,7 +300,6 @@ exports.endturn = (game, p) => {
     rules.worm(game);
     rules.airdropBirth(game);
     rules.airdrop(game);
-    // rules.drill(game)
 
     onOrder(game);
 

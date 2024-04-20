@@ -68,7 +68,7 @@ exports.worm = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
     if (game.spoil[i].name == "worm" && game.spoil[i].team == game.turn) {
       let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y);
-      if (en.isAlive(game, game.spoil[i].data.worm)) {
+      if (en.isAlive(game, game.spoil[i].data.worm) && game.spoil[i].data.worm?.tp == "worm") {
         if (game.spoil[i].data.worm != unit) {
           en.death(game, unit);
           // en.addSpoil(
@@ -425,6 +425,8 @@ exports.airdrop = (game) => {
   // Retrieve all points on the grid
   const allPoints = en.allPoints();
 
+  let points = allPoints.filter((p) => game.field[p.x][p.y].slice(0, -1) != "team");
+
   // Function to find the minimum Manhattan distance from a point to a set of points
   const minDistanceToPoints = (point, points) => {
     let minDist = Infinity;
@@ -443,7 +445,7 @@ exports.airdrop = (game) => {
   // Find the point with the maximum minimum distance to all combined points
   let maxDistance = 0;
   let bestPoints = [];
-  allPoints.forEach((point) => {
+  points.forEach((point) => {
     const dist = minDistanceToPoints(point, combinedPoints);
     if (dist > maxDistance) {
       maxDistance = dist;
@@ -481,4 +483,13 @@ exports.flagwin = (game) => {
   } else if (flag[1] == 0) {
     gm.endgame(game, 1);
   }
+};
+
+exports.genocide = (game) => {
+  //закончилисиь юниты
+  let team1isAlive = game.unit.some((unit) => unit.team === 1);
+  let team2isAlive = game.unit.some((unit) => unit.team === 2);
+  if (team1isAlive && !team2isAlive) gm.endgame(game, 1);
+  if (team2isAlive && !team1isAlive) gm.endgame(game, 2);
+  if (!team1isAlive && !team2isAlive) game.leftturns = 0;
 };

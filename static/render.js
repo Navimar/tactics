@@ -18,16 +18,23 @@ let renderanimated = (diff) => {
 
   rendertip();
   renderdescription();
+
   if (diff) {
     fps = parseInt((1000 / diff + fps * 10) / 11);
-    let y = 0;
-    if (fps <= 30) drawTxt("fps " + fps, 0, y, 4, "#000000", undefined, undefined, true);
+    let x = -2.85;
+    let y = 8;
+    if (orientation == "h") {
+      x = 6.85;
+      y = -0.9;
+    }
+
+    if (fps <= 30) drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
     if (quality < 100)
       drawTxt(
         "quality " + Math.ceil(quality),
-        0,
+        x,
         (y += 0.5),
-        4,
+        2,
         "#000000",
 
         undefined,
@@ -49,7 +56,7 @@ let renderanimated = (diff) => {
 let render = () => {
   resize();
 
-  if (data.history) drawBackground("history.bck");
+  if (data.history) drawBackground("history");
   else {
     if (data.turn == 1) {
       drawBackground("edgeTurn");
@@ -80,18 +87,14 @@ let render = () => {
     drawImg("sandclock", local.sandclock.x, local.sandclock.y);
   }
 };
+
 let renderpanel = () => {
   let c = [
-    [-2, 0],
-    [-2, 2],
-    [-2, 8],
-    [-2, 6],
-    [-2, 4],
     [9, 0],
     [9, 2],
-    [9, 4],
+    [9, 8],
     [9, 6],
-    [9, 7],
+    [9, 4],
   ];
   if (orientation == "h") {
     c.forEach((e) => e.reverse());
@@ -164,99 +167,79 @@ let renderpanel = () => {
       }
     });
     drawPanel("next", c[1][0], c[1][1], 2, 2);
-
-    drawTxt(arr.length + "", c[1][0] + 0.15, c[1][1] + 1.6, 1, "#222");
-    drawTxt(data.leftturns + "", c[0][0] + 1.5, c[0][1] + 0.1, 1, "#222");
-
-    let goldtext = data.gold[0] + "";
-    drawTxt(goldtext, c[1][0] + 0.15, c[1][1] + 0.3, 1, "#090");
-    drawTxt(data.gold[1] + "", c[1][0] + 0.15, c[1][1] + 0.6 + 0.3, 1, "#f00");
-    drawTxt(local.unitcn + "", c[1][0] + 1.6, c[1][1] + 0.3, 1, "#222");
-    drawTxt(local.unitencn + "", c[1][0] + 1.6, c[1][1] + 0.6 + 0.3, 1, "#222");
-
-    // drawTxt(team1 + '', c[1][0] + 0.15, c[1][1] + 0.5 + 0.15, '#090')
-    // drawTxt(team2 + '', c[1][0] + 1 + 0.15, c[1][1] + 0.5 + 0.15, '#f00')
+    if (data.win != "win" && data.win != "defeat")
+      drawTxt(data.leftturns + "⌛", c[0][0] + 0.5, c[0][1] + 0.35, 1.5, "#222", 150);
   }
-  if (orientation == "h") drawPanel("scrollh", 0, 9, 9, 2);
-  else drawPanel("scroll", 9, 0, 2, 9);
-
-  // drawPanel("abyss", c[6][0], c[6][1], 2, 2);
-  // drawPanel("abyss", c[7][0], c[7][1], 2, 2);
-  // drawPanel("abyss", c[8][0], c[8][1], 2, 2);
-  // drawPanel("abyss", c[9][0], c[9][1], 2, 2);
+  if (orientation == "h") drawPanel("scrollh", 0, -3, 9, 3);
+  else drawPanel("scroll", -3, 0, 3, 9);
 };
 
-const drawUnit = (unit, x, y, sizeAdd, cropPercent = 0) => {
-  sizeAdd = sizeAdd ? sizeAdd : 0;
-  const groundSize = ["grass", "team1", "team2"].includes(data.field[unit.x][unit.y]) ? 56 : 0;
-  if (cropPercent > 0)
+const drawUnit = (unit) => {
+  unit.sizeAdd = unit.sizeAdd || 0;
+  cellX = Math.round(unit.x);
+  cellY = Math.round(unit.y);
+  const groundSize = ["grass", "team1", "team2"].includes(data.field[cellX][cellY]) ? 56 : 0;
+
+  if (unit.cropPercent)
     drawPropUnitCropped(
       unit.img,
-      x,
-      y,
+      unit.x,
+      unit.y,
       unit.m,
       unit.color,
       unit.isReady,
       unit.isActive,
-      groundSize - sizeAdd,
-      groundSize + sizeAdd,
-      true,
-      cropPercent
+      groundSize - unit.sizeAdd,
+      groundSize + unit.sizeAdd,
+      !unit.static,
+      unit.cropPercent
     );
   else
     drawPropUnit(
       unit.img,
-      x,
-      y,
+      unit.x,
+      unit.y,
       unit.m,
       unit.color,
       unit.isReady,
       unit.isActive,
-      groundSize - sizeAdd,
-      groundSize + sizeAdd,
-      true
+      groundSize - unit.sizeAdd,
+      groundSize + unit.sizeAdd,
+      !unit.static
     );
-  if (local.unit == unit) drawImg("focus", x, y, true);
+  if (unit.focused) drawImg("focus", unit.x, unit.y, true);
+  if (data.field[cellX][cellY] === "water")
+    drawImgNormal("drawn", unit.x, unit.y, fieldmask[cellX][cellY], true);
 
-  if (data.field[unit.x][unit.y] === "water")
-    drawImgNormal("drawn", x, y, fieldmask[unit.x][unit.y], true);
-
-  if (unit.sticker) drawSticker(unit.sticker.img, x, y, unit.sticker.color);
+  if (unit.sticker) drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
 
   unit.status.forEach((stt) =>
-    drawStatus(stt, x, y, unit.m, unit.color, unit.isReady, unit.isActive)
+    drawStatus(stt, unit.x, unit.y, unit.m, unit.color, unit.isReady, unit.isActive)
   );
 };
 
 const renderunit = (x, y, diff) => {
   let unit = data.unit.find((unit) => unit.x === x && unit.y === y);
   if (!unit) return;
+  unit = { ...unit, focused: local.unit == unit ? true : false };
 
   const amItarget =
     data?.order?.akt?.img && unit.x === data.order.akt.x && unit.y === data.order.akt.y;
-  // const amIhero = u == local.unit;
-
-  // console.log(data.trail);
 
   if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "addunit")) {
-    animateAdd(unit, diff);
-    return;
+    if (animateAdd(unit, diff)) return;
   }
   if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "polymorph")) {
-    animatePolymorph(unit, diff);
-    return;
+    if (animatePolymorph(unit, diff)) return;
   }
   if (amItarget && ["move", "take"].includes(data.order.akt.img)) {
-    animateWalk(unit, diff);
-    return;
+    if (animateWalk(unit, diff)) return;
   }
   if (amItarget && ["fly"].includes(data.order.akt.img)) {
-    animateFlight(unit, diff);
-    return;
+    if (animateFlight(unit, diff)) return;
   }
   if (amItarget && ["teleport"].includes(data.order.akt.img)) {
-    animateTeleport(unit, diff);
-    return;
+    if (animateTeleport(unit, diff)) return;
   }
   if (
     data.order?.unit?.tp != "worm" &&
@@ -264,44 +247,36 @@ const renderunit = (x, y, diff) => {
     data?.order?.unit?.y == unit.y &&
     isAdjacent(unit.x, unit.y, data?.order?.akt?.x, data?.order?.akt?.y)
   ) {
-    animatePunch(unit, diff); // Анимация "punch" для героя, когда цель рядом
-    return;
+    if (animatePunch(unit, diff)) return;
   }
 
   if (amItarget && !["worm", "random", "change"].includes(data.order.akt.img)) {
-    animateShake(unit, diff);
-    return;
+    if (animateShake(unit, diff)) return;
   }
-  if (
-    (unit.isReady || unit.isActive) &&
-    data.turn &&
-    unit.canMove &&
-    !data.chooseteam &&
-    (!local.unit.canMove || !local.unit.isReady)
-  ) {
+  if (unit.isReady && data.turn && unit.canMove && (!local.unit?.canMove || !local.unit?.isReady)) {
     animateBreath(unit, diff);
     return;
   }
-  drawUnit(unit, unit.x, unit.y);
+  drawUnit({ ...unit, static: true });
 };
-
-// const shouldRenderNormally = (u) => {
-//   return (
-//     !data.order ||
-//     data.order.img === "worm" ||
-//     u.x !== data.order.akt.x ||
-//     u.y !== data.order.akt.y ||
-//     (u.progress && u.progress > 1000)
-//   );
-// };
 
 let renderfield = (x, y) => {
   let v = 0;
   drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
   if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
-    drawImgNormal("ns" + data.field[x][y - 1] + data.field[x][y], x, y - 0.5, fieldmask[x][y]);
+    drawImgFieldConnection(
+      "ns" + data.field[x][y - 1] + data.field[x][y],
+      x,
+      y - 0.5,
+      fieldmask[x][y]
+    );
   if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
-    drawImgNormal("we" + data.field[x - 1][y] + data.field[x][y], x - 0.5, y, fieldmask[x][y]);
+    drawImgFieldConnection(
+      "we" + data.field[x - 1][y] + data.field[x][y],
+      x - 0.5,
+      y,
+      fieldmask[x][y]
+    );
   if (data.turn)
     if (data.field[x][y] == "team1" && data.gold[0] >= local.cost) drawImg("canBuild", x, y);
 };
@@ -317,12 +292,18 @@ let renderakt = () => {
     local.unit.akt.forEach((a) => {
       if (local.unit.color == 3 && !local.unit.canMove) return;
       if (local.unit.canMove) {
-        let sizeAdd = (local.cadr * 20) / 1000;
-        drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
-        return;
+        if (data.turn == 1) {
+          let sizeAdd = (local.cadr * 15) / 700;
+          drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
+          return;
+        } else {
+          let sizeAdd = (local.cadr * 15) / 700;
+          drawAkt(a.img, a.x, a.y, 0, 0, "disabled");
+          return;
+        }
       }
       if (!local.unit.canMove) {
-        drawAkt(a.img, a.x, a.y, a.x, a.y, true);
+        drawAkt(a.img, a.x, a.y, 0, 0, "enemy");
         return;
       }
     });
@@ -333,7 +314,7 @@ let rendertrail = () => {
     for (let x = 0; x < 9; x++) {
       let u = data.trail.filter((u) => u.x == x && u.y == y);
       u.forEach((t) => {
-        drawTrail(t.img, t.x, t.y);
+        if (t.img != "polymorph") drawTrail(t.img, t.x, t.y);
       });
     }
   }
@@ -352,17 +333,21 @@ let rendertip = () => {
     );
 };
 
-let renderdescription = () => {
-  if (local.unit) {
+function renderdescription() {
+  if (local.unit?.name) local.description.name = local.unit.name;
+  if (local.unit?.description) local.description.description = local.unit.description;
+  if (local.unit?.color) local.description.color = local.unit.color;
+
+  if (local.description.name) {
     let namecolor = "#006600";
-    if (local.unit.color == 2) namecolor = "#660000";
-    if (local.unit.color == 3) namecolor = "#666600";
+    if (local.description.color == 2) namecolor = "#660000";
+    if (local.description.color == 3) namecolor = "#666600";
     if (orientation == "h") {
-      drawTxt(local.unit.name, 0.2, 9.2, 2, namecolor, 130, false, true);
-      drawTxt(local.unit.description, 0.2, 9.7, 8.55, "#000000", 100, false, true);
+      drawTxt(local.description.name, 0.2, -2.8, 2, namecolor, 130, false, true);
+      drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, true);
     } else {
-      drawTxt(local.unit.name, 9, 0.2, 1.85, namecolor, 130, false, true);
-      drawTxt(local.unit.description, 9, 0.7, 1.85, "#000000", 100, false, true);
+      drawTxt(local.description.name, -2.92, 0.2, 2.9, namecolor, 130, false, true);
+      drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, true);
     }
   }
-};
+}

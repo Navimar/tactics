@@ -5,6 +5,7 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
+const TEST_UNIT = "bomb";
 
 exports.new = (rank, ai) => {
   rank = 9999;
@@ -246,6 +247,8 @@ exports.new = (rank, ai) => {
   if (!ai) {
     bluearr[0].tp = START_UNIT;
     orangearr[0].tp = START_UNIT;
+
+    if (TEST_UNIT) orangearr.push({ x: 7, y: 1, tp: TEST_UNIT });
 
     points = [];
     let leftPoints = [];

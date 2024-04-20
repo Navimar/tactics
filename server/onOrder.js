@@ -15,7 +15,7 @@ module.exports = (game, unit, akt) => {
             x: game.deadPool[i].x,
             y: game.deadPool[i].y,
             unit: game.deadPool[i],
-          }),
+          })
         );
       }
       rules.bomber(
@@ -23,14 +23,14 @@ module.exports = (game, unit, akt) => {
           x: game.deadPool[i].x,
           y: game.deadPool[i].y,
           unit: game.deadPool[i],
-        }),
+        })
       );
       rules.drop(
         wrapper(game, game.deadPool[i], {
           x: game.deadPool[i].x,
           y: game.deadPool[i].y,
           unit: game.deadPool[i],
-        }),
+        })
       );
       game.deadPool.splice(i, 1);
     }
@@ -42,7 +42,7 @@ module.exports = (game, unit, akt) => {
             x: game.appearPool[i].x,
             y: game.appearPool[i].y,
             unit: game.appearPool[i],
-          }),
+          })
         );
       }
       game.appearPool.splice(i, 1);
@@ -59,6 +59,7 @@ module.exports = (game, unit, akt) => {
     rules.fireInWater(game);
     rules.unitInFire(game);
     rules.wormportal(game);
+    rules.genocide(game);
     if (!game.ai) rules.flagwin(game);
   } while (game.deadPool.length > 0);
 };

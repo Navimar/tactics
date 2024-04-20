@@ -2,6 +2,7 @@ let mobile = false;
 
 let local = {
   time: 0,
+  description: {},
   seconds: 0,
   lastclick: 0,
   akt: [],
@@ -158,16 +159,18 @@ let onStep = (diff) => {
     tapDown = false;
   }
 
-  if (local.cadr > 1000) {
+  let cadrduration = 750;
+  if (local.cadr > cadrduration) {
     local.rise = false;
-    local.cadr = 1000;
+    local.cadr = cadrduration;
   }
-  if (local.cadr < -1000) {
+  if (local.cadr < -cadrduration) {
     local.rise = true;
-    local.cadr = -1000;
+    local.cadr = -cadrduration;
   }
   if (local.rise) local.cadr += diff;
   else local.cadr -= diff;
+  local.animationProgress += diff;
   renderanimated(diff);
 };
 
@@ -181,6 +184,7 @@ let onLogin = (val) => {
   render();
 };
 let onUpdate = (val) => {
+  local.animationProgress = 0;
   blocked = false;
   // updateAudio.play();
   // console.log(val);
@@ -274,7 +278,6 @@ let clickOnAkt = () => {
       "#333"
     );
   }
-  console.log("on alt false");
   return false;
 };
 
@@ -285,8 +288,8 @@ let onMouseDown = () => {
     login();
   } else if (data.history) {
     if (
-      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
-      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7)
+      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
+      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
     ) {
       // if (data.finished) {
       // rematch();
@@ -314,15 +317,15 @@ let onMouseDown = () => {
   } else {
     local.tip = false;
     if (
-      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 8) ||
-      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 8)
+      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 8) ||
+      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 8)
     ) {
       if (!data.finished) {
         surrender();
       }
     } else if (
-      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 4 && mouseCell.x <= 5) ||
-      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 4 && mouseCell.y <= 5)
+      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 4 && mouseCell.x <= 5) ||
+      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 4 && mouseCell.y <= 5)
     ) {
       if (local.unit) tip(local.unit.description, 3, 3, "#000", 5, 120);
       else if (local.build)
@@ -344,21 +347,21 @@ let onMouseDown = () => {
           120
         );
     } else if (
-      (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
-      (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 6 && mouseCell.y <= 7)
+      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
+      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
     ) {
       if (local.frame > 0) showframe(data.keyframe);
     } else if (data.bonus == "ready" && data.win != "win" && data.win != "defeat") {
       let wise = false;
       if (
-        ((mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x <= 1) ||
-          (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y <= 1)) &&
+        ((mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x <= 1) ||
+          (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y <= 1)) &&
         data.turn
       ) {
         endturn();
       } else if (
-        (mouseCell.y >= -2 && mouseCell.y < 0 && mouseCell.x >= 2 && mouseCell.x < 4) ||
-        (mouseCell.x >= -2 && mouseCell.x < 0 && mouseCell.y >= 2 && mouseCell.y < 4)
+        (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 2 && mouseCell.x < 4) ||
+        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 2 && mouseCell.y < 4)
       ) {
         let arr = [];
         data.unit.forEach((u) => {

@@ -45,3 +45,7 @@ exports.capture = (wd) => {
   // } else wd.addStatus("teleporter");
   wd.tire();
 };
+
+exports.move = (wd) => {
+  wd.walk();
+};

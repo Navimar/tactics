@@ -19,23 +19,36 @@ let resize = (active) => {
 };
 
 function resizecanvas(canvas, ctx) {
-  const realWidth = window.innerWidth * window.devicePixelRatio * (quality / 100);
-  const realHeight = window.innerHeight * window.devicePixelRatio * (quality / 100);
+  const realWidth = window.innerWidth * window.devicePixelRatio;
+  const realHeight = window.innerHeight * window.devicePixelRatio;
   canvas.style.width = `${window.innerWidth}px`;
   canvas.style.height = `${window.innerHeight}px`;
-  canvas.width = realWidth;
-  canvas.height = realHeight;
+  if (quality == 100) {
+    canvas.width = realWidth;
+    canvas.height = realHeight;
+  } else {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  let cellWidth = 14;
   if (canvas.width > canvas.height) {
-    if (canvas.height / 9.3 < canvas.width / 13) dh = canvas.height / 9.3;
-    else dh = canvas.width / 13;
+    if (canvas.height / 9.3 < canvas.width / cellWidth) dh = canvas.height / 9.3;
+    else dh = canvas.width / cellWidth;
     orientation = "w";
   } else {
-    if (canvas.height / 13 < canvas.width / 9) dh = canvas.height / 13;
+    if (canvas.height / cellWidth < canvas.width / 9) dh = canvas.height / cellWidth;
     else dh = canvas.width / 9;
     orientation = "h";
   }
-  shiftX = (canvas.width - dh * 9) / 2;
-  shiftY = (canvas.height - dh * 9) / 2;
+  if (orientation == "w") {
+    shiftX = (canvas.width - dh * 8) / 2;
+    shiftY = (canvas.height - dh * 9) / 2;
+  }
+  if (orientation == "h") {
+    shiftX = (canvas.width - dh * 9) / 2;
+    shiftY = (canvas.height - dh * 8) / 2;
+  }
   // ctx.fillStyle = "rgb(0,0,0)";
   // ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -85,8 +98,8 @@ function drawTxt(txt, x, y, width, color, size, font, animate) {
   color = color || "#222";
   size = size || 100;
   width = width || 0;
-  size = dh * 0.24 * size * 0.01;
-  font = font || "Verdana";
+  size = dh * 0.26 * size * 0.01;
+  font = font || "Play";
   font = size + "px " + font;
   ctx.font = font;
   ctx.fillStyle = "white";
@@ -253,6 +266,7 @@ function getImgRaw(name) {
   if (img === undefined || img === null) img = questionmark;
   return img;
 }
+
 function getImg(name, s, mask) {
   s = even(s);
   let img = grafio(name + "." + s);
@@ -298,6 +312,15 @@ function drawImgNormal(name, x, y, mask, animate) {
   drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
 }
 
+function drawImgFieldConnection(name, x, y, mask, animate) {
+  let img;
+  mask = false;
+  if (mask && mask.length > 0) img = getImg(name, dh, mask[0]);
+  else img = getImg(name, dh);
+  if (img && img != questionmark)
+    drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
+}
+
 function drawSpoil(name, x, y) {
   let p = dh / 10;
   let img = getImg(name + ".spoil", dh);
@@ -330,16 +353,24 @@ function drawField(name, x, y, mask) {
 // }
 function drawTrail(name, x, y) {
   let img = getImg(name + ".trl", dh);
-  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, dh, dh, false);
 }
 
-function drawAkt(name, x, y, ws, hs, enemy) {
+function drawAkt(name, x, y, ws, hs, style) {
   let ctx = ctxAnimated;
   img = getImg(name + ".akt", dh);
-  if (enemy) {
+  if (style == "enemy") {
     ctx.save();
     ctx.globalAlpha = 0.5;
     ctx.shadowColor = "rgba(255,0,0,1)";
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 0;
+  }
+  if (style == "disabled") {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.shadowColor = "rgba(0,255,0,1)";
     ctx.shadowOffsetX = 3;
     ctx.shadowOffsetY = 3;
     ctx.shadowBlur = 0;
@@ -371,7 +402,7 @@ function drawLife(quantity, x, y) {
   // ctx.drawImage(img, x * dh  + shiftX, y * dh, dh/8 + 2 * p, dh/8 + 2 * p);
 }
 
-function drawSticker(name, x, y, team) {
+function drawSticker(name, x, y, team, animate) {
   let color = false;
   if (team == 1) color = "team1Ready";
   if (team == 2) color = "team2Ready";
@@ -382,7 +413,7 @@ function drawSticker(name, x, y, team) {
 
   x = x + 0.2;
   y = y + 0.4;
-  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, size, size, true);
+  drawImageEven(img, x * dh + shiftX, y * dh + shiftY, size, size, animate);
 }
 
 function determineColor(team, isReady, isActive) {
@@ -451,8 +482,11 @@ function drawPropUnitCropped(name, x, y, m, team, isReady, isActive, ws, hs, ani
   let img;
   if (!animate) img = getImg(name + ".unit" + "." + color, h);
   else img = getImg(name + ".unit" + "." + color, (h + w) / 2);
+  let newYOffset;
 
-  let newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY;
+  if (cropPercent < 0) {
+    newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY - cropStartY;
+  } else newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY;
 
   if (m) {
     ctx.save();
