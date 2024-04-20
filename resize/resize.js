@@ -48,15 +48,14 @@ const lresize = async (size, file) => {
         .blit(imgColored, (+height / 100) * borderweight, (-height / 100) * borderweight)
         .blit(imgColored, (-height / 100) * borderweight, (+height / 100) * borderweight)
         .blit(imgOriginal, 0, 0)
-        .resize(size, size, Jimp.RESIZE_LANCZOS)
-        .colorType(0);
+        .resize(size, size, Jimp.RESIZE_LANCZOS);
       await imgBordered.writeAsync(output + name + "." + color + "." + size + ".png");
       console.log(name + "." + color + "." + size + ".png");
     }
   } else if (file.includes(".pnl.png")) {
   } else if (file.includes(".bck.png")) {
   } else {
-    img.resize(size, size, Jimp.RESIZE_LANCZOS).colorType(0);
+    img.resize(size, size, Jimp.RESIZE_LANCZOS);
     await img.writeAsync(output + name + "." + size + ".png");
     console.log(name + "." + size + ".png");
   }
