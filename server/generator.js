@@ -5,7 +5,7 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
-const TEST_UNIT = "bomb";
+const TEST_UNIT = false;
 
 exports.new = (rank, ai) => {
   rank = 9999;
