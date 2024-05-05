@@ -5,9 +5,15 @@ function findGetParameter(name, url) {
   name = name.replace(/[\[\]]/g, "\\$&");
   var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
     results = regex.exec(url);
+
   if (!results) return null;
   if (!results[2]) return "";
-  return decodeURIComponent(results[2].replace(/\+/g, " "));
+
+  try {
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  } catch (e) {
+    return null; // или можно вернуть оригинальное значение, если это приемлемо
+  }
 }
 
 const isAdjacent = (x1, y1, x2, y2) => {
