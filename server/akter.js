@@ -35,16 +35,17 @@ module.exports = (game, me) => {
     },
     move: () => {
       let akts = [];
-      let pointsSet = new Set([`${me.x},${me.y}`]);
+      let pointsMap = new Map();
+      pointsMap.set(`${me.x},${me.y}`, 0);
 
       _.times(me.energy, () => {
-        let newPoints = [];
-        pointsSet.forEach((ptStr) => {
+        let newPoints = new Map();
+        pointsMap.forEach((energySpent, ptStr) => {
           let [x, y] = ptStr.split(",").map(Number);
           let near = en.near(x, y);
           near.forEach((np) => {
             let npStr = `${np.x},${np.y}`;
-            if (!pointsSet.has(npStr)) {
+            if (!pointsMap.has(npStr)) {
               let nf = en.fieldInPoint(game, np.x, np.y);
               let pf = en.fieldInPoint(game, x, y);
               if (
@@ -53,21 +54,26 @@ module.exports = (game, me) => {
                   _.includes(["team1", "team2", "water"], nf) ||
                   _.includes(["team1", "team2", "water"], pf))
               ) {
-                newPoints.push(npStr);
+                newPoints.set(npStr, energySpent + 1);
               }
             }
           });
         });
-        newPoints.forEach((npStr) => pointsSet.add(npStr));
+        newPoints.forEach((energyCost, npStr) => {
+          if (!pointsMap.has(npStr) || pointsMap.get(npStr) > energyCost) {
+            pointsMap.set(npStr, energyCost);
+          }
+        });
       });
 
-      pointsSet.forEach((ptStr) => {
+      pointsMap.forEach((energyCost, ptStr) => {
         let [x, y] = ptStr.split(",").map(Number);
         if (!en.isOccupied(game, x, y)) {
           akts.push({
             x: x,
             y: y,
             img: "move",
+            data: { energyCost },
           });
         }
       });
@@ -130,11 +136,7 @@ function removeDuplicates(arr) {
     if (duplicatesIndices.includes(index)) return;
     result.push(current);
     // Сравниваем каждый элемент в массиве после текущего
-    for (
-      let comparisonIndex = index + 1;
-      comparisonIndex < arr.length;
-      comparisonIndex++
-    ) {
+    for (let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++) {
       const comparison = arr[comparisonIndex];
       const currentKeys = Object.keys(current);
       const comparisonKeys = Object.keys(comparison);

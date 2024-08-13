@@ -7,29 +7,23 @@ module.exports = (game, me, target) => {
     game,
     me,
     target,
-    walk: () => {
-      let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y);
-      let mf = en.fieldInPoint(game, me.x, me.y);
-      let tf = en.fieldInPoint(game, target.x, target.y);
-      if (
-        mf != tf &&
-        mf != "water" &&
-        tf != "water" &&
-        mf.slice(0, -1) != "team" &&
-        tf.slice(0, -1) != "team" &&
-        tire == 1
-      ) {
-        tire = 3;
-      }
+    walk: (energyCost) => {
+      me.animation.push({
+        name: "walk",
+        fromX: me.x,
+        fromY: me.y,
+      });
       en.move(game, me, target.x, target.y);
-      // me.energy -= d
-      me.energy -= tire;
+      me.energy -= energyCost;
     },
-    flywalk: () => {
-      let tire = Math.abs(me.x - target.x) + Math.abs(me.y - target.y);
+    flywalk: (energyCost) => {
+      me.animation.push({
+        name: "fly",
+        fromX: me.x,
+        fromY: me.y,
+      });
       en.move(game, me, target.x, target.y);
-      // me.energy -= d
-      me.energy -= tire;
+      me.energy -= energyCost;
     },
     damage: (x, y, d) => {
       if (x != undefined && y != undefined) {
@@ -93,17 +87,12 @@ module.exports = (game, me, target) => {
     },
     clearspoil: (x, y, name) => {
       for (i = game.spoil.length; i--; i > 0) {
-        if (
-          game.spoil[i].name == name &&
-          game.spoil[i].x == x &&
-          game.spoil[i].y == y
-        )
+        if (game.spoil[i].name == name && game.spoil[i].x == x && game.spoil[i].y == y)
           game.spoil.splice(i, 1);
       }
     },
     addStatus: (st, x, y) => {
-      if (_.isFinite(x) && _.isFinite(y))
-        en.addStatus(en.unitInPoint(game, x, y), st);
+      if (_.isFinite(x) && _.isFinite(y)) en.addStatus(en.unitInPoint(game, x, y), st);
       else en.addStatus(target.unit, st);
     },
     addUnit: (tp, x, y, team) => {
@@ -117,6 +106,15 @@ module.exports = (game, me, target) => {
         // console.log('in wrapper game.appearPool', game.appearPool);
         return u;
       }
+    },
+    addTrail: (name, turn) => {
+      game.trail.push({
+        name,
+        x: target.x,
+        y: target.y,
+        data: { unit: target.unit },
+        turn: turn || 0,
+      });
     },
     changeTeam: (unit) => {
       if (unit.team != 3) unit.team = 3 - unit.team;
@@ -138,7 +136,7 @@ module.exports = (game, me, target) => {
           tp == unit.tp ||
           meta[tp].class == "neutral" ||
           meta[tp].class == "none" ||
-          meta[tp].img == "base"
+          tp == "base"
         );
         unit.tp = tp;
       }
@@ -148,6 +146,9 @@ module.exports = (game, me, target) => {
       console.log(game.field[x][y]);
       if (game.field[x][y].slice(0, -1) != "team") game.field[x][y] = terrain;
       console.log(game.field[x][y]);
+    },
+    animatePunch: () => {
+      me.animation.push({ name: "punch", targetX: target.x, targetY: target.y });
     },
   };
 };

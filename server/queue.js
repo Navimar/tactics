@@ -29,8 +29,9 @@ exports.find = (p, bot) => {
       queue = [p];
       // console.log(queue[0]);
       player.list().forEach((e) => {
-        if (p.id == e.id) send.bot(p.id, "Вы ищете игру", bot);
-        else if (e.subscribe)
+        if (p.id == e.id) {
+          send.bot(p.id, "Вы ищете игру", bot);
+        } else if (e.subscribe) {
           send.bot(
             e.id,
             "Игрок с рангом " +
@@ -38,6 +39,7 @@ exports.find = (p, bot) => {
               " ищет игру, нажмите /find, чтобы присоединиться к игре!\n\n(/subscribe, чтобы больше не получать уведомлений)",
             bot
           );
+        }
       });
     }
   } else {

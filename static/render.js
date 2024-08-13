@@ -8,19 +8,17 @@ let renderanimated = (diff) => {
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      renderunit(x, y, diff);
+      rendertrail(x, y);
+      renderunit(x, y);
     }
   }
   renderakt();
-  rendertrail();
   if (data.bonus == "choose") renderpanel();
   if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
 
-  rendertip();
-  renderdescription();
-
   if (diff) {
-    fps = parseInt((1000 / diff + fps * 10) / 11);
+    // fps = Math.ceil((parseInt(1000 / diff) + fps * 10) / 11);
+    fps = Math.ceil(1000 / diff);
     let x = -2.85;
     let y = 8;
     if (orientation == "h") {
@@ -28,7 +26,8 @@ let renderanimated = (diff) => {
       y = -0.9;
     }
 
-    if (fps <= 30) drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
+    // if (fps <= 30)
+    drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
     if (quality < 100)
       drawTxt(
         "quality " + Math.ceil(quality),
@@ -46,9 +45,9 @@ let renderanimated = (diff) => {
 
     // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
 
-    if (fps <= 30) {
-      quality = 50;
-    }
+    // if (fps <= 30) {
+    //   quality = 50;
+    // }
   }
   // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
 };
@@ -86,6 +85,8 @@ let render = () => {
   if (local.sandclock) {
     drawImg("sandclock", local.sandclock.x, local.sandclock.y);
   }
+  renderdescription();
+  rendertip();
 };
 
 let renderpanel = () => {
@@ -175,6 +176,11 @@ let renderpanel = () => {
 };
 
 const drawUnit = (unit) => {
+  if (!local.once) {
+    console.log("drawUnit", unit);
+
+    local.once = true;
+  }
   unit.sizeAdd = unit.sizeAdd || 0;
   cellX = Math.round(unit.x);
   cellY = Math.round(unit.y);
@@ -218,43 +224,50 @@ const drawUnit = (unit) => {
   );
 };
 
-const renderunit = (x, y, diff) => {
+const renderunit = (x, y) => {
   let unit = data.unit.find((unit) => unit.x === x && unit.y === y);
   if (!unit) return;
   unit = { ...unit, focused: local.unit == unit ? true : false };
 
-  const amItarget =
-    data?.order?.akt?.img && unit.x === data.order.akt.x && unit.y === data.order.akt.y;
+  let animationTurn = Math.floor(local.animationProgress / 1000);
 
-  if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "addunit")) {
-    if (animateAdd(unit, diff)) return;
-  }
-  if (data.trail.find((t) => t.x == unit.x && t.y == unit.y && t.img == "polymorph")) {
-    if (animatePolymorph(unit, diff)) return;
-  }
-  if (amItarget && ["move", "take"].includes(data.order.akt.img)) {
-    if (animateWalk(unit, diff)) return;
-  }
-  if (amItarget && ["fly"].includes(data.order.akt.img)) {
-    if (animateFlight(unit, diff)) return;
-  }
-  if (amItarget && ["teleport"].includes(data.order.akt.img)) {
-    if (animateTeleport(unit, diff)) return;
-  }
-  if (
-    data.order?.unit?.tp != "worm" &&
-    data?.order?.unit?.x == unit.x &&
-    data?.order?.unit?.y == unit.y &&
-    isAdjacent(unit.x, unit.y, data?.order?.akt?.x, data?.order?.akt?.y)
-  ) {
-    if (animatePunch(unit, diff)) return;
-  }
+  let animation = unit.animation[animationTurn];
 
-  if (amItarget && !["worm", "random", "change"].includes(data.order.akt.img)) {
-    if (animateShake(unit, diff)) return;
+  if (animation) {
+    switch (animation.name) {
+      case "walk":
+        animateWalk(unit, animation.fromX, animation.fromY);
+        break;
+      case "fly":
+        animateFlight(unit, animation.fromX, animation.fromY);
+        break;
+      case "jump":
+        animateJump(unit, animation.fromX, animation.fromY);
+        break;
+      case "teleport":
+        animateTeleport(unit, animation.fromX, animation.fromY);
+        break;
+      case "worm":
+        animateWorm(unit, animation.fromX, animation.fromY);
+        break;
+      case "punch":
+        animatePunch(unit, animation.targetX, animation.targetY);
+        break;
+      case "idle":
+        drawUnit({ ...unit, x: animation.fromX, y: animation.fromY });
+        break;
+      case "polymorph":
+        console.log("polymorph", animation.img);
+        animatePolymorph(unit, animation.img);
+        break;
+      default:
+        drawUnit({ ...unit, static: true });
+        console.log("Unknown animation:", animation.name);
+    }
+    return;
   }
   if (unit.isReady && data.turn && unit.canMove && (!local.unit?.canMove || !local.unit?.isReady)) {
-    animateBreath(unit, diff);
+    animateBreath(unit);
     return;
   }
   drawUnit({ ...unit, static: true });
@@ -309,15 +322,22 @@ let renderakt = () => {
     });
   }
 };
-let rendertrail = () => {
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      let u = data.trail.filter((u) => u.x == x && u.y == y);
-      u.forEach((t) => {
-        if (t.img != "polymorph") drawTrail(t.img, t.x, t.y);
-      });
+let rendertrail = (x, y) => {
+  let p = data.trail.filter((p) => p.x == x && p.y == y);
+  p.forEach((trail) => {
+    let animationTurn = Math.floor(local.animationProgress / 1000);
+    trail.turn = trail.turn || 0;
+    if (animationTurn == trail.turn) {
+      if (trail.name == "death") {
+        animateTrailDeath(trail.data.unit, trail.x, trail.y);
+      }
+      if (trail.name == "idle") {
+        console.log("idle");
+        drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
+        // animateTrailIdle(t.data.unit, t.x, t.y);
+      }
     }
-  }
+  });
 };
 let rendertip = () => {
   if (local.tip && local.tip.dur > 0)
@@ -343,11 +363,11 @@ function renderdescription() {
     if (local.description.color == 2) namecolor = "#660000";
     if (local.description.color == 3) namecolor = "#666600";
     if (orientation == "h") {
-      drawTxt(local.description.name, 0.2, -2.8, 2, namecolor, 130, false, true);
-      drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, true);
+      drawTxt(local.description.name, 0.2, -2.8, 2, namecolor, 130, false, false);
+      drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, false);
     } else {
-      drawTxt(local.description.name, -2.92, 0.2, 2.9, namecolor, 130, false, true);
-      drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, true);
+      drawTxt(local.description.name, -2.92, 0.2, 2.9, namecolor, 130, false, false);
+      drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, false);
     }
   }
 }

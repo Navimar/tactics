@@ -60,6 +60,7 @@ module.exports = (game, unit, akt) => {
     rules.unitInFire(game);
     rules.wormportal(game);
     rules.genocide(game);
+    rules.maxEnergyLimit(game);
     if (!game.ai) rules.flagwin(game);
   } while (game.deadPool.length > 0);
 };

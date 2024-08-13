@@ -82,32 +82,15 @@ let creategame = (p1, p2, id, ai) => {
   return game;
 };
 exports.order = (game, orderUnit, akt) => {
+  game.unit.forEach((u) => {
+    u.animation = [];
+  });
+
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
   if (game && !game.finished) {
     fisher(game);
     game.trail = [];
     let unit = en.unitInPoint(game, orderUnit.x, orderUnit.y);
-    // if (akt.img == "build") {
-    //   game.unit.forEach((u) => {
-    //     if (u.team == game.turn)
-    //       if (u.energy < 3 && u.isReady) {
-    //         wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-    //         //onTire
-    //         rules.frog(game);
-    //         rules.aerostat(game);
-    //       }
-    //   });
-    //   let newu = wrapper(game, orderUnit, {
-    //     x: orderUnit.x,
-    //     y: orderUnit.y,
-    //     unit: orderUnit,
-    //   }).addUnit(orderUnit, akt.x, akt.y, game.turn);
-    //   if (newu) {
-    //     game.gold[game.turn - 1] -= 5;
-    //     newu.isReady = false;
-    //   }
-    // }
-    // else {
     if (unit && unit.isReady) {
       if (game.chooseteam) addbonus(game, unit);
 
@@ -150,7 +133,7 @@ exports.order = (game, orderUnit, akt) => {
     //onOrder
     onOrder(game, unit, akt);
     updateAkts(game);
-    send.data(game, { unit: orderUnit, akt });
+    send.data(game);
   }
 };
 
@@ -259,12 +242,13 @@ exports.endturn = (game, p) => {
   }
 
   if (game && !game.finished) {
+    game.trail = [];
     game.unit.forEach((u) => {
       u.energy = meta[u.tp].maxenergy || 3;
       u.isReady = true;
+      u.animation = [];
     });
     game.leftturns--;
-
     //закончились ходы
     if (game.leftturns == 0) {
       let flag = cnFlag();

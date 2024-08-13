@@ -56,11 +56,11 @@ function inputMouse() {
   //   }
   // }, false);
 
-  canvasAnimated.addEventListener(
+  canvasText.addEventListener(
     "touchstart",
     (e) => {
       mobile = true;
-      mousePos = getTouchPos(canvasAnimated, e);
+      mousePos = getTouchPos(canvasText, e);
       setMouseCell();
 
       tapTime = local.time;
@@ -70,10 +70,10 @@ function inputMouse() {
     },
     false
   );
-  canvasAnimated.addEventListener(
+  canvasText.addEventListener(
     "touchend",
     (e) => {
-      mousePos = getTouchPos(canvasAnimated, e);
+      mousePos = getTouchPos(canvasText, e);
       setMouseCell();
 
       tapDown = false;
@@ -83,10 +83,10 @@ function inputMouse() {
     },
     false
   );
-  canvasAnimated.addEventListener("touchcancel", (e) => {}, false);
-  canvasAnimated.addEventListener("touchmove", (e) => {}, false);
+  canvasText.addEventListener("touchcancel", (e) => {}, false);
+  canvasText.addEventListener("touchmove", (e) => {}, false);
 
-  canvasAnimated.addEventListener(
+  canvasText.addEventListener(
     "mousedown",
     (e) => {
       // alert(window.orientation);
@@ -94,7 +94,7 @@ function inputMouse() {
       switch (e.which) {
         case 1:
           //Left Mouse button pressed.
-          mousePos = getMousePos(canvasAnimated, e);
+          mousePos = getMousePos(canvasText, e);
           setMouseCell();
 
           mouseDown = true;
@@ -103,7 +103,7 @@ function inputMouse() {
         case 2:
           break;
         case 3:
-          mousePos = getMousePos(canvasAnimated, e);
+          mousePos = getMousePos(canvasText, e);
           setMouseCell();
 
           mouseDown = true;
@@ -116,18 +116,18 @@ function inputMouse() {
     },
     false
   );
-  canvasAnimated.addEventListener(
+  canvasText.addEventListener(
     "mouseup",
     (e) => {
       mouseDown = false;
-      mousePos = getMousePos(canvasAnimated, e);
+      mousePos = getMousePos(canvasText, e);
     },
     false
   );
-  canvasAnimated.addEventListener(
+  canvasText.addEventListener(
     "mousemove",
     (e) => {
-      mousePos = getMousePos(canvasAnimated, e);
+      mousePos = getMousePos(canvasText, e);
       setMouseCell();
     },
     false

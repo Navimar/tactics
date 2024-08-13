@@ -15,7 +15,12 @@ exports.web = (p, game) => {
 };
 
 exports.bot = (id, text, bot) => {
-  bot.telegram.sendMessage(id, text);
+  bot.telegram.sendMessage(id, text).catch((error) => {
+    console.log(error);
+    if (error.response.error_code == 403) {
+      player.stop(player.byId(id));
+    }
+  });
 };
 exports.botPhoto = (id, src, bot) => {
   bot.telegram.sendPhoto(id, src);
@@ -33,7 +38,9 @@ exports.gamelist = (id, p, bot) => {
       }
       if ((e.turn == 1 && id == e.players[0].id) || (e.turn == 2 && id == e.players[1].id))
         text += "ВАШ ХОД!!! ";
-      text += e.players[0].id + " vs " + e.players[1].id + " ";
+      let firstplayer = e.players[0].username || e.players[0].id;
+      let secondplayer = e.players[1].username || e.players[1].id;
+      text += firstplayer + " vs " + secondplayer + " ";
     }
     text += process.env.DOMAIN + "/?id=" + id + "&key=" + key + "u" + "&game=" + e.id + "\n";
   });
@@ -51,10 +58,9 @@ exports.successfulLogin = (socket) => {
   socket.emit("login", "success");
 };
 
-exports.data = (game, order) => {
+exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
-      order,
       frame: (() => {
         if (!game.sandbox && player == 2) return game.frame.length - 1;
         else return game.frame.length;
@@ -72,7 +78,7 @@ exports.data = (game, order) => {
       finished: game.finished,
       leftturns: game.leftturns,
       chooseteam: game.chooseteam,
-      trail: game.trail,
+      trail: [],
       bonus: (() => {
         if (game.bonus[3 - player] === null) return "choose";
         if (game.bonus[1] !== null && game.bonus[2] !== null) return "ready";
@@ -116,6 +122,26 @@ exports.data = (game, order) => {
         else return false;
       })(),
     };
+    game.trail.forEach((tr) => {
+      let unit = tr?.data?.unit;
+      if (unit) {
+        tr.data.unit.img = _.isFunction(meta[unit.tp].img)
+          ? meta[unit.tp].img(wrapper(game, unit, unit))
+          : meta[unit.tp].img;
+        tr.data.unit.color = (() => {
+          if (player == 1) return unit.team;
+          if (player == 2)
+            return (() => {
+              if (unit.team == 1) {
+                return 2;
+              } else if (unit.team == 2) {
+                return 1;
+              } else return unit.team;
+            })();
+        })();
+      }
+      send.trail.push(tr);
+    });
 
     game.unit.forEach((u) => {
       send.unit.push({
@@ -130,6 +156,7 @@ exports.data = (game, order) => {
         m: u.m,
         x: u.x,
         y: u.y,
+        animation: u.animation,
         sticker: u.sticker
           ? {
               img: _.isFunction(meta[u.sticker.tp].img)

@@ -1,11 +1,11 @@
 const meta = require("./meta");
-
 const en = require("./engine");
-
 const _ = require("lodash");
 
 const START_UNIT = "base";
-const TEST_UNIT = false;
+const TEST_UNIT = "firebat";
+
+// const TEST_UNIT = false;
 
 exports.new = (rank, ai) => {
   rank = 9999;
@@ -248,7 +248,10 @@ exports.new = (rank, ai) => {
     bluearr[0].tp = START_UNIT;
     orangearr[0].tp = START_UNIT;
 
-    if (TEST_UNIT) orangearr.push({ x: 7, y: 1, tp: TEST_UNIT });
+    if (TEST_UNIT) {
+      orangearr.push({ x: 7, y: 1, tp: TEST_UNIT });
+      bluearr.push({ x: 1, y: 7, tp: TEST_UNIT });
+    }
 
     points = [];
     let leftPoints = [];

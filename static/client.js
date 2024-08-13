@@ -171,6 +171,8 @@ let onStep = (diff) => {
   if (local.rise) local.cadr += diff;
   else local.cadr -= diff;
   local.animationProgress += diff;
+  local.cadrProgress += diff;
+  if (local.cadrProgress >= 1000) local.cadrProgress -= 1000;
   renderanimated(diff);
 };
 
@@ -185,17 +187,17 @@ let onLogin = (val) => {
 };
 let onUpdate = (val) => {
   local.animationProgress = 0;
+  local.cadrProgress = 0;
   blocked = false;
   // updateAudio.play();
   // console.log(val);
+  local.lastclick = local.seconds;
   data = val;
   local.tip = false;
   local.unit = false;
   local.sandclock = false;
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
-  // console.log('dataturn',data.turn)
-  console.log("data.order", data.order);
   if (local.turn == false && data.turn == true) {
     tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 240);
     local.turn = data.turn;
@@ -216,7 +218,7 @@ let onUpdate = (val) => {
     local.frame = data.frame;
   }
   render();
-  if (!data.history && allakts() == 0) {
+  if (!data.history && allakts() == 0 && data.turn) {
     endturn();
   }
 };

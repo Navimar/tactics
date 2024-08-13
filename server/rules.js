@@ -4,6 +4,12 @@ const meta = require("./meta");
 const gm = require("./game");
 const wrapper = require("./wrapper");
 
+exports.maxEnergyLimit = (game) => {
+  game.unit.forEach((u) => {
+    if (u.maxenergy < u.energy) u.energy = u.maxenergy;
+  });
+};
+
 exports.telepath = (game) => {
   game.unit.forEach((u) => {
     u.status.remove("telepath");
@@ -68,9 +74,14 @@ exports.worm = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
     if (game.spoil[i].name == "worm" && game.spoil[i].team == game.turn) {
       let unit = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y);
-      if (en.isAlive(game, game.spoil[i].data.worm) && game.spoil[i].data.worm?.tp == "worm") {
-        if (game.spoil[i].data.worm != unit) {
-          en.death(game, unit);
+      let worm = game.spoil[i].data.worm;
+      if (en.isAlive(game, worm) && game.spoil[i].data.worm?.tp == "worm") {
+        if (worm != unit) {
+          if (unit) {
+            game.trail.push({ name: "idle", x: unit.x, y: unit.y, data: { unit }, turn: 0 });
+            game.trail.push({ name: "death", x: unit.x, y: unit.y, data: { unit }, turn: 1 });
+            en.death(game, unit);
+          }
           // en.addSpoil(
           //   game,
           //   "wormportal",
@@ -79,7 +90,8 @@ exports.worm = (game) => {
           //   { worm: game.spoil[i].data.worm },
           //   3,
           // );
-          en.move(game, game.spoil[i].data.worm, game.spoil[i].x, game.spoil[i].y);
+          worm.animation.push({ name: "worm", fromX: worm.x, fromY: worm.y });
+          en.move(game, worm, game.spoil[i].x, game.spoil[i].y);
         }
       }
       game.spoil.splice(i, 1);

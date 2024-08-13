@@ -3,7 +3,51 @@ const game = require("./game");
 const meta = require("./meta");
 const queue = require("./queue");
 const send = require("./send.js");
+
 const sha = require("sha256");
+const fs = require("fs");
+
+exports.start = () => {
+  register_players();
+  count_units();
+
+  function count_units() {
+    let i = 0;
+    let arr = [];
+    Object.keys(meta).forEach(function (key) {
+      arr.push({
+        name: key,
+        rank: meta[key].rank,
+      });
+    });
+    arr = arr.sort((a, b) => {
+      return a.rank - b.rank;
+    });
+    arr.forEach((e) => {
+      if (meta[e.name].weight > 0) {
+        i++;
+        console.log(i, e.name, e.rank);
+      }
+    });
+  }
+
+  function register_players() {
+    fs.readdir("data", (err, files) => {
+      if (err) {
+        return console.error(`Unable to scan directory: ${err}`);
+      }
+
+      // Перебираем все файлы в директории
+      files.forEach((file) => {
+        const filePath = `data/${file}`;
+        // Проверяем, является ли элемент файлом (а не директорией)
+        if (fs.lstatSync(filePath).isFile()) {
+          player.register(file);
+        }
+      });
+    });
+  }
+};
 
 exports.tick = (clock) => {
   if (clock % 3600 == 0)
@@ -96,9 +140,8 @@ exports.bot = (ctx, bot) => {
   let text = ctx.message.text;
   let username = ctx.message.from.username;
   let p = player.byId(id);
-  if (!p) {
-    p = player.register(id, username);
-  }
+  if (!p) p = player.register(id);
+  if (p.username != username) player.setUsername(p, username);
 
   let arr = [];
   Object.keys(meta).forEach(function (key) {

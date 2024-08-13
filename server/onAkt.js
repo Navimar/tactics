@@ -24,8 +24,7 @@ exports.telepath = (game, u) => {
   // game.unit.forEach(u => {
   u.akt = u.akt.filter((a) => {
     if (a.img == "telepath" && en.unitInPoint(game, a.x, a.y)) {
-      if (en.unitInPoint(game, a.x, a.y).status.includes("telepath"))
-        return false;
+      if (en.unitInPoint(game, a.x, a.y).status.includes("telepath")) return false;
       else return true;
     } else {
       return true;
@@ -73,11 +72,7 @@ exports.teamPortal = (game, u) => {
 
 exports.worm = (game, u) => {
   for (i = game.spoil.length; i--; i > 0) {
-    if (
-      game.spoil[i].name == "wormportal" &&
-      game.spoil[i].x == u.x &&
-      game.spoil[i].y == u.y
-    ) {
+    if (game.spoil[i].name == "wormportal" && game.spoil[i].x == u.x && game.spoil[i].y == u.y) {
       let oldx = u.x;
       let oldy = u.y;
       u.x = game.spoil[i].data.worm.x;

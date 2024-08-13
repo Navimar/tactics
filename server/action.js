@@ -3,33 +3,29 @@ const _ = require("lodash");
 const meta = require("./meta");
 
 exports.teleport = (wd) => {
+  wd.me.animation.push({ name: "teleport", fromX: wd.me.x, fromY: wd.me.y });
   wd.go(wd.target.x, wd.target.y);
-  wd.me.status.remove("teleporter");
-  // wd.tire();
+  if (wd.me.status.includes("teleporter")) {
+    wd.me.status.remove("teleporter");
+    wd.tire();
+  }
 };
 
-exports.digger = (wd) => {
-  // wd.flywalk();
-
-  if (wd.game.field[wd.target.x][wd.target.y] == "grass")
-    wd.game.field[wd.target.x][wd.target.y] = "ground";
-  // else if (wd.game.field[wd.target.x][wd.target.y] == 'ground')
-  //   wd.game.field[wd.target.x][wd.target.y] = 'grass'
-  // else if (wd.game.field[wd.target.x][wd.target.y] == 'water')
-  //   wd.game.field[wd.target.x][wd.target.y] = 'grass'
-  wd.tire();
-};
 exports.kill = (wd) => {
   wd.kill();
   wd.tire();
 };
+
 exports.polymorph = (wd) => {
+  wd.animatePunch();
+  wd.target.unit.animation.push({ name: "polymorph", img: meta[wd.target.unit.tp].img() });
   wd.polymorph();
   wd.tire();
 };
 
 exports.wound = (wd) => {
   if (wd.target.unit.status.includes("wound2")) {
+    wd.addTrail("death");
     wd.kill();
   } else if (wd.target.unit.status.includes("wound")) {
     wd.target.unit.status.remove("wound");
@@ -39,13 +35,11 @@ exports.wound = (wd) => {
 };
 
 exports.capture = (wd) => {
-  // if (wd.target.unit.team == 3) {
+  wd.animatePunch();
   wd.target.unit.team = wd.me.team;
-  // wd.target.unit.isReady = false;
-  // } else wd.addStatus("teleporter");
   wd.tire();
 };
 
-exports.move = (wd) => {
-  wd.walk();
+exports.move = (wd, data) => {
+  wd.walk(data.energyCost);
 };

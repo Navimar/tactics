@@ -74,14 +74,12 @@ en.fieldInPoint = (game, x, y) => {
 };
 en.death = (game, unit) => {
   if (unit) {
-    game.trail.push({ img: "damage", x: unit.x, y: unit.y });
     game.deadPool.push(unit);
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
 };
 en.disappear = (game, unit) => {
   if (unit) {
-    game.trail.push({ img: "disappear", x: unit.x, y: unit.y });
     if (meta[unit.tp].onDisappear) game.deadPool.push(unit);
     game.unit.splice(game.unit.indexOf(unit), 1);
   }
@@ -90,7 +88,6 @@ en.disappear = (game, unit) => {
 en.addUnit = (game, tp, x, y, team) => {
   if (!en.isOccupied(game, x, y)) {
     let u = en.makeUnit(tp, x, y, team);
-    game.trail.push({ img: "addunit", x, y });
     game.unit.push(u);
     game.appearPool.push(u);
     return u;
@@ -113,27 +110,15 @@ en.makeUnit = (tp, x, y, team) => {
     y,
     data: {},
     team,
+    animation: [],
   };
 };
-en.damage = (game, unit, d) => {
-  if (unit) {
-    if (d) {
-      unit.life -= d;
-    } else {
-      unit.life--;
-    }
-    // if (unit.life <= 0) en.death(game, unit);
-    game.trail.push({ img: "damage", x: unit.x, y: unit.y });
-  } else {
-    // require('./send').logicerror(game, 'damage cant find the unit')
-  }
-};
+
 en.isAlive = (game, unit) => {
   if (game.unit.indexOf(unit) >= 0) return true;
 };
 en.move = (game, unit, x, y) => {
   if (unit) {
-    // game.trail.push({ img: 'move', x: unit.x, y: unit.y });
     if (en.inField(x, y)) {
       if (!en.unitInPoint(game, x, y)) {
         unit.x = x;

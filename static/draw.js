@@ -5,6 +5,8 @@ const canvasStatic = document.getElementById("canvas");
 const ctxStatic = canvasStatic.getContext("2d");
 const canvasAnimated = document.getElementById("canvasanimated");
 const ctxAnimated = canvasAnimated.getContext("2d");
+const canvasText = document.getElementById("canvastext");
+const ctxText = canvasText.getContext("2d");
 
 const questionmark = new Image();
 questionmark.src = "/undefined.png";
@@ -15,7 +17,10 @@ let quality = 100;
 
 let resize = (active) => {
   if (active) resizecanvas(canvasAnimated, ctxAnimated);
-  else resizecanvas(canvasStatic, ctxStatic);
+  else {
+    resizecanvas(canvasStatic, ctxStatic);
+    resizecanvas(canvasText, ctxText);
+  }
 };
 
 function resizecanvas(canvas, ctx) {
@@ -94,7 +99,7 @@ function drawBoard() {
 }
 
 function drawTxt(txt, x, y, width, color, size, font, animate) {
-  let ctx = animate ? ctxAnimated : ctxStatic;
+  let ctx = ctxText;
   color = color || "#222";
   size = size || 100;
   width = width || 0;
