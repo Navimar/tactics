@@ -1,6 +1,7 @@
 const fs = require("fs");
 const sha = require("sha256");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 
