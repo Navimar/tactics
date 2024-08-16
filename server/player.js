@@ -9,6 +9,13 @@ const playerArr = [];
 let player = {};
 
 player.register = (id) => {
+  const filePath = path.join("data", id);
+
+  const dirPath = path.dirname(filePath);
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+
   let p = {
     id,
     rank: 0,
@@ -18,7 +25,8 @@ player.register = (id) => {
     lastsocket: 0,
     subscribe: true,
   };
-  fs.readFile("data/" + p.id, "utf8", function (err, data) {
+
+  fs.readFile(filePath, "utf8", function (err, data) {
     try {
       const jsonData = JSON.parse(data);
       p.rank = jsonData.rank || 0;
@@ -26,13 +34,14 @@ player.register = (id) => {
       p.username = jsonData.username;
     } catch (parseErr) {
       fs.writeFile(
-        "data/" + p.id,
+        filePath,
         JSON.stringify({ rank: p.rank, subscribe: p.subscribe, username: p.username }, (err) => {
-          err;
+          if (err) console.error(err);
         })
       );
     }
   });
+
   playerArr.push(p);
   return p;
 };

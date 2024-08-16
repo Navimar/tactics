@@ -78,20 +78,24 @@ const animateWorm = (u, fromX, fromY) => {
   return true;
 };
 
-const animateShake = (u, diff) => {
-  let totalDuration = 500;
+const animateShake = (u) => {
+  let totalDuration = 1000;
 
   if (local.cadrProgress > totalDuration) return false;
 
-  let easingCoef = local.cadrProgress / 1000;
-  let easing = Math.pow(easingCoef - 1, 3) + 1;
-  let x =
-    u.x +
-    (easing * (Math.cos(local.cadrProgress * 0.1) + Math.cos(local.cadrProgress * 0.3115))) / 40;
-  let y =
-    u.y +
-    (easing * (Math.sin(local.cadrProgress * 0.05) + Math.sin(local.cadrProgress * 0.057113))) / 40;
-
+  let x = u.x;
+  let y = u.y;
+  if (local.cadrProgress > 200 && local.cadrProgress < 700) {
+    let easingCoef = local.cadrProgress / totalDuration;
+    let easing = Math.pow(easingCoef - 1, 3) + 1;
+    x =
+      u.x +
+      (easing * (Math.cos(local.cadrProgress * 0.1) + Math.cos(local.cadrProgress * 0.3115))) / 40;
+    y =
+      u.y +
+      (easing * (Math.sin(local.cadrProgress * 0.05) + Math.sin(local.cadrProgress * 0.057113))) /
+        40;
+  }
   drawUnit({ ...u, x, y });
 
   return true;
@@ -155,5 +159,17 @@ const animatePolymorph = (u, img) => {
   cropPercent = 100 * ((totalDuration - local.cadrProgress) / totalDuration); // От 100% до 0%
   drawUnit({ ...u, cropPercent }); // Используем новое изображение из unit.img
   // }
+  return true;
+};
+
+const animateLookAround = (u) => {
+  let totalDuration = 1000; // Общая длительность анимации в миллисекундах
+  if (local.cadrProgress > totalDuration) return false;
+
+  // Определяем направление в зависимости от времени анимации
+  let m = Math.floor(local.cadrProgress / 250) % 2; // Чередование каждые 250 мс (0 или 1)
+
+  drawUnit({ ...u, m });
+
   return true;
 };

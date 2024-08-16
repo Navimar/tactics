@@ -334,6 +334,7 @@ exports.firebat = {
     return arr;
   },
   firebat: (wd) => {
+    wd.target.unit.animation.push({ name: "shake" });
     wd.animatePunch();
     wd.addStatus("fire");
     wd.tire();
@@ -994,6 +995,7 @@ exports.telepath = {
     wd.tire();
   },
 };
+
 exports.spliter = {
   name: "Расщипитель",
   description: "Расщипляет юнита на два. Обе половины нестабильны и вскоре исчезают",
@@ -1022,6 +1024,34 @@ exports.spliter = {
     wd.tire();
   },
 };
+
+// exports.naga = {
+//   name: "Нага",
+//   description: "Окружает цель кусачими нестабильными рыбами, которые исчезнут в конце хода",
+//   weight: 100,
+//   class: "norm",
+//   img: () => "fire",
+//   akt: (akt) => {
+//     let akts = akt.move().concat(akt.hand("spliter"));
+//     return akts;
+//   },
+//   spliter: (wd) => {
+//     wd.addStatus("spliter");
+//     // console.log(wd.target);
+//     let u = wd.addUnit(
+//       wd.target.unit.tp,
+//       wd.target.x + (wd.target.x - wd.me.x),
+//       wd.target.y + (wd.target.y - wd.me.y),
+//       wd.target.unit.team
+//     );
+//     // let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
+//     if (u) u.status.push("spliter");
+//     // if (u2)
+//     //   u2.status.push('spliter')
+//     wd.tire();
+//   },
+// };
+
 exports.hatchery = {
   name: "Рыбашня",
   description: "Кидается призрачными рыбами, которые кусаются и исчезают в конце хода",

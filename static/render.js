@@ -256,6 +256,9 @@ const renderunit = (x, y) => {
       case "idle":
         drawUnit({ ...unit, x: animation.fromX, y: animation.fromY });
         break;
+      case "shake":
+        animateShake(unit);
+        break;
       case "polymorph":
         console.log("polymorph", animation.img);
         animatePolymorph(unit, animation.img);
@@ -300,6 +303,7 @@ let renderspoil = (x, y) => {
     drawSpoil(s.name, s.x, s.y);
   });
 };
+
 let renderakt = () => {
   if (local.unit?.akt) {
     local.unit.akt.forEach((a) => {
