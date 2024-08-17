@@ -11,7 +11,6 @@ let player = {};
 
 player.register = (id) => {
   const filePath = path.join("data", String(id));
-
   const dirPath = path.dirname(filePath);
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
@@ -36,9 +35,10 @@ player.register = (id) => {
     } catch (parseErr) {
       fs.writeFile(
         filePath,
-        JSON.stringify({ rank: p.rank, subscribe: p.subscribe, username: p.username }, (err) => {
+        JSON.stringify({ rank: p.rank, subscribe: p.subscribe, username: p.username }),
+        (err) => {
           if (err) console.error(err);
-        })
+        }
       );
     }
   });
