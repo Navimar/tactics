@@ -10,7 +10,7 @@ const playerArr = [];
 let player = {};
 
 player.register = (id) => {
-  const filePath = path.join("data", id);
+  const filePath = path.join("data", String(id));
 
   const dirPath = path.dirname(filePath);
   if (!fs.existsSync(dirPath)) {
