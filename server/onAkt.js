@@ -37,6 +37,7 @@ exports.teleporter = (game, u) => {
     let akts = [];
     let points = en.allPoints();
     points = points.filter((pt) => !en.isOccupied(game, pt.x, pt.y));
+    points = points.filter((pt) => en.fieldInPoint(game, pt.x, pt.y).slice(0, -1) != "team");
     points.forEach((pt) => {
       akts.push({
         x: pt.x,

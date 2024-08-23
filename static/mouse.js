@@ -135,7 +135,7 @@ function inputMouse() {
 }
 
 let setMouseCell = () => {
-  if (quality == 100)
+  if (getDeviceType() == "desktop")
     mouseCell = {
       x: Math.floor(
         ((mousePos.x - shiftX / window.devicePixelRatio) / dh) * window.devicePixelRatio
@@ -144,7 +144,7 @@ let setMouseCell = () => {
         ((mousePos.y - shiftY / window.devicePixelRatio) / dh) * window.devicePixelRatio
       ),
     };
-  if (quality == 50)
+  else
     mouseCell = {
       x: Math.floor((mousePos.x - shiftX) / dh),
       y: Math.floor((mousePos.y - shiftY) / dh),

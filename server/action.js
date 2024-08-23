@@ -32,6 +32,8 @@ exports.wound = (wd) => {
     wd.addStatus("wound2");
   } else wd.addStatus("wound");
   wd.tire();
+  wd.target.unit.animation.push({ name: "shake" });
+  wd.animatePunch();
 };
 
 exports.capture = (wd) => {

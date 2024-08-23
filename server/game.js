@@ -277,9 +277,9 @@ exports.endturn = (game, p) => {
     rules.aerostat(game);
     rules.landmine(game);
     rules.egg(game);
-    rules.rockettarget(game);
     rules.fireBurn(game);
     rules.firestt(game);
+    rules.rockettarget(game);
     rules.splitOnEndturn(game);
     rules.worm(game);
     rules.airdropBirth(game);

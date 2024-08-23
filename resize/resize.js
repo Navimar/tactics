@@ -62,7 +62,7 @@ const lresize = async (size, file) => {
 };
 
 const convert = async (file) => {
-  let from = 64;
+  let from = 40;
   let to = 220;
   let name = file.substring(0, file.length - 4);
   let fn = async () => {

@@ -281,7 +281,7 @@ exports.new = (rank, ai) => {
 
     // Добавляем грибы в выбранные точки
     points.forEach((point) => {
-      data.unit.push(makeUnit("mashroom", point.x, point.y, 3));
+      data.unit.push(makeUnit("mushroom", point.x, point.y, 3));
     });
   } else {
     barraks = _.shuffle(barraks);

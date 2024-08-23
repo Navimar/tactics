@@ -98,11 +98,9 @@ function step(lastTime) {
   let timeDiff = time - lastTime;
   lastTime = time;
   if (!document.hidden) onStep(timeDiff);
-  // setTimeout(function () {
   requestAnimationFrame(function () {
     step(lastTime);
   });
-  // }, 1000 / 100);
 }
 
 let renderhtml = (login) => {
@@ -258,16 +256,28 @@ let clickOnAkt = () => {
     } else {
       tip("Нажмите на юнита, чтобы построить такого же", mouseCell.x, mouseCell.y, "#005500");
     }
-  } else if (!data.turn) {
+    return;
+  }
+  if (!data.turn) {
     tip("Сейчас ход соперника", mouseCell.x, mouseCell.y, "#005500");
   } else if (!gu && local.unit && local.unit.color == 2) {
-    tip("Это юнит соперника! Ходите юнитами с белой обводкой!!!", mouseCell.x, mouseCell.y, "#333");
+    tip(
+      "Вы пытаетесь ходить юнитом соперника! Ходите юнитами с белой обводкой.",
+      mouseCell.x,
+      mouseCell.y,
+      "#333"
+    );
   } else if (!gu && local.unit && local.unit.color == 3 && !local.unit.canMove) {
     // local.unit = false;
-    tip("Это нейтральный юнит. Ваши юниты имеют белую обводку", mouseCell.x, mouseCell.y, "#050");
+    tip(
+      "Вы пытаетесь ходить нейтральным юнитом. Ваши юниты имеют белую обводку.",
+      mouseCell.x,
+      mouseCell.y,
+      "#050"
+    );
   } else if (!gu && local.unit && !local.unit.isReady) {
     tip(
-      "Этот юнит устал и никуда не пойдет. Ходите юнитами с белой обводкой",
+      "Ваш юнит устал и никуда не пойдет на этом ходу. Действуйте юнитами с белой обводкой",
       mouseCell.x,
       mouseCell.y,
       "#050"
@@ -285,39 +295,48 @@ let clickOnAkt = () => {
 
 let onMouseDown = () => {
   local.lastclick = local.seconds;
-  if (!socket.connected) {
-    tip("Подключение к серверу...", 3, 3, "#FF0", 5, 200);
-    login();
-  } else if (data.history) {
-    if (
-      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
-      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
-    ) {
-      // if (data.finished) {
-      // rematch();
-      if (local.frame > 0) showframe(data.keyframe);
-      // }
-    } else {
-      showframe(data.frame + 1);
+  let handleclick = () => {
+    if (!socket.connected) {
+      tip("Подключение к серверу...", 3, 3, "#FF0", 5, 200);
+      login();
+      return;
     }
-  } else if (data.bonus == "choose") {
-    if ((mouseCell.y > -3 && mouseCell.y < 0) || (mouseCell.x > -3 && mouseCell.x < 0)) {
-      let b;
-      if (mouseCell.x < 0) b = (mouseCell.x + 2) * 9 + mouseCell.y;
-      if (mouseCell.y < 0) b = (mouseCell.y + 2) * 9 + mouseCell.x;
-      sendbonus(b);
-    } else {
-      tip(
-        "Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.",
-        mouseCell.x,
-        mouseCell.y,
-        "#222"
-      );
+    if (data.history) {
+      if (
+        (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
+        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
+      ) {
+        // if (data.finished) {
+        // rematch();
+        if (local.frame > 0) showframe(data.keyframe);
+        // }
+      } else {
+        showframe(data.frame + 1);
+      }
+      return;
     }
-  } else if (data.bonus == "wait") {
-    tip("Соперник еще выбирает бонус. Подождите", mouseCell.x, mouseCell.y, "#222");
-  } else {
+    if (data.bonus == "choose") {
+      if ((mouseCell.y > -3 && mouseCell.y < 0) || (mouseCell.x > -3 && mouseCell.x < 0)) {
+        let b;
+        if (mouseCell.x < 0) b = (mouseCell.x + 2) * 9 + mouseCell.y;
+        if (mouseCell.y < 0) b = (mouseCell.y + 2) * 9 + mouseCell.x;
+        sendbonus(b);
+      } else {
+        tip(
+          "Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.",
+          mouseCell.x,
+          mouseCell.y,
+          "#222"
+        );
+      }
+      return;
+    }
+    if (data.bonus == "wait") {
+      tip("Соперник еще выбирает бонус. Подождите", mouseCell.x, mouseCell.y, "#222");
+      return;
+    }
     local.tip = false;
+    local.description.spoil = false;
     if (
       (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 8) ||
       (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 8)
@@ -325,7 +344,9 @@ let onMouseDown = () => {
       if (!data.finished) {
         surrender();
       }
-    } else if (
+      return;
+    }
+    if (
       (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 4 && mouseCell.x <= 5) ||
       (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 4 && mouseCell.y <= 5)
     ) {
@@ -348,108 +369,101 @@ let onMouseDown = () => {
           5,
           120
         );
-    } else if (
+      return;
+    }
+    if (
       (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
       (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
     ) {
       if (local.frame > 0) showframe(data.keyframe);
-    } else if (data.bonus == "ready" && data.win != "win" && data.win != "defeat") {
-      let wise = false;
-      if (
-        ((mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x <= 1) ||
-          (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y <= 1)) &&
-        data.turn
-      ) {
-        endturn();
-      } else if (
-        (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 2 && mouseCell.x < 4) ||
-        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 2 && mouseCell.y < 4)
-      ) {
-        let arr = [];
-        data.unit.forEach((u) => {
-          if (u.color == 1 && u.isReady) {
-            arr.push(u);
-          }
-        });
-        if (arr[nextunit] && local.unit != arr[nextunit]) {
-          local.unit = arr[nextunit];
-          nextunit++;
-        } else {
-          nextunit = 0;
-          local.unit = false;
-          // nextunit++;
-        }
-      } else if (local.unit.x != mouseCell.x || mouseCell.y != local.unit.y) {
-        let gu = getUnit(mouseCell.x, mouseCell.y);
-        let gakt = getAkt(mouseCell.x, mouseCell.y);
-        if (local.unit && gakt) {
-          leftclickcn++;
-          if (leftclickcn == 2) {
-            let txt =
-              "Если вместо выделения вы хотите отдать приказ — нажмите ПРАВОЙ кнопкной мыши!!!";
-            if (mobile)
-              txt = "Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!";
-            tip(txt, mouseCell.x, mouseCell.y, "#550000");
-            leftclickcn = 0;
-            wise = true;
-          }
-        }
-
-        if (gu) {
-          if (gu.color == 1 || !clickOnAkt()) {
-            local.unit = gu;
-            local.build = false;
-          }
-        } else {
-          // if (local.build && (mouseCell.x == local.build.x && mouseCell.y == local.build.y)) {
-          //   local.build = false;
-          // }
-          // else if (data.field[mouseCell.x][mouseCell.y] == 'team1') {
-          //   if (data.gold[0] >= local.cost) {
-          //     local.build = { x: mouseCell.x, y: mouseCell.y }
-          //     local.unit = false;
-          //   }
-          //   else {
-          //     tip('Нужно ' + local.cost + ' золота, чтобы построить юнита. У вас ' + data.gold[0] + " золота", mouseCell.x, mouseCell.y, '#f00')
-          //   }
-          // }
-          // else
-          if (local.unit) clickOnAkt();
-          else if (data.chooseteam)
-            tip("Выделите синиго или рыжего юнита. И ходите им!", mouseCell.x, mouseCell.y, "#333");
-          else
-            tip(
-              "Выделите юнита с белой обводкой и ходите им!",
-              mouseCell.x,
-              mouseCell.y,
-              "#000",
-              5,
-              100
-            );
-
-          // let arr = [];
-          // data.unit.forEach((u) => {
-          //   if (u.color == 1 && u.isReady) {
-          //     arr.push(u);
-          //   }
-          // });
-          // if (arr[nextunit] && local.unit != arr[nextunit]) {
-          //   local.unit = arr[nextunit];
-          //   nextunit++;
-          // } else {
-          //   nextunit = 0;
-          //   local.unit = arr[nextunit];
-          //   nextunit++;
-          // }
-        }
-      } else {
-        //нажал на себя
-        local.unit = false;
-      }
-      // local.focus = false;
-      // local.akt = [];
+      return;
     }
-  }
+    if (data.bonus != "ready" || data.win == "win" || data.win == "defeat") return;
+    if (
+      ((mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x <= 1) ||
+        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y <= 1)) &&
+      data.turn
+    ) {
+      endturn();
+      return;
+    }
+    if (
+      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 2 && mouseCell.x < 4) ||
+      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 2 && mouseCell.y < 4)
+    ) {
+      let arr = [];
+      data.unit.forEach((u) => {
+        if (u.color == 1 && u.isReady) {
+          arr.push(u);
+        }
+      });
+      if (arr[nextunit] && local.unit != arr[nextunit]) {
+        local.unit = arr[nextunit];
+        nextunit++;
+        return;
+      }
+      nextunit = 0;
+      local.unit = false;
+
+      return;
+    }
+
+    if (local.unit?.x != mouseCell.x || mouseCell.y != local.unit?.y) {
+      let gu = getUnit(mouseCell.x, mouseCell.y);
+      if (local.unit && getAkt(mouseCell.x, mouseCell.y)) {
+        leftclickcn++;
+        if (leftclickcn == 2) {
+          let txt =
+            "Если вместо выделения вы хотите отдать приказ — нажмите ПРАВОЙ кнопкной мыши!!!";
+          if (mobile)
+            txt = "Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!";
+          tip(txt, mouseCell.x, mouseCell.y, "#550000");
+          leftclickcn = 0;
+        }
+      }
+      if (gu) {
+        if (gu?.color == 1 || !clickOnAkt()) {
+          local.unit = gu;
+          local.build = false;
+        }
+        return;
+      }
+
+      if (local.unit) {
+        clickOnAkt();
+        return;
+      }
+      if (data.chooseteam) {
+        tip("Выделите синиго или рыжего юнита. И ходите им!", mouseCell.x, mouseCell.y, "#333");
+        return;
+      }
+      if (!local.unit) {
+        local.description.name = description_field[data.field[mouseCell.x][mouseCell.y]]?.name;
+        local.description.description =
+          description_field[data.field[mouseCell.x][mouseCell.y]]?.description;
+        if (!local.description.name) local.description.name = data.field[mouseCell.x][mouseCell.y];
+        if (!local.description.description) local.description.description = description_notfound;
+        local.description.color = "#000066";
+        let s = data.spoil.filter((s) => s.x == mouseCell.x && s.y == mouseCell.y);
+
+        local.description.spoil = s[0]?.name;
+        tip(
+          "Выделите юнита с белой обводкой и ходите им!",
+          mouseCell.x,
+          mouseCell.y,
+          "#000",
+          5,
+          100
+        );
+        return;
+      }
+    }
+    local.unit = false; //нажал на себя
+
+    return;
+  };
+
+  handleclick();
   render();
 };
 

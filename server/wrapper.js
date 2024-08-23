@@ -80,6 +80,10 @@ module.exports = (game, me, target) => {
       en.move(game, target.unit, xto, yto);
     },
     go: (xto, yto) => {
+      if (xto === undefined || yto === undefined) {
+        xto = target.x;
+        yto = target.y;
+      }
       en.move(game, me, xto, yto);
     },
     spoil: (name, x, y, data, team) => {

@@ -25,3 +25,18 @@ const isAdjacent = (x1, y1, x2, y2) => {
   // Проверяем ортогональную смежность
   return (x1 === x2 && Math.abs(y1 - y2) === 1) || (y1 === y2 && Math.abs(x1 - x2) === 1);
 };
+
+function getDeviceType() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  const width = window.innerWidth;
+
+  if (/mobi|android|iphone|ipad|ipod|blackberry|phone/i.test(userAgent)) {
+    if (width < 768) {
+      return "phone";
+    } else {
+      return "tablet";
+    }
+  } else {
+    return "desktop";
+  }
+}

@@ -182,13 +182,13 @@ exports.egg = (game) => {
 
 exports.airdropBirth = (game) => {
   for (let i = game.spoil.length - 1; i >= 0; i--) {
-    let tp = "mashroom";
+    let tp = "mushroom";
 
     if (
       game.spoil[i].name === "airdrop" &&
       !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
     ) {
-      const team = tp === "mashroom" ? 3 : game.turn; // Используем game.turn для "base"
+      const team = tp === "mushroom" ? 3 : game.turn; // Используем game.turn для "base"
       en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, team);
       game.spoil.splice(i, 1);
     }

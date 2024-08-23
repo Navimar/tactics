@@ -24,10 +24,8 @@ exports.start = () => {
       return a.rank - b.rank;
     });
     arr.forEach((e) => {
-      if (meta[e.name].weight > 0) {
-        i++;
-        console.log(i, e.name, e.rank);
-      }
+      i++;
+      console.log(i, e.name);
     });
   }
 

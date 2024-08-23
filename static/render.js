@@ -17,30 +17,28 @@ let renderanimated = (diff) => {
   if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
 
   if (diff) {
-    // fps = Math.ceil((parseInt(1000 / diff) + fps * 10) / 11);
     fps = Math.ceil(1000 / diff);
     let x = -2.85;
     let y = 8;
     if (orientation == "h") {
       x = 6.85;
-      y = -0.9;
+      y = -0.4;
     }
 
     // if (fps <= 30)
     drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
-    if (quality < 100)
-      drawTxt(
-        "quality " + Math.ceil(quality),
-        x,
-        (y += 0.5),
-        2,
-        "#000000",
+    // if (quality < 100)
+    //   drawTxt(
+    //     "quality " + Math.ceil(quality),
+    //     x,
+    //     (y += 0.5),
+    //     2,
+    //     "#000000",
 
-        undefined,
-        undefined,
-        true
-      );
-    // drawTxt('local.seconds ' + local.seconds, 0, y += 0.5, "#000000", undefined, undefined, true);
+    //     undefined,
+    //     undefined,
+    //     true
+    //   );
     // drawTxt('local.lastclick ' + local.lastclick, 0, y += 0.5, "#000000", undefined, undefined, true);
 
     // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
@@ -49,7 +47,6 @@ let renderanimated = (diff) => {
     //   quality = 50;
     // }
   }
-  // drawTxt('size ' + (dh + 2 * (dh / 10)), 8, 0.5, "#000000", undefined, undefined, true);
 };
 
 let render = () => {
@@ -63,6 +60,7 @@ let render = () => {
       drawBackground("edgeWait");
     }
   }
+
   if (data.bonus != "choose") renderpanel();
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
@@ -85,6 +83,7 @@ let render = () => {
   if (local.sandclock) {
     drawImg("sandclock", local.sandclock.x, local.sandclock.y);
   }
+
   renderdescription();
   rendertip();
 };
@@ -178,7 +177,6 @@ let renderpanel = () => {
 const drawUnit = (unit) => {
   if (!local.once) {
     console.log("drawUnit", unit);
-
     local.once = true;
   }
   unit.sizeAdd = unit.sizeAdd || 0;
@@ -219,9 +217,7 @@ const drawUnit = (unit) => {
 
   if (unit.sticker) drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
 
-  unit.status.forEach((stt) =>
-    drawStatus(stt, unit.x, unit.y, unit.m, unit.color, unit.isReady, unit.isActive)
-  );
+  unit.status.forEach((stt) => drawStatus(stt, unit.x, unit.y, true));
 };
 
 const renderunit = (x, y) => {
@@ -336,7 +332,6 @@ let rendertrail = (x, y) => {
         animateTrailDeath(trail.data.unit, trail.x, trail.y);
       }
       if (trail.name == "idle") {
-        console.log("idle");
         drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
         // animateTrailIdle(t.data.unit, t.x, t.y);
       }
@@ -358,20 +353,126 @@ let rendertip = () => {
 };
 
 function renderdescription() {
-  if (local.unit?.name) local.description.name = local.unit.name;
-  if (local.unit?.description) local.description.description = local.unit.description;
-  if (local.unit?.color) local.description.color = local.unit.color;
+  if (local.unit) {
+    local.description.name = description_unit[local.unit.tp]?.name;
+    local.description.description = description_unit[local.unit.tp]?.description;
+    if (!local.description.name) local.description.name = local.unit.tp;
+    if (!local.description.description) local.description.description = description_notfound;
+    if (local.unit?.color == 1) local.description.color = "#006600";
+    if (local.unit?.color == 2) local.description.color = "#660000";
+    if (local.unit?.color == 3) local.description.color = "#666600";
+  }
 
   if (local.description.name) {
-    let namecolor = "#006600";
-    if (local.description.color == 2) namecolor = "#660000";
-    if (local.description.color == 3) namecolor = "#666600";
+    let lasty;
     if (orientation == "h") {
-      drawTxt(local.description.name, 0.2, -2.8, 2, namecolor, 130, false, false);
-      drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, false);
+      drawTxt(local.description.name, 0.2, -2.8, 8.55, local.description.color, 130, false, false);
+      lasty = drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, false);
+      if (local.unit?.status && local.unit?.status[0]) {
+        drawStatus(local.unit.status[0], 0.2, lasty + 0.5, false);
+        drawTxt(
+          description_status[local.unit.status[0]],
+          1.5,
+          lasty + 0.5,
+          6,
+          "#000000",
+          100,
+          false,
+          false
+        );
+      } else {
+        if (local.unit.sticker) {
+          drawPropUnit(
+            local.unit.sticker.img,
+            0.2,
+            lasty + 0.5,
+            false,
+            local.unit.sticker.color,
+            true,
+            false,
+            52,
+            52,
+            false
+          );
+          drawTxt(
+            description_sticker + description_unit[local.unit.sticker.img]?.name,
+            1.5,
+            lasty + 0.5,
+            6,
+            "#000000",
+            100,
+            false,
+            false
+          );
+        }
+      }
+      if (local.description.spoil) {
+        drawSpoil(local.description.spoil, 0.2, lasty + 0.5, false);
+        drawTxt(
+          description_spoil[local.description.spoil] || local.description.spoil,
+          1.5,
+          lasty + 0.5,
+          6,
+          "#000000",
+          100,
+          false,
+          false
+        );
+      }
     } else {
-      drawTxt(local.description.name, -2.92, 0.2, 2.9, namecolor, 130, false, false);
-      drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, false);
+      drawTxt(local.description.name, -2.92, 0.2, 2.9, local.description.color, 130, false, false);
+      lasty = drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, false);
+      if (local.unit?.status && local.unit?.status[0]) {
+        drawStatus(local.unit.status[0], -2.7, lasty + 0.5, false);
+        drawTxt(
+          description_status[local.unit.status[0]] || local.unit.status[0],
+          -2.92,
+          lasty + 1.7,
+          2.9,
+          "#000000",
+          100,
+          false,
+          false
+        );
+      } else {
+        if (local.unit.sticker) {
+          drawPropUnit(
+            local.unit.sticker.img,
+            -2.7,
+            lasty + 0.5,
+            false,
+            local.unit.sticker.color,
+            true,
+            false,
+            52,
+            52,
+            false
+          );
+          drawTxt(
+            description_sticker + description_unit[local.unit.sticker.img]?.name,
+            -2.92,
+            lasty + 1.7,
+            2.9,
+            "#000000",
+            100,
+            false,
+            false
+          );
+        }
+      }
+      if (local.description.spoil) {
+        drawSpoil(local.description.spoil, -2.7, lasty + 0.5, false);
+        drawTxt(
+          description_spoil[local.description.spoil] || local.description.spoil,
+          -2.92,
+          lasty + 1.7,
+          2.9,
+          "#000000",
+          100,
+          false,
+          false
+        );
+      }
     }
   }
 }
