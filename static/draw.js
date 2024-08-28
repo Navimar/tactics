@@ -263,9 +263,19 @@ function drawImgFieldConnection(name, x, y, mask, animate) {
     drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
 }
 
-function drawSpoil(name, x, y) {
+function drawSpoil(name, x, y, animate) {
+  let ctx = animate ? ctxAnimated : ctxStatic;
   let img = getImg(name + ".spoil", dh);
-  drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh);
+  if (animate) {
+    let cadr = local.cadrProgress + local.spoilmask[x][y];
+    if (cadr > 1000) cadr -= 1000;
+    if (local.cadrProgress > 500) {
+      ctx.save();
+      ctx.scale(-1, 1);
+      drawImageCeil(img, (x * dh + shiftX) * -1 - dh, y * dh + shiftY, dh, dh, true);
+      ctx.restore();
+    } else drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, true);
+  } else drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, false);
 }
 
 function drawStatus(name, x, y, animate) {

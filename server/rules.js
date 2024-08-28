@@ -114,6 +114,13 @@ exports.rockettarget = (game) => {
         if (en.isAlive(game, game.spoil[i].data.unit) && game.spoil[i].data.unit.tp == "rocket") {
           if (game.spoil[i].data.unit != unit) {
             en.death(game, unit);
+            game.trail.push({
+              name: "launch",
+              x: game.spoil[i].data.unit.x,
+              y: game.spoil[i].data.unit.y,
+              data: { unit: game.spoil[i].data.unit },
+              turn: 0,
+            });
             en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
             en.death(game, game.spoil[i].data.unit);
             for (let xx = -1; xx <= 1; xx++) {
@@ -121,6 +128,7 @@ exports.rockettarget = (game) => {
                 if (en.inField(game.spoil[i].x + xx, game.spoil[i].y + yy)) {
                   if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == "grass")
                     game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = "ground";
+
                   en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
                   en.addSpoil(game, "fire", game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
                 }
@@ -262,6 +270,13 @@ exports.splitOnEndturn = (game) => {
     let u = game.unit[i];
     if (u.status.includes("spliter2")) {
       en.disappear(game, u);
+      game.trail.push({
+        name: "death",
+        x: u.x,
+        y: u.y,
+        data: { unit: u },
+        turn: 0,
+      });
     }
     if (u.status.includes("spliter")) {
       u.status.remove("spliter");
@@ -490,9 +505,9 @@ exports.flagwin = (game) => {
       }
     }
   }
-  if (flag[0] == 0) {
+  if (flag[0] == 0 && game.turn == 2) {
     gm.endgame(game, 2);
-  } else if (flag[1] == 0) {
+  } else if (flag[1] == 0 && game.turn == 1) {
     gm.endgame(game, 1);
   }
 };

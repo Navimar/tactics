@@ -9,6 +9,7 @@ let local = {
   focus: false,
   fisher: [999, 999],
   sandclock: { x: 0, y: 0 },
+  spoilmask: _.times(9, () => _.times(9, () => _.random(1, 1000))),
   tip: {
     text: "Подключение к серверу...",
     x: 3,

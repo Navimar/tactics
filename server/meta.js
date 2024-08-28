@@ -345,11 +345,8 @@ exports.firebat = {
 // }
 
 exports.teleporter = {
-  weight: 100,
-  rank: 80,
   class: "warrior",
-  life: 3,
-  img: "teleporter",
+  img: () => "teleporter",
   akt: (akt) => {
     let arr = akt.move();
     let far = akt.hand("teleporter");
@@ -361,9 +358,6 @@ exports.teleporter = {
       arr = arr.concat(far);
     }
     return arr;
-  },
-  move: (wd) => {
-    wd.walk();
   },
   teleporter: (wd) => {
     wd.addStatus("teleporter");
@@ -776,7 +770,11 @@ exports.mushroom = {
     );
     points.forEach((pt) => {
       let tp = en.unitInPoint(akt.game, pt.x, pt.y)?.tp;
-      if (tp != "mushroom" && tp != "base") akts.push({ x: pt.x, y: pt.y, img: "change" });
+      if (
+        tp != "mushroom"
+        //  && tp != "base"
+      )
+        akts.push({ x: pt.x, y: pt.y, img: "change" });
       else akts.push({ x: pt.x, y: pt.y, img: "random" });
     });
     return akts;
@@ -845,9 +843,21 @@ exports.pusher = {
   life: 3,
   img: () => "pusher",
   akt: (akt) => {
-    let arr = akt.move();
-    if (akt.me.energy > 0) arr = arr.concat(akt.hand("push"));
-    return arr;
+    let akts = akt.move();
+    if (akt.me.energy > 0) akts = akts.concat(akt.hand("push"));
+    akts = akts.filter((a) => {
+      let pf = akt.game.field[akt.me.x][akt.me.y];
+      let nf = akt.game.field[a.x][a.y];
+      if (
+        a.img == "push" &&
+        nf !== pf &&
+        !_.includes(["team1", "team2", "water"], nf) &&
+        !_.includes(["team1", "team2", "water"], pf)
+      )
+        return false;
+      else return true;
+    });
+    return akts;
   },
   push: (wd) => {
     wd.me.animation.push({
@@ -1315,17 +1325,17 @@ exports.kicker = {
 //   }
 // }
 
-exports.slime = {
-  weight: 100,
-  rank: 130,
-  class: "norm",
-  img: () => "slime",
-  akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
-    return akt.move();
-    // .concat(akt.hand('electric'))
-  },
-};
+// exports.slime = {
+//   weight: 100,
+//   rank: 130,
+//   class: "norm",
+//   img: () => "slime",
+//   akt: (akt) => {
+//     // return [{ x: 5, y: 5, img: 'move' }]
+//     return akt.move();
+//     // .concat(akt.hand('electric'))
+//   },
+// };
 
 //   electric: (wd) => {
 //     let marks = new Map();
@@ -1378,11 +1388,29 @@ exports.bear = {
     return akts;
   },
   bear: (wd) => {
-    wd.tire();
+    wd.target.unit.animation.push({ name: "jump", fromX: wd.target.x, fromY: wd.target.y });
     let x = wd.me.x - wd.target.x;
     let y = wd.me.y - wd.target.y;
-    wd.kill(x + wd.me.x, y + wd.me.y);
+    wd.animatePunch();
+    if (wd.unitInPoint(x + wd.me.x, y + wd.me.y)) {
+      wd.game.trail.push({
+        name: "idle",
+        x: x + wd.me.x,
+        y: y + wd.me.y,
+        data: { unit: wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
+        turn: 0,
+      });
+      wd.game.trail.push({
+        name: "death",
+        x: x + wd.me.x,
+        y: y + wd.me.y,
+        data: { unit: wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
+        turn: 1,
+      });
+      wd.kill(x + wd.me.x, y + wd.me.y);
+    }
     wd.move(x + wd.me.x, y + wd.me.y);
+    wd.tire();
   },
 };
 

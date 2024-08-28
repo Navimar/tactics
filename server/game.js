@@ -284,10 +284,10 @@ exports.endturn = (game, p) => {
     rules.worm(game);
     rules.airdropBirth(game);
     rules.airdrop(game);
-
     onOrder(game);
+    rules.flagwin(game);
 
-    rules.foxPolymoprh(game);
+    // rules.foxPolymoprh(game);
     if (game.ai && game.turn == 1) worldshift(game);
     updateAkts(game);
 

@@ -173,3 +173,13 @@ const animateLookAround = (u) => {
 
   return true;
 };
+
+const animateLaunch = (u, x, y) => {
+  let totalDuration = 1000; // Общая длительность анимации в миллисекундах
+  if (local.cadrProgress > totalDuration) return false;
+
+  y = y - (15 / totalDuration) * local.cadrProgress; // Увеличиваем смещение по Y на высоту экрана
+
+  drawUnit({ ...u, x, y });
+  return true;
+};

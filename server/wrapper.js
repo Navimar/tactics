@@ -139,8 +139,8 @@ module.exports = (game, me, target) => {
         } while (
           tp == unit.tp ||
           meta[tp].class == "neutral" ||
-          meta[tp].class == "none" ||
-          tp == "base"
+          meta[tp].class == "none"
+          // || tp == "base"
         );
         unit.tp = tp;
       }

@@ -3,11 +3,12 @@ let fps = 60;
 let renderanimated = (diff) => {
   resize(true);
 
-  if (!diff) diff = 0;
-  if (diff > 100) diff = 100;
-
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
+      let u = data.spoil.filter((u) => u.x == x && u.y == y);
+      u.forEach((s) => {
+        if (s.name.startsWith("fire")) drawSpoil(s.name, s.x, s.y, true);
+      });
       rendertrail(x, y);
       renderunit(x, y);
     }
@@ -16,6 +17,8 @@ let renderanimated = (diff) => {
   if (data.bonus == "choose") renderpanel();
   if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
 
+  if (!diff) diff = 0;
+  if (diff > 100) diff = 100;
   if (diff) {
     fps = Math.ceil(1000 / diff);
     let x = -2.85;
@@ -296,7 +299,7 @@ let renderfield = (x, y) => {
 let renderspoil = (x, y) => {
   let u = data.spoil.filter((u) => u.x == x && u.y == y);
   u.forEach((s) => {
-    drawSpoil(s.name, s.x, s.y);
+    if (!s.name.startsWith("fire")) drawSpoil(s.name, s.x, s.y);
   });
 };
 
@@ -334,6 +337,10 @@ let rendertrail = (x, y) => {
       if (trail.name == "idle") {
         drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
         // animateTrailIdle(t.data.unit, t.x, t.y);
+      }
+      if (trail.name == "launch") {
+        console.log("launch");
+        animateLaunch(trail.data.unit, trail.x, trail.y);
       }
     }
   });
