@@ -86,7 +86,7 @@ let description_unit = {
   },
   mushroom: {
     name: "Гриб",
-    description: "Превращается в любого юнита на поле, кроме Лисы",
+    description: "Превращается в случайного юнита или в любого юнита на поле.",
   },
   pusher: {
     name: "Бычок",

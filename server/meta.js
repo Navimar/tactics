@@ -385,6 +385,7 @@ exports.staziser = {
     return akt.move().concat(akt.hand("stazis"));
   },
   stazis: (wd) => {
+    wd.animatePunch();
     if (wd.target.unit.status.includes("stazis")) wd.target.unit.status.remove("stazis");
     else wd.addStatus("stazis");
     wd.tire();

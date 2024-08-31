@@ -298,7 +298,7 @@ let onMouseDown = () => {
   local.lastclick = local.seconds;
   let handleclick = () => {
     if (!socket.connected) {
-      tip("Подключение к серверу...", 3, 3, "#FF0", 5, 200);
+      tip("Подключение к серверу...", 3, 3, "#0F0", 5, 200);
       login();
       return;
     }

@@ -18,7 +18,7 @@ exports.kill = (wd) => {
 
 exports.polymorph = (wd) => {
   wd.animatePunch();
-  wd.target.unit.animation.push({ name: "polymorph", img: meta[wd.target.unit.tp].img() });
+  wd.target.unit.animation.push({ name: "polymorph", img: meta[wd.target.unit.tp].img(wd) });
   wd.polymorph();
   wd.tire();
 };
