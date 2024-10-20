@@ -234,6 +234,8 @@ const renderunit = (x, y) => {
 
   if (animation) {
     switch (animation.name) {
+      case "none":
+        break;
       case "walk":
         animateWalk(unit, animation.fromX, animation.fromY);
         break;
@@ -248,6 +250,9 @@ const renderunit = (x, y) => {
         break;
       case "worm":
         animateWorm(unit, animation.fromX, animation.fromY);
+        break;
+      case "add":
+        animateAdd(unit);
         break;
       case "punch":
         animatePunch(unit, animation.targetX, animation.targetY);
