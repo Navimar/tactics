@@ -11,8 +11,9 @@ exports.teleport = (wd) => {
   }
 };
 
-exports.kill = (wd) => {
+exports.kill = (wd, turn) => {
   wd.kill();
+  wd.addTrail("death", turn);
   wd.tire();
 };
 
@@ -25,7 +26,13 @@ exports.polymorph = (wd) => {
 
 exports.wound = (wd) => {
   if (wd.target.unit.status.includes("wound2")) {
-    wd.addTrail("death");
+    wd.game.trail.push({
+      name: "death",
+      x: wd.target.x,
+      y: wd.target.y,
+      data: { unit: wd.target.unit },
+      turn: 0,
+    });
     wd.kill();
   } else if (wd.target.unit.status.includes("wound")) {
     wd.target.unit.status.remove("wound");

@@ -80,7 +80,7 @@ exports.fish = {
     return akts.concat(akt.hand("wound"));
   },
   move: (wd, data) => {
-    wd.flywalk(data.energyCost);
+    wd.flywalk(data.energyCost, "jump");
   },
 };
 
@@ -110,12 +110,12 @@ exports.headcrab = {
   // }
 };
 
-exports.mushroomking = {
+exports.bee = {
   weight: 100,
   rank: 0,
   class: "norm",
   life: 3,
-  img: () => "mushroomking",
+  img: () => "bee",
   akt: (akt) => {
     let akts = [];
     let initialPoint = `${akt.me.x},${akt.me.y}`;
@@ -126,7 +126,7 @@ exports.mushroomking = {
       let newPoints = [];
       pointsSet.forEach((ptStr) => {
         let [x, y] = ptStr.split(",").map(Number);
-        if (en.unitInPoint(akt.game, x, y)?.tp === "mushroom" || (x == akt.me.x && y == akt.me.y))
+        if (en.unitInPoint(akt.game, x, y)?.tp === "bush" || (x == akt.me.x && y == akt.me.y))
           en.near(x, y).forEach((nearPoint) => {
             let nearPointStr = `${nearPoint.x},${nearPoint.y}`;
             if (!pointsSet.has(nearPointStr)) newPoints.push(nearPointStr);
@@ -141,7 +141,7 @@ exports.mushroomking = {
     }
     pointsSet.forEach((ptStr) => {
       let [x, y] = ptStr.split(",").map(Number);
-      if (en.unitInPoint(akt.game, x, y)?.tp != "mushroom") {
+      if (en.unitInPoint(akt.game, x, y)?.tp != "bush") {
         if (!en.isOccupied(akt.game, x, y)) akts.push({ x, y, img: "move" });
         if (en.isOccupied(akt.game, x, y) && (x != akt.me.x || y != akt.me.y))
           akts.push({ x, y, img: "kill" });
@@ -152,31 +152,26 @@ exports.mushroomking = {
   },
 
   kill: (wd) => {
-    wd.me.animation.push({ name: "teleport", fromX: wd.me.x, fromY: wd.me.y });
-    wd.game.trail.push({
-      name: "idle",
-      x: wd.target.x,
-      y: wd.target.y,
-      data: { unit: wd.target.unit },
-    });
+    wd.me.animation.push({ name: "walk", fromX: wd.me.x, fromY: wd.me.y });
+    wd.addTrail("idle");
     oldx = wd.me.x;
     oldy = wd.me.y;
     wd.kill();
     wd.go();
     if (en.fieldInPoint(wd.game, oldx, oldy).slice(0, -1) != "team")
-      wd.addUnit("mushroom", oldx, oldy, 3);
+      wd.addUnit("bush", oldx, oldy, 3);
 
     wd.tire();
   },
   move: (wd) => {
-    wd.me.animation.push({ name: "teleport", fromX: wd.me.x, fromY: wd.me.y });
+    wd.me.animation.push({ name: "walk", fromX: wd.me.x, fromY: wd.me.y });
 
     oldx = wd.me.x;
     oldy = wd.me.y;
     wd.go();
 
     if (en.fieldInPoint(wd.game, oldx, oldy).slice(0, -1) != "team")
-      wd.addUnit("mushroom", oldx, oldy, 3);
+      wd.addUnit("bush", oldx, oldy, 3);
 
     wd.tire();
   },
@@ -241,12 +236,10 @@ exports.base = {
   weight: 100,
   rank: 0,
   class: "norm",
-  img: () => "base",
+  img: () => "mushroomking",
   akt: (akt) => {
-    let akts = akt
-      .move()
-      .concat(akt.hand("capture", "neutral"))
-      .concat(akt.hand("polymorph", "notneutral"));
+    let akts = akt.move().concat(akt.hand("capture", "neutral"));
+    // .concat(akt.hand("polymorph", "notneutral"));
     return akts;
   },
   // onDeath: (wd) => {
@@ -263,10 +256,13 @@ exports.merchant = {
     return akt.move().concat(akt.hand("trade"));
   },
   trade: (wd) => {
+    wd.animatePunch();
     wd.disappear();
-    let u = wd.addUnit("box", wd.target.x, wd.target.y, wd.target.unit.team);
+    wd.addTrail("idle");
+    let u = wd.addUnit("bush", wd.target.x, wd.target.y, wd.target.unit.team);
+    u.animation.push({ name: "add" });
     u.sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team };
-
+    u.isReady = false;
     wd.tire();
   },
 };
@@ -345,7 +341,7 @@ exports.firebat = {
 // }
 
 exports.teleporter = {
-  class: "warrior",
+  class: "norm",
   img: () => "teleporter",
   akt: (akt) => {
     let arr = akt.move();
@@ -510,7 +506,7 @@ exports.aerostat = {
     let x = wd.me.x;
     let y = wd.me.y;
     let sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team };
-    wd.game.trail.push({
+    wd.addTrail({
       name: "idle",
       x: wd.target.x,
       y: wd.target.y,
@@ -741,7 +737,7 @@ exports.zombie = {
 //   // }
 // }
 
-exports.box = {
+exports.bush = {
   // neutral: true,
   rank: 0,
   weight: 100,
@@ -795,19 +791,18 @@ exports.mushroom = {
   // },
 };
 
-// exports.polymorpher = {
-//   rank: 0,
-//   weight: 50,
-//   class: 'norm',
-//   life: 3,
-//   img: 'polymorpher',
-//   akt: (akt) => {
-//     return akt.move().concat(akt.hand('polymorph'))
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-// }
+exports.polymorpher = {
+  rank: 0,
+  weight: 50,
+  class: "norm",
+  img: "chicken",
+  akt: (akt) => {
+    return akt.move().concat(akt.hand("polymorph"));
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+};
 
 // exports.oldmushroom = {
 //   // neutral: true,
@@ -979,10 +974,10 @@ exports.naga = {
     return akts;
   },
   naga: (wd) => {
-    let u = wd.addUnit("fish", wd.target.x - 1, wd.target.y, wd.me.team);
-    let u2 = wd.addUnit("fish", wd.target.x + 1, wd.target.y, wd.me.team);
-    let u3 = wd.addUnit("fish", wd.target.x, wd.target.y - 1, wd.me.team);
-    let u4 = wd.addUnit("fish", wd.target.x, wd.target.y + 1, wd.me.team);
+    let u = wd.addUnit("fish", wd.target.x - 1, wd.target.y, wd.game.turn);
+    let u2 = wd.addUnit("fish", wd.target.x + 1, wd.target.y, wd.game.turn);
+    let u3 = wd.addUnit("fish", wd.target.x, wd.target.y - 1, wd.game.turn);
+    let u4 = wd.addUnit("fish", wd.target.x, wd.target.y + 1, wd.game.turn);
 
     if (u) {
       u.status.push("spliter2");
@@ -1121,7 +1116,7 @@ exports.plant = {
   //   wd.tire();
   // },
   plant: (wd) => {
-    let u = wd.addUnit("fish", wd.target.x, wd.target.y, wd.me.team);
+    let u = wd.addUnit("fish");
     if (u) u.isReady = false;
     u.animation.push({
       name: "jump",
@@ -1457,6 +1452,20 @@ exports.frog = {
       wd.me.status.remove("frog");
       wd.me.status.push("frog2");
     } else if (wd.me.status.includes("frog2")) {
+      wd.game.trail.push({
+        name: "idle",
+        x: wd.target.x,
+        y: wd.target.y,
+        data: { unit: wd.target.unit },
+        turn: 0,
+      });
+      wd.game.trail.push({
+        name: "death",
+        x: wd.target.x,
+        y: wd.target.y,
+        data: { unit: wd.target.unit },
+        turn: 1,
+      });
       wd.kill();
     } else {
       wd.me.status.push("frog");

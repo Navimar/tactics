@@ -275,12 +275,15 @@ exports.new = (rank, ai) => {
     );
 
     // Добавляем центральную точку
-    points.push({ x: 4, y: 4 });
+    // points.push({ x: 4, y: 4 });
 
     // Добавляем грибы в выбранные точки
     points.forEach((point) => {
       data.unit.push(makeUnit("mushroom", point.x, point.y, 3));
     });
+
+    //куст в центре
+    data.unit.push(makeUnit("bush", 4, 4, 3));
   } else {
     barraks = _.shuffle(barraks);
     bluearr = _.sampleSize(bluearr, 9);

@@ -128,20 +128,20 @@ const animateTrailDeath = (unit, x, y) => {
   let cropPercent;
 
   if (local.cadrProgress <= totalDuration) {
-    cropPercent = 100 * (local.cadrProgress / totalDuration); // От 0% до 100%
+    cropPercent = (100 * (local.cadrProgress / totalDuration)) / 2; // От 0% до 100%
     drawUnit({ ...unit, x, y, cropPercent });
   }
   return true;
 };
 
-const animateAdd = (u, diff) => {
-  let totalDuration = 500; // Общая длительность анимации в миллисекундах
+const animateAdd = (unit) => {
+  let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
   let cropPercent;
 
-  cropPercent = 100 * ((totalDuration - local.cadrProgress) / totalDuration); // От 100% до 0%
-  drawUnit({ ...u, cropPercent });
+  cropPercent = (100 * ((totalDuration - local.cadrProgress) / totalDuration)) / 2; // От 100% до 0%
+  drawUnit({ ...unit, cropPercent });
   return true;
 };
 

@@ -16,9 +16,10 @@ module.exports = (game, me, target) => {
       en.move(game, me, target.x, target.y);
       me.energy -= energyCost;
     },
-    flywalk: (energyCost) => {
+    flywalk: (energyCost, animationName) => {
+      animationName = animationName || "fly";
       me.animation.push({
-        name: "fly",
+        name: animationName,
         fromX: me.x,
         fromY: me.y,
       });
@@ -104,7 +105,7 @@ module.exports = (game, me, target) => {
         x = target.x;
         y = target.y;
       }
-      if (!team) team = me.team;
+      if (!team) team = game.turn;
       if (!en.unitInPoint(game, x, y) && en.inField(x, y)) {
         let u = en.addUnit(game, tp, x, y, team);
         // console.log('in wrapper game.appearPool', game.appearPool);
