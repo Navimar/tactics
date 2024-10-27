@@ -44,6 +44,10 @@ let description_status = {
 };
 let description_notfound = "Описание не готово";
 let description_unit = {
+  polymorpher: {
+    name: "Полиморфер",
+    description: "Превращает юнита в другого",
+  },
   teleporter: {
     name: "Портальный маг",
     description:

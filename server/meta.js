@@ -512,7 +512,7 @@ exports.aerostat = {
     let x = wd.me.x;
     let y = wd.me.y;
     let sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team };
-    wd.addTrail("idle", wd.target.unit, wd.target.x, wd.target.y, 0);
+    wd.addTrail("idle");
     wd.disappear(wd.target.unit);
 
     wd.flywalk(data.energyCost);
@@ -850,11 +850,10 @@ exports.pusher = {
       );
       wd.addTrail(
         "fly",
+        0,
         { ...poorGuy, x: wd.target.x + x * (z + 1), y: wd.target.y + y * (z + 1) },
-
         wd.target.x + x * z,
-        wd.target.y + y * z,
-        0
+        wd.target.y + y * z
       );
     }
     wd.go(wd.target.x, wd.target.y);
@@ -1263,14 +1262,13 @@ exports.kicker = {
           poorGuy.animation.push({ name: "none", fromX: poorGuy.x, fromY: poorGuy.y });
           poorGuy.animation.push({ name: "none", fromX: poorGuy.x, fromY: poorGuy.y });
 
-          wd.addTrail("idle", poorGuy, newX + x * z, newY + y * z, 0);
+          wd.addTrail("idle", 0, poorGuy, newX + x * z, newY + y * z);
           wd.addTrail(
             "fly",
+            1,
             { ...poorGuy, x: newX + x * (z + 1), y: newY + y * (z + 1) },
-
             newX + x * z,
-            newY + y * z,
-            1
+            newY + y * z
           );
           wd.teleport(newX + x * z, newY + y * z, newX + x * (z + 1), newY + y * (z + 1));
         }
@@ -1378,20 +1376,20 @@ exports.bear = {
         name: "idle",
         x: x + wd.me.x,
         y: y + wd.me.y,
-        data: { unit: wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
+        unit: { ...wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
         turn: 0,
       });
       wd.game.trail.push({
         name: "death",
         x: x + wd.me.x,
         y: y + wd.me.y,
-        data: { unit: wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
+        unit: { ...wd.unitInPoint(x + wd.me.x, y + wd.me.y) },
         turn: 1,
       });
       wd.kill(x + wd.me.x, y + wd.me.y);
     }
     wd.move(x + wd.me.x, y + wd.me.y);
-    wd.addTrail("jump", { ...wd.target.unit, x: x + wd.me.x, y: y + wd.me.y });
+    // wd.addTrail("jump", { ...wd.target.unit, x: x + wd.me.x, y: y + wd.me.y });
     wd.tire();
   },
 };
@@ -1438,20 +1436,8 @@ exports.frog = {
       wd.me.status.remove("frog");
       wd.me.status.push("frog2");
     } else if (wd.me.status.includes("frog2")) {
-      wd.game.trail.push({
-        name: "idle",
-        x: wd.target.x,
-        y: wd.target.y,
-        data: { unit: wd.target.unit },
-        turn: 0,
-      });
-      wd.game.trail.push({
-        name: "death",
-        x: wd.target.x,
-        y: wd.target.y,
-        data: { unit: wd.target.unit },
-        turn: 1,
-      });
+      wd.addTrail("idle");
+      wd.addTrail("death", 1);
       wd.kill();
     } else {
       wd.me.status.push("frog");

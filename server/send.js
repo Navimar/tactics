@@ -123,38 +123,45 @@ exports.data = (game) => {
       })(),
     };
     game.trail.forEach((tr) => {
-      let unit = tr?.data?.unit;
+      let unit = tr.unit;
+      let sendunit = false;
       if (unit) {
-        unit.img = _.isFunction(meta[unit.tp].img)
-          ? meta[unit.tp].img(wrapper(game, unit, unit))
-          : meta[unit.tp].img;
-        if (unit.sticker) {
-          unit.sticker.img = meta[unit.sticker.tp].img(wrapper(game, unit, unit));
-          unit.sticker.color = (() => {
-            if (player == 1) return unit.sticker.team;
+        sendunit = {
+          x: unit.x,
+          y: unit.y,
+          isActive: unit.isActive,
+          isReady: unit.isReady,
+          img: meta[unit.tp].img(wrapper(game, unit, unit)),
+          sticker: unit.sticker
+            ? {
+                img: meta[unit.sticker.tp].img(wrapper(game, u, u)),
+                color: (() => {
+                  if (player == 1) return u.sticker.team;
+                  if (player == 2)
+                    return (() => {
+                      if (unit.sticker.team == 1) {
+                        return 2;
+                      } else if (unit.sticker.team == 2) {
+                        return 1;
+                      } else return unit.sticker.team;
+                    })();
+                })(),
+              }
+            : false,
+          color: (() => {
+            if (player == 1) return unit.team;
             if (player == 2)
               return (() => {
-                if (unit.sticker.team == 1) {
+                if (unit.team == 1) {
                   return 2;
-                } else if (unit.sticker.team == 2) {
+                } else if (unit.team == 2) {
                   return 1;
-                } else return unit.sticker.team;
+                } else return unit.team;
               })();
-          })();
-        }
-        unit.color = (() => {
-          if (player == 1) return unit.team;
-          if (player == 2)
-            return (() => {
-              if (unit.team == 1) {
-                return 2;
-              } else if (unit.team == 2) {
-                return 1;
-              } else return unit.team;
-            })();
-        })();
+          })(),
+        };
       }
-      send.trail.push(tr);
+      send.trail.push({ ...tr, unit: sendunit });
     });
 
     game.unit.forEach((u) => {
@@ -164,7 +171,6 @@ exports.data = (game) => {
         status: u.status.slice(),
         isActive: u.isActive,
         isReady: u.isReady,
-        life: u.life,
         description: meta[u.tp].description,
         name: meta[u.tp].name,
         m: u.m,

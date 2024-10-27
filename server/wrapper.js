@@ -111,7 +111,7 @@ module.exports = (game, me, target) => {
         return u;
       }
     },
-    addTrail: (name, unit, x, y, turn) => {
+    addTrail: (name, turn, unit, x, y) => {
       if (x == undefined) x = target.x;
       if (y == undefined) y = target.y;
       unit = unit || target.unit;
@@ -119,7 +119,7 @@ module.exports = (game, me, target) => {
         name,
         x,
         y,
-        data: { unit },
+        unit: { ...unit },
         turn: turn || 0,
       });
     },
@@ -147,7 +147,6 @@ module.exports = (game, me, target) => {
         );
         unit.tp = tp;
       }
-      game.trail.push({ img: "polymorph", x, y });
     },
     terraform: (x, y, terrain) => {
       console.log(game.field[x][y]);

@@ -3,7 +3,7 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
-const SECOND_UNIT = false;
+const SECOND_UNIT = "frog";
 
 exports.new = (rank, ai) => {
   rank = 9999;

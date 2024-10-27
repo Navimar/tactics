@@ -5,7 +5,7 @@ let renderanimated = (diff) => {
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
-      if (local.animationTurn != local.renderedturn) {
+      if (local.animationTurn != local.renderedturn && local.animationTurn < 4) {
         local.renderedturn = local.animationTurn;
         render();
       }
@@ -202,7 +202,6 @@ let renderpanel = () => {
 
 const drawUnit = (unit) => {
   if (!local.once) {
-    console.log("drawUnit", unit);
     local.once = true;
   }
   unit.sizeAdd = unit.sizeAdd || 0;
@@ -245,7 +244,7 @@ const drawUnit = (unit) => {
 
   if (unit.sticker) drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
 
-  unit.status.forEach((stt) => drawStatus(stt, unit.x, unit.y, true));
+  unit.status?.forEach((stt) => drawStatus(stt, unit.x, unit.y, true));
 };
 
 const renderunit = (x, y) => {
@@ -379,23 +378,22 @@ let rendertrail = (x, y) => {
     if (local.animationTurn == trail.turn) {
       switch (trail.name) {
         case "death":
-          animateTrailDeath(trail.data.unit, trail.x, trail.y);
+          animateTrailDeath(trail.unit, trail.x, trail.y);
           break;
         case "fly":
-          animateFlight(trail.data.unit, trail.x, trail.y);
+          animateFlight(trail.unit, trail.x, trail.y);
           break;
         case "jump":
-          animateJump(trail.data.unit, trail.x, trail.y);
+          animateJump(trail.unit, trail.x, trail.y);
           break;
         case "idle":
-          console.log(trail);
-          drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
+          drawUnit({ ...trail.unit, x: trail.x, y: trail.y });
           break;
         case "launch":
-          animateLaunch(trail.data.unit, trail.x, trail.y);
+          animateLaunch(trail.unit, trail.x, trail.y);
           break;
         case "fall":
-          animateFall(trail.data.unit, trail.x, trail.y);
+          animateFall(trail.unit, trail.x, trail.y);
           break;
         default:
           // Обработка случая, если имя trail не соответствует ни одному из вариантов

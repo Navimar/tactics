@@ -78,8 +78,8 @@ exports.worm = (game) => {
       if (en.isAlive(game, worm) && game.spoil[i].data.worm?.tp == "worm") {
         if (worm != unit) {
           if (unit) {
-            game.trail.push({ name: "idle", x: unit.x, y: unit.y, data: { unit }, turn: 0 });
-            game.trail.push({ name: "death", x: unit.x, y: unit.y, data: { unit }, turn: 1 });
+            game.trail.push({ name: "idle", x: unit.x, y: unit.y, unit, turn: 0 });
+            game.trail.push({ name: "death", x: unit.x, y: unit.y, unit, turn: 1 });
             en.death(game, unit);
           }
           // en.addSpoil(
@@ -118,14 +118,14 @@ exports.rockettarget = (game) => {
               name: "launch",
               x: game.spoil[i].data.unit.x,
               y: game.spoil[i].data.unit.y,
-              data: { unit: game.spoil[i].data.unit },
+              unit: game.spoil[i].data.unit,
               turn: 0,
             });
             game.trail.push({
               name: "fall",
               x: game.spoil[i].x,
               y: game.spoil[i].y,
-              data: { unit: game.spoil[i].data.unit },
+              unit: game.spoil[i].data.unit,
               turn: 1,
             });
             en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
@@ -142,14 +142,14 @@ exports.rockettarget = (game) => {
                       name: "idle",
                       x: game.spoil[i].x + xx,
                       y: game.spoil[i].y + yy,
-                      data: { unit: poorGuy },
+                      unit: poorGuy,
                       turn: 0,
                     });
                     game.trail.push({
                       name: "idle",
                       x: game.spoil[i].x + xx,
                       y: game.spoil[i].y + yy,
-                      data: { unit: poorGuy },
+                      unit: poorGuy,
                       turn: 1,
                     });
                     en.death(game, poorGuy);
@@ -278,19 +278,20 @@ exports.baseRebirth = (game) => {
   let points = en.freeCells(game);
   let point = _.sample(points);
   let u = en.addUnit(game, "base", point.x, point.y, game.turn);
+  u.animation.push({ name: "add" });
   u.status.push("teleporter");
 };
 
-exports.basePolymoprh = (game) => {
-  let ulist = game.unit.filter((unit) => unit.team == game.turn);
-  if (!ulist.some((unit) => unit.tp === "base")) {
-    let newBase = _.sample(ulist);
-    if (newBase) {
-      newBase.tp = "base";
-      game.trail.push({ img: "polymorph", x: newBase.x, y: newBase.y });
-    }
-  }
-};
+// exports.basePolymoprh = (game) => {
+//   let ulist = game.unit.filter((unit) => unit.team == game.turn);
+//   if (!ulist.some((unit) => unit.tp === "base")) {
+//     let newBase = _.sample(ulist);
+//     if (newBase) {
+//       newBase.tp = "base";
+//       newBase.animation.push({ name: "polymorph", img: meta[wd.target.unit.tp].img(wd) });
+//     }
+//   }
+// };
 
 exports.eggcrack = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
@@ -298,7 +299,7 @@ exports.eggcrack = (game) => {
     if (sp.name == "egg") {
       let u = en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y);
       if (u) {
-        game.trail.push({ img: "egg", x: game.spoil[i].x, y: game.spoil[i].y });
+        // game.trail.push({ img: "egg", x: game.spoil[i].x, y: game.spoil[i].y });
         game.spoil.splice(i, 1);
       }
     }
@@ -352,7 +353,7 @@ exports.splitOnEndturn = (game) => {
         name: "death",
         x: u.x,
         y: u.y,
-        data: { unit: u },
+        unit: u,
         turn: 0,
       });
     }
