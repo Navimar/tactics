@@ -13,7 +13,13 @@ exports.teleport = (wd) => {
 
 exports.kill = (wd, turn) => {
   wd.kill();
-  wd.addTrail("death", turn);
+  wd.addTrail("death", wd.target.unit, wd.target.x, wd.target.y, turn);
+  wd.tire();
+};
+
+exports.disappear = (wd, turn) => {
+  wd.disappear();
+  wd.addTrail("disappear", wd.target.unit, wd.target.x, wd.target.y, turn);
   wd.tire();
 };
 
@@ -45,7 +51,7 @@ exports.wound = (wd) => {
 
 exports.capture = (wd) => {
   wd.animatePunch();
-  wd.target.unit.team = wd.me.team;
+  wd.target.unit.team = wd.game.turn;
   wd.tire();
 };
 

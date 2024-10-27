@@ -245,13 +245,22 @@ function drawImg(name, x, y, animate) {
   drawImageCeil(img, x * dh - p + shiftX, y * dh - p + shiftY, s, s, animate);
 }
 
-function drawImgNormal(name, x, y, mask, animate) {
+function drawImgMask(name, x, y, mask, animate) {
   let img;
   mask = false;
   if (mask && mask.length > 0) img = getImg(name, dh, mask[0]);
   else img = getImg(name, dh);
-
   drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
+}
+
+function drawImgMaskAplha(name, x, y, mask, alpha) {
+  let ctx = ctxAnimated;
+  let img;
+  mask = false;
+  if (mask && mask.length > 0) img = getImg(name, dh, mask[0]);
+  ctx.globalAlpha = alpha;
+  drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, animate);
+  ctx.restore;
 }
 
 function drawImgFieldConnection(name, x, y, mask, animate) {
@@ -299,7 +308,7 @@ function drawField(name, x, y, mask) {
     drawImageCeil(img, x * dh - p + shiftX, y * dh - p + shiftY, w, h);
   }
 }
-// }
+
 function drawTrail(name, x, y) {
   let img = getImg(name + ".trl", dh);
   drawImageCeil(img, x * dh + shiftX, y * dh + shiftY, dh, dh, false);
@@ -402,9 +411,15 @@ function drawPropUnit(name, x, y, m, team, isReady, isActive, ws, hs, animate) {
 
   let newYOffset = y * dh - 0.1 * dh - py * 2 + shiftY;
 
-  if (m) {
+  if (m === "upsidedown") {
     ctx.save();
-    ctx.scale(-1, 1);
+    ctx.translate(x * dh + shiftX, newYOffset + h); // Перемещаем начало координат для удобного переворачивания
+    ctx.scale(1, -1); // Отражение по вертикали
+    drawImageCeil(img, -px, -h, w, h, animate);
+    ctx.restore();
+  } else if (m === true) {
+    ctx.save();
+    ctx.scale(-1, 1); // Отражение по горизонтали
     drawImageCeil(img, (x * dh - px + shiftX) * -1 - w, newYOffset, w, h, animate);
     ctx.restore();
   } else {

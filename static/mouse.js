@@ -65,7 +65,7 @@ function inputMouse() {
 
       tapTime = local.time;
       tapDown = true;
-      // drawImgNormal('tap', mouseCell.x, mouseCell.y);
+      // drawImgMask('tap', mouseCell.x, mouseCell.y);
       e.preventDefault();
     },
     false

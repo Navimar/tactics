@@ -5,10 +5,26 @@ let renderanimated = (diff) => {
 
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
+      if (local.animationTurn != local.renderedturn) {
+        local.renderedturn = local.animationTurn;
+        render();
+      }
+
       let u = data.spoil.filter((u) => u.x == x && u.y == y);
-      u.forEach((s) => {
-        if (s.name.startsWith("fire")) drawSpoil(s.name, s.x, s.y, true);
+      u.forEach((spoil) => {
+        let spoil_animation;
+        if (spoil.animation) spoil_animation = spoil.animation[local.animationTurn];
+
+        if (spoil_animation) {
+          switch (spoil_animation.name) {
+            case "none":
+              break;
+          }
+          return;
+        }
+        if (spoil.name.startsWith("fire")) drawSpoil(spoil.name, spoil.x, spoil.y, true);
       });
+
       rendertrail(x, y);
       renderunit(x, y);
     }
@@ -68,6 +84,13 @@ let render = () => {
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
       renderfield(x, y);
+      if (
+        local.animationTurn < 2 &&
+        local.oldfield &&
+        local.oldfield[x][y] == "grass" &&
+        data.field[x][y] == "ground"
+      )
+        drawImgMask("grass", x, y, fieldmask[x][y], false);
     }
     for (let x = 0; x < 9; x++) {
       renderspoil(x, y);
@@ -77,8 +100,8 @@ let render = () => {
     // }
     if (data.chooseteam || !data.bonus == "ready") {
       for (let x = 0; x < 9; x++) {
-        if (data.field[x][y] == "team1") drawImgNormal("bluestart", x, y);
-        if (data.field[x][y] == "team2") drawImgNormal("orangestart", x, y);
+        if (data.field[x][y] == "team1") drawImgMask("bluestart", x, y);
+        if (data.field[x][y] == "team2") drawImgMask("orangestart", x, y);
       }
     }
   }
@@ -185,6 +208,8 @@ const drawUnit = (unit) => {
   unit.sizeAdd = unit.sizeAdd || 0;
   cellX = Math.round(unit.x);
   cellY = Math.round(unit.y);
+  if (!(cellX >= 0 && cellX < 9 && cellY < 9 && cellY >= 0)) return true;
+
   const groundSize = ["grass", "team1", "team2"].includes(data.field[cellX][cellY]) ? 56 : 0;
 
   if (unit.cropPercent)
@@ -216,7 +241,7 @@ const drawUnit = (unit) => {
     );
   if (unit.focused) drawImg("focus", unit.x, unit.y, true);
   if (data.field[cellX][cellY] === "water")
-    drawImgNormal("drawn", unit.x, unit.y, fieldmask[cellX][cellY], true);
+    drawImgMask("drawn", unit.x, unit.y, fieldmask[cellX][cellY], true);
 
   if (unit.sticker) drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
 
@@ -228,9 +253,7 @@ const renderunit = (x, y) => {
   if (!unit) return;
   unit = { ...unit, focused: local.unit == unit ? true : false };
 
-  let animationTurn = Math.floor(local.animationProgress / 1000);
-
-  let animation = unit.animation[animationTurn];
+  let animation = unit.animation[local.animationTurn];
 
   if (animation) {
     switch (animation.name) {
@@ -264,7 +287,6 @@ const renderunit = (x, y) => {
         animateShake(unit);
         break;
       case "polymorph":
-        console.log("polymorph", animation.img);
         animatePolymorph(unit, animation.img);
         break;
       default:
@@ -281,8 +303,9 @@ const renderunit = (x, y) => {
 };
 
 let renderfield = (x, y) => {
+  if (!data.field) return;
   let v = 0;
-  drawImgNormal(data.field[x][y], x, y + v, fieldmask[x][y]);
+  drawImgMask(data.field[x][y], x, y + v, fieldmask[x][y]);
   if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
     drawImgFieldConnection(
       "ns" + data.field[x][y - 1] + data.field[x][y],
@@ -299,6 +322,25 @@ let renderfield = (x, y) => {
     );
   if (data.turn)
     if (data.field[x][y] == "team1" && data.gold[0] >= local.cost) drawImg("canBuild", x, y);
+};
+
+let renderoldfield = (x, y) => {
+  let v = 0;
+  drawImgMask(local.oldfield[x][y], x, y + v, fieldmask[x][y]);
+  if (local.oldfield[x][y - 1] && local.oldfield[x][y - 1] != local.oldfield[x][y])
+    drawImgFieldConnection(
+      "ns" + local.oldfield[x][y - 1] + local.oldfield[x][y],
+      x,
+      y - 0.5,
+      fieldmask[x][y]
+    );
+  if (local.oldfield[x - 1] && local.oldfield[x - 1][y] != local.oldfield[x][y])
+    drawImgFieldConnection(
+      "we" + local.oldfield[x - 1][y] + local.oldfield[x][y],
+      x - 0.5,
+      y,
+      fieldmask[x][y]
+    );
 };
 
 let renderspoil = (x, y) => {
@@ -333,19 +375,31 @@ let renderakt = () => {
 let rendertrail = (x, y) => {
   let p = data.trail.filter((p) => p.x == x && p.y == y);
   p.forEach((trail) => {
-    let animationTurn = Math.floor(local.animationProgress / 1000);
     trail.turn = trail.turn || 0;
-    if (animationTurn == trail.turn) {
-      if (trail.name == "death") {
-        animateTrailDeath(trail.data.unit, trail.x, trail.y);
-      }
-      if (trail.name == "idle") {
-        drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
-        // animateTrailIdle(t.data.unit, t.x, t.y);
-      }
-      if (trail.name == "launch") {
-        console.log("launch");
-        animateLaunch(trail.data.unit, trail.x, trail.y);
+    if (local.animationTurn == trail.turn) {
+      switch (trail.name) {
+        case "death":
+          animateTrailDeath(trail.data.unit, trail.x, trail.y);
+          break;
+        case "fly":
+          animateFlight(trail.data.unit, trail.x, trail.y);
+          break;
+        case "jump":
+          animateJump(trail.data.unit, trail.x, trail.y);
+          break;
+        case "idle":
+          console.log(trail);
+          drawUnit({ ...trail.data.unit, x: trail.x, y: trail.y });
+          break;
+        case "launch":
+          animateLaunch(trail.data.unit, trail.x, trail.y);
+          break;
+        case "fall":
+          animateFall(trail.data.unit, trail.x, trail.y);
+          break;
+        default:
+          // Обработка случая, если имя trail не соответствует ни одному из вариантов
+          break;
       }
     }
   });

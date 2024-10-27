@@ -85,6 +85,9 @@ exports.order = (game, orderUnit, akt) => {
   game.unit.forEach((u) => {
     u.animation = [];
   });
+  game.spoil.forEach((s) => {
+    s.animation = [];
+  });
 
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
   if (game && !game.finished) {
@@ -129,7 +132,7 @@ exports.order = (game, orderUnit, akt) => {
         );
       else console.log("unkonwn akt", akt.img);
     }
-    // }
+
     //onOrder
     onOrder(game, unit, akt);
     updateAkts(game);
@@ -248,6 +251,9 @@ exports.endturn = (game, p) => {
       u.isReady = true;
       u.animation = [];
     });
+    game.spoil.forEach((s) => {
+      s.animation = [];
+    });
     game.leftturns--;
     //закончились ходы
     if (game.leftturns == 0) {
@@ -287,7 +293,8 @@ exports.endturn = (game, p) => {
     onOrder(game);
     rules.flagwin(game);
 
-    // rules.foxPolymoprh(game);
+    // rules.basePolymoprh(game);
+    rules.baseRebirth(game);
     if (game.ai && game.turn == 1) worldshift(game);
     updateAkts(game);
 

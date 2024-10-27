@@ -121,6 +121,13 @@ exports.rockettarget = (game) => {
               data: { unit: game.spoil[i].data.unit },
               turn: 0,
             });
+            game.trail.push({
+              name: "fall",
+              x: game.spoil[i].x,
+              y: game.spoil[i].y,
+              data: { unit: game.spoil[i].data.unit },
+              turn: 1,
+            });
             en.move(game, game.spoil[i].data.unit, game.spoil[i].x, game.spoil[i].y);
             en.death(game, game.spoil[i].data.unit);
             for (let xx = -1; xx <= 1; xx++) {
@@ -129,8 +136,34 @@ exports.rockettarget = (game) => {
                   if (game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] == "grass")
                     game.field[game.spoil[i].x + xx][game.spoil[i].y + yy] = "ground";
 
-                  en.death(game, en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy));
-                  en.addSpoil(game, "fire", game.spoil[i].x + xx, game.spoil[i].y + yy, false, 3);
+                  let poorGuy = en.unitInPoint(game, game.spoil[i].x + xx, game.spoil[i].y + yy);
+                  if (poorGuy) {
+                    game.trail.push({
+                      name: "idle",
+                      x: game.spoil[i].x + xx,
+                      y: game.spoil[i].y + yy,
+                      data: { unit: poorGuy },
+                      turn: 0,
+                    });
+                    game.trail.push({
+                      name: "idle",
+                      x: game.spoil[i].x + xx,
+                      y: game.spoil[i].y + yy,
+                      data: { unit: poorGuy },
+                      turn: 1,
+                    });
+                    en.death(game, poorGuy);
+                  }
+                  let s = en.addSpoil(
+                    game,
+                    "fire",
+                    game.spoil[i].x + xx,
+                    game.spoil[i].y + yy,
+                    false,
+                    3
+                  );
+                  s.animation.push({ name: "none" });
+                  s.animation.push({ name: "none" });
                 }
               }
             }
@@ -196,14 +229,59 @@ exports.airdropBirth = (game) => {
       game.spoil[i].name === "airdrop" &&
       !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)
     ) {
-      const team = tp === "mushroom" ? 3 : game.turn; // Используем game.turn для "base"
-      en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, team);
+      let u = en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, 3);
+      // let u = en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, game.turn);
+
+      u.animation.push({ name: "add" });
       game.spoil.splice(i, 1);
     }
   }
 };
 
-exports.foxPolymoprh = (game) => {
+// exports.teamBirth = (game) => {
+//   // Retrieve all points on the grid
+//   const allPoints = en.allPoints();
+
+//   // Determine the team based on the current turn
+//   const targetTeam = `team${game.turn}`;
+
+//   // Filter points where the field matches the target team and is unoccupied
+//   let availablePoints = allPoints.filter(
+//     (p) => game.field[p.x][p.y] === targetTeam && !en.unitInPoint(game, p.x, p.y)
+//   );
+
+//   // If no available points, find nearby unoccupied points first
+//   if (availablePoints.length === 0) {
+//     let teamPoints = allPoints.filter((p) => game.field[p.x][p.y] === targetTeam);
+//     let nearbyPoints = [];
+//     teamPoints.forEach((point) => {
+//       en.near(point.x, point.y).forEach((pt) => {
+//         if (!en.unitInPoint(game, pt.x, pt.y)) {
+//           nearbyPoints.push(pt);
+//         }
+//       });
+//     });
+//     availablePoints = nearbyPoints;
+//   }
+
+//   // Randomly select one of the available points and add a unit
+//   if (availablePoints.length > 0) {
+//     const selectedPoint = _.sample(availablePoints);
+//     let u = en.addUnit(game, "mushroom", selectedPoint.x, selectedPoint.y, game.turn);
+//     u.animation.push({ name: "add" });
+//   }
+// };
+
+// exports.baseRebirth = (game) => {
+//   let ulist = game.unit.filter((unit) => unit.team == game.turn);
+//   if (ulist.some((unit) => unit.tp === "base")) return;
+//   let points = en.freeCells(game);
+//   let point = _.sample(points);
+//   let u = en.addUnit(game, "base", point.x, point.y, game.turn);
+//   u.status.push("teleporter");
+// };
+
+exports.basePolymoprh = (game) => {
   let ulist = game.unit.filter((unit) => unit.team == game.turn);
   if (!ulist.some((unit) => unit.tp === "base")) {
     let newBase = _.sample(ulist);
@@ -486,11 +564,7 @@ exports.airdrop = (game) => {
   if (bestPoints.length > 0) {
     const selectedPoint = _.sample(bestPoints);
     en.addSpoil(game, "airdrop", selectedPoint.x, selectedPoint.y, false, 3);
-    return selectedPoint; // Return the selected point if needed
   }
-
-  // Return null if no suitable point is found
-  return null;
 };
 
 exports.flagwin = (game) => {

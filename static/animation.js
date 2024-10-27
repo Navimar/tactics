@@ -183,3 +183,14 @@ const animateLaunch = (u, x, y) => {
   drawUnit({ ...u, x, y });
   return true;
 };
+
+const animateFall = (u, x, y) => {
+  let totalDuration = 1000; // Общая длительность анимации в миллисекундах
+  if (local.cadrProgress > totalDuration) return false;
+
+  // Позиция начинается из-за границы сверху и движется к целевому значению y
+  y = y - (15 / totalDuration) * (totalDuration - local.cadrProgress); // Падаем вниз из-за края
+
+  drawUnit({ ...u, x, y, m: "upsidedown" }); // Добавляем 'upsidedown' для переворота юнита
+  return true;
+};

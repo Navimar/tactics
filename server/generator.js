@@ -3,7 +3,7 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
-const SECOND_UNIT = "base";
+const SECOND_UNIT = false;
 
 exports.new = (rank, ai) => {
   rank = 9999;
@@ -12,7 +12,6 @@ exports.new = (rank, ai) => {
     if (meta[key].rank <= rank)
       if (meta[key].weight) if (meta[key].class == "basic") barraks.push(key);
   });
-  // barraks = _.sampleSize(barraks, 4);
 
   let neutral = [];
   Object.keys(meta).forEach(function (key) {
@@ -184,11 +183,6 @@ exports.new = (rank, ai) => {
   // orangearr.push({ x: up.x, y: up.y + 1 });
   // orangearr.push({ x: up.x + 1, y: up.y });
   // orangearr.push({ x: up.x, y: up.y });
-
-  bluearr.push({ x: 1, y: 1 });
-  orangearr.push({ x: 7, y: 7 });
-  // bluearr.push({ x: 1,y:7 });
-  // orangearr.push({ x: 7, y: 1 });
   const pointsnearteam = [
     [4 + dir, 4],
     [4 - dir, 4],
@@ -243,9 +237,12 @@ exports.new = (rank, ai) => {
   });
 
   if (!ai) {
-    bluearr[0].tp = START_UNIT;
-    orangearr[0].tp = START_UNIT;
-
+    if (START_UNIT) {
+      bluearr.push({ x: 1, y: 1 });
+      orangearr.push({ x: 7, y: 7 });
+      bluearr[0].tp = START_UNIT;
+      orangearr[0].tp = START_UNIT;
+    }
     if (SECOND_UNIT) {
       orangearr.push({ x: 7, y: 1, tp: SECOND_UNIT });
       bluearr.push({ x: 1, y: 7, tp: SECOND_UNIT });

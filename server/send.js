@@ -125,10 +125,24 @@ exports.data = (game) => {
     game.trail.forEach((tr) => {
       let unit = tr?.data?.unit;
       if (unit) {
-        tr.data.unit.img = _.isFunction(meta[unit.tp].img)
+        unit.img = _.isFunction(meta[unit.tp].img)
           ? meta[unit.tp].img(wrapper(game, unit, unit))
           : meta[unit.tp].img;
-        tr.data.unit.color = (() => {
+        if (unit.sticker) {
+          unit.sticker.img = meta[unit.sticker.tp].img(wrapper(game, unit, unit));
+          unit.sticker.color = (() => {
+            if (player == 1) return unit.sticker.team;
+            if (player == 2)
+              return (() => {
+                if (unit.sticker.team == 1) {
+                  return 2;
+                } else if (unit.sticker.team == 2) {
+                  return 1;
+                } else return unit.sticker.team;
+              })();
+          })();
+        }
+        unit.color = (() => {
           if (player == 1) return unit.team;
           if (player == 2)
             return (() => {

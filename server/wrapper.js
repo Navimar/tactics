@@ -64,7 +64,6 @@ module.exports = (game, me, target) => {
     },
     spoilInPoint: (x, y, name) => {
       return en.spoilInPoint(game, x, y).filter((s) => {
-        console.log(s);
         return s.name == name;
       });
     },
@@ -88,7 +87,7 @@ module.exports = (game, me, target) => {
       en.move(game, me, xto, yto);
     },
     spoil: (name, x, y, data, team) => {
-      en.addSpoil(game, name, x, y, data, team);
+      return en.addSpoil(game, name, x, y, data, team);
     },
     clearspoil: (x, y, name) => {
       for (i = game.spoil.length; i--; i > 0) {
@@ -112,12 +111,15 @@ module.exports = (game, me, target) => {
         return u;
       }
     },
-    addTrail: (name, turn) => {
+    addTrail: (name, unit, x, y, turn) => {
+      if (x == undefined) x = target.x;
+      if (y == undefined) y = target.y;
+      unit = unit || target.unit;
       game.trail.push({
         name,
-        x: target.x,
-        y: target.y,
-        data: { unit: target.unit },
+        x,
+        y,
+        data: { unit },
         turn: turn || 0,
       });
     },
@@ -140,8 +142,8 @@ module.exports = (game, me, target) => {
         } while (
           tp == unit.tp ||
           meta[tp].class == "neutral" ||
-          meta[tp].class == "none"
-          // || tp == "base"
+          meta[tp].class == "none" ||
+          tp == "base"
         );
         unit.tp = tp;
       }

@@ -9,6 +9,13 @@ module.exports = (game, unit, akt) => {
   //возимся с мертвыми и выполняем правила
   do {
     for (let i = game.deadPool.length; i--; i > 0) {
+      rules.drop(
+        wrapper(game, game.deadPool[i], {
+          x: game.deadPool[i].x,
+          y: game.deadPool[i].y,
+          unit: game.deadPool[i],
+        })
+      );
       if (_.isFunction(meta[game.deadPool[i].tp].onDeath)) {
         meta[game.deadPool[i].tp].onDeath(
           wrapper(game, game.deadPool[i], {
@@ -19,13 +26,6 @@ module.exports = (game, unit, akt) => {
         );
       }
       rules.bomber(
-        wrapper(game, game.deadPool[i], {
-          x: game.deadPool[i].x,
-          y: game.deadPool[i].y,
-          unit: game.deadPool[i],
-        })
-      );
-      rules.drop(
         wrapper(game, game.deadPool[i], {
           x: game.deadPool[i].x,
           y: game.deadPool[i].y,

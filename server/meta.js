@@ -238,8 +238,10 @@ exports.base = {
   class: "norm",
   img: () => "mushroomking",
   akt: (akt) => {
-    let akts = akt.move().concat(akt.hand("capture", "neutral"));
-    // .concat(akt.hand("polymorph", "notneutral"));
+    let akts = akt
+      .move()
+      .concat(akt.hand("capture", "neutral"))
+      .concat(akt.hand("polymorph", "notneutral"));
     return akts;
   },
   // onDeath: (wd) => {
@@ -253,7 +255,11 @@ exports.merchant = {
   class: "norm",
   img: () => "merchant",
   akt: (akt) => {
-    return akt.move().concat(akt.hand("trade"));
+    let handakts = akt.hand("trade");
+    // handakts.forEach((a) => {
+    //   if (en.unitInPoint(akt.game, a.x, a.y)?.tp == "bush") a.img = "disappear";
+    // });
+    return akt.move().concat(handakts);
   },
   trade: (wd) => {
     wd.animatePunch();
@@ -506,12 +512,7 @@ exports.aerostat = {
     let x = wd.me.x;
     let y = wd.me.y;
     let sticker = { tp: wd.target.unit.tp, team: wd.target.unit.team };
-    wd.addTrail({
-      name: "idle",
-      x: wd.target.x,
-      y: wd.target.y,
-      data: { unit: wd.target.unit },
-    });
+    wd.addTrail("idle", wd.target.unit, wd.target.x, wd.target.y, 0);
     wd.disappear(wd.target.unit);
 
     wd.flywalk(data.energyCost);
@@ -697,46 +698,6 @@ exports.zombie = {
 //   }
 // }
 
-// exports.bush = {
-//   // neutral: true,
-//   rank: 0,
-//   weight: 100,
-//   class: 'neutral',
-//   life: 3,
-//   img: 'bush',
-//   akt: (akt) => {
-//     let akts = []
-//     let points = en.allPoints();
-//     points = points.filter(pt => {
-//       let u = en.unitInPoint(akt.game, pt.x, pt.y)
-//       if (u && u.team == akt.me.team)
-//         return true
-//     });
-//     points.forEach((pt) => {
-//       if (pt.x != akt.me.x || pt.y != akt.me.y) {
-//         akts.push({
-//           x: pt.x,
-//           y: pt.y,
-//           img: 'change',
-//         })
-//       }
-//     });
-//     return akts;
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-//   change: (wd) => {
-//     let x = wd.me.x
-//     let y = wd.me.y
-//     wd.disappear(x, y);
-//     wd.teleport(wd.target.x, wd.target.y, x, y)
-//   },
-//   // onDeath: (wd) => {
-//   //   wd.addUnit(_.sample(Object.keys(this)), wd.target.x, wd.target.y, wd.me.team)
-//   // }
-// }
-
 exports.bush = {
   // neutral: true,
   rank: 0,
@@ -753,6 +714,10 @@ exports.bush = {
       },
     ];
   },
+  // onDeath: (wd) => {
+  //   u = wd.addUnit("bush", wd.target.x, wd.target.y, wd.me.team);
+  //   if (u) wd.polymorph(wd.target.x, wd.target.y);
+  // },
 };
 
 exports.mushroom = {
@@ -767,13 +732,10 @@ exports.mushroom = {
     );
     points.forEach((pt) => {
       let tp = en.unitInPoint(akt.game, pt.x, pt.y)?.tp;
-      if (
-        tp != "mushroom"
-        //  && tp != "base"
-      )
-        akts.push({ x: pt.x, y: pt.y, img: "change" });
-      else akts.push({ x: pt.x, y: pt.y, img: "random" });
+      if (tp != "mushroom" && tp != "base") akts.push({ x: pt.x, y: pt.y, img: "change" });
     });
+    akts.push({ x: akt.me.x, y: akt.me.y, img: "random" });
+
     return akts;
   },
   change: (wd) => {
@@ -795,7 +757,7 @@ exports.polymorpher = {
   rank: 0,
   weight: 50,
   class: "norm",
-  img: "chicken",
+  img: () => "chicken",
   akt: (akt) => {
     return akt.move().concat(akt.hand("polymorph"));
   },
@@ -872,10 +834,13 @@ exports.pusher = {
     }
     for (z = i; z--; z < 0) {
       let poorGuy = en.unitInPoint(wd.game, wd.target.x + x * z, wd.target.y + y * z);
+      // poorGuy.animation.push({
+      //   name: "fly",
+      //   fromX: wd.target.x + x * z,
+      //   fromY: wd.target.y + y * z,
+      // });
       poorGuy.animation.push({
-        name: "fly",
-        fromX: wd.target.x + x * z,
-        fromY: wd.target.y + y * z,
+        name: "none",
       });
       wd.teleport(
         wd.target.x + x * z,
@@ -883,11 +848,20 @@ exports.pusher = {
         wd.target.x + x * (z + 1),
         wd.target.y + y * (z + 1)
       );
+      wd.addTrail(
+        "fly",
+        { ...poorGuy, x: wd.target.x + x * (z + 1), y: wd.target.y + y * (z + 1) },
+
+        wd.target.x + x * z,
+        wd.target.y + y * z,
+        0
+      );
     }
     wd.go(wd.target.x, wd.target.y);
     wd.me.energy--;
   },
 };
+
 exports.fountain = {
   rank: 70,
   class: "norm",
@@ -896,17 +870,7 @@ exports.fountain = {
   img: () => "fountain",
   akt: (akt) => {
     let akts = akt.hand("fish");
-    akts.forEach((a) => {
-      if (en.unitInPoint(akt.game, a.x, a.y).tp == "fish") a.img = "polymorph";
-    });
-    // akts = akts.concat(akt.hand('digger'));
-    // akts = akts.filter(a => {
-    //   let f = akt.game.field[a.x][a.y];
-    //   if (a.img == 'digger' && (f.slice(0, -1) == 'team' || f == 'ground' || f == 'water'))
-    //     return false
-    //   else
-    //     return true
-    // });
+    akts = akts.filter((a) => en.unitInPoint(akt.game, a.x, a.y).tp != "fish");
     akts = akts.concat(akt.move());
     return akts;
   },
@@ -1031,6 +995,11 @@ exports.hatchery = {
     let u = wd.addUnit("fish");
     if (u) {
       u.status.push("spliter2");
+      u.animation.push({
+        name: "add",
+        fromX: wd.me.x,
+        fromY: wd.me.y,
+      });
     }
     wd.tire();
     // if (u)
@@ -1054,19 +1023,6 @@ exports.bomb = {
     return aktarr;
   },
   onDeath: (wd) => {
-    this.bomb.bomb(wd);
-  },
-  bomb: (wd) => {
-    for (let xx = -1; xx <= 1; xx++) {
-      for (let yy = -1; yy <= 1; yy++) {
-        if (
-          en.inField(wd.target.x + xx, wd.target.y + yy) &&
-          wd.game.field[wd.target.x + xx][wd.target.y + yy] == "grass"
-        )
-          wd.game.field[wd.target.x + xx][wd.target.y + yy] = "ground";
-      }
-    }
-    wd.disappear();
     wd.kill(wd.me.x - 1, wd.me.y - 1);
     wd.spoil("fire", wd.me.x - 1, wd.me.y - 1, false, 3);
     wd.kill(wd.me.x, wd.me.y - 1);
@@ -1083,8 +1039,22 @@ exports.bomb = {
     wd.spoil("fire", wd.me.x, wd.me.y + 1, false, 3);
     wd.kill(wd.me.x + 1, wd.me.y + 1);
     wd.spoil("fire", wd.me.x + 1, wd.me.y + 1, false, 3);
+
     wd.spoil("fire", wd.me.x, wd.me.y, false, 3);
-    wd.tire();
+    // this.bomb.bomb(wd);
+  },
+  bomb: (wd) => {
+    for (let xx = -1; xx <= 1; xx++) {
+      for (let yy = -1; yy <= 1; yy++) {
+        if (
+          en.inField(wd.target.x + xx, wd.target.y + yy) &&
+          wd.game.field[wd.target.x + xx][wd.target.y + yy] == "grass"
+        )
+          wd.game.field[wd.target.x + xx][wd.target.y + yy] = "ground";
+      }
+    }
+
+    wd.kill();
   },
 };
 
@@ -1126,6 +1096,7 @@ exports.plant = {
     wd.tire();
   },
 };
+
 exports.worm = {
   weight: 100,
   life: 3,
@@ -1146,6 +1117,7 @@ exports.worm = {
       (pt) =>
         akt.game.field[pt.x][pt.y].slice(0, -1) != "team" &&
         (pt.x != akt.me.x || pt.y != akt.me.y) &&
+        !en.unitInPoint(akt.game, pt.x, pt.y) &&
         !wormportalSpoils.some((s) => s.x === pt.x && s.y === pt.y)
     );
 
@@ -1286,8 +1258,20 @@ exports.kicker = {
         }
         for (z = i; z--; z < 0) {
           let poorGuy = wd.unitInPoint(newX + x * z, newY + y * z);
-          poorGuy.animation.push({ name: "idle", fromX: poorGuy.x, fromY: poorGuy.y });
-          poorGuy.animation.push({ name: "fly", fromX: poorGuy.x, fromY: poorGuy.y });
+          // poorGuy.animation.push({ name: "idle", fromX: poorGuy.x, fromY: poorGuy.y });
+          // poorGuy.animation.push({ name: "fly", fromX: poorGuy.x, fromY: poorGuy.y });
+          poorGuy.animation.push({ name: "none", fromX: poorGuy.x, fromY: poorGuy.y });
+          poorGuy.animation.push({ name: "none", fromX: poorGuy.x, fromY: poorGuy.y });
+
+          wd.addTrail("idle", poorGuy, newX + x * z, newY + y * z, 0);
+          wd.addTrail(
+            "fly",
+            { ...poorGuy, x: newX + x * (z + 1), y: newY + y * (z + 1) },
+
+            newX + x * z,
+            newY + y * z,
+            1
+          );
           wd.teleport(newX + x * z, newY + y * z, newX + x * (z + 1), newY + y * (z + 1));
         }
         wd.move(newX, newY);
@@ -1369,10 +1353,10 @@ exports.bear = {
     let akts = akt.move();
     let points = en.near(akt.me.x, akt.me.y);
     points = points.filter((pt) => {
-      // let x = (2 * akt.me.x - pt.x)
-      // let y = (2 * akt.me.y - pt.y)
-      // return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y) != 1
-      return en.isOccupied(akt.game, pt.x, pt.y);
+      let x = 2 * akt.me.x - pt.x;
+      let y = 2 * akt.me.y - pt.y;
+      return en.isOccupied(akt.game, pt.x, pt.y) && en.isOccupied(akt.game, x, y) != 1;
+      // return en.isOccupied(akt.game, pt.x, pt.y);
     });
     points.forEach((pt) => {
       akts.push({
@@ -1385,6 +1369,7 @@ exports.bear = {
   },
   bear: (wd) => {
     wd.target.unit.animation.push({ name: "jump", fromX: wd.target.x, fromY: wd.target.y });
+    // wd.target.unit.animation.push({ name: "none" });
     let x = wd.me.x - wd.target.x;
     let y = wd.me.y - wd.target.y;
     wd.animatePunch();
@@ -1406,6 +1391,7 @@ exports.bear = {
       wd.kill(x + wd.me.x, y + wd.me.y);
     }
     wd.move(x + wd.me.x, y + wd.me.y);
+    wd.addTrail("jump", { ...wd.target.unit, x: x + wd.me.x, y: y + wd.me.y });
     wd.tire();
   },
 };

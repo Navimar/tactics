@@ -33,19 +33,9 @@ let data = {
   trail: [],
   spoil: [],
   gold: [11, 11],
-  field: [
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-    ["water", "water", "water", "water", "water", "water", "water", "water", "water"],
-  ],
   unit: [],
 };
+
 let fieldmask = (() => {
   let arr = [];
   for (let y = 0; y < 9; y++) {
@@ -172,6 +162,7 @@ let onStep = (diff) => {
   local.animationProgress += diff;
   local.cadrProgress += diff;
   if (local.cadrProgress >= 1000) local.cadrProgress -= 1000;
+  local.animationTurn = Math.floor(local.animationProgress / 1000);
   renderanimated(diff);
 };
 
@@ -191,6 +182,7 @@ let onUpdate = (val) => {
   // updateAudio.play();
   // console.log(val);
   local.lastclick = local.seconds;
+  local.oldfield = data.field;
   data = val;
   local.tip = false;
   local.unit = false;
@@ -394,7 +386,7 @@ let onMouseDown = () => {
     ) {
       let arr = [];
       data.unit.forEach((u) => {
-        if (u.color == 1 && u.isReady) {
+        if (u.isReady && u.akt.length > 0 && u.canMove) {
           arr.push(u);
         }
       });

@@ -35,6 +35,11 @@ en.allPoints = () => {
   }
   return points;
 };
+
+en.freeCells = (game) => {
+  return en.allPoints().filter((point) => !en.isOccupied(game, point.x, point.y));
+};
+
 en.isFlag = (game, x, y) => {
   return game.field[x][y].slice(0, -1) == "team";
 };
@@ -94,7 +99,9 @@ en.addUnit = (game, tp, x, y, team) => {
   }
 };
 en.addSpoil = (game, name, x, y, data, team) => {
-  game.spoil.push({ name, data, x, y, team });
+  const spoil = { name, data, x, y, team, animation: [] };
+  game.spoil.push(spoil);
+  return spoil;
 };
 
 en.makeUnit = (tp, x, y, team) => {
