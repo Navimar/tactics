@@ -272,14 +272,14 @@ exports.airdropBirth = (game) => {
 //   }
 // };
 
-// exports.baseRebirth = (game) => {
-//   let ulist = game.unit.filter((unit) => unit.team == game.turn);
-//   if (ulist.some((unit) => unit.tp === "base")) return;
-//   let points = en.freeCells(game);
-//   let point = _.sample(points);
-//   let u = en.addUnit(game, "base", point.x, point.y, game.turn);
-//   u.status.push("teleporter");
-// };
+exports.baseRebirth = (game) => {
+  let ulist = game.unit.filter((unit) => unit.team == game.turn);
+  if (ulist.some((unit) => unit.tp === "base")) return;
+  let points = en.freeCells(game);
+  let point = _.sample(points);
+  let u = en.addUnit(game, "base", point.x, point.y, game.turn);
+  u.status.push("teleporter");
+};
 
 exports.basePolymoprh = (game) => {
   let ulist = game.unit.filter((unit) => unit.team == game.turn);
