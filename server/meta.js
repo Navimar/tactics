@@ -87,7 +87,7 @@ exports.fish = {
 exports.headcrab = {
   weight: 100,
   rank: 0,
-  class: "norm",
+  class: "slowdeath",
   life: 3,
   img: () => "headcrab",
   akt: (akt) => {
@@ -113,7 +113,7 @@ exports.headcrab = {
 exports.bee = {
   weight: 100,
   rank: 0,
-  class: "norm",
+  class: "spawners",
   life: 3,
   img: () => "bee",
   akt: (akt) => {
@@ -154,6 +154,8 @@ exports.bee = {
   kill: (wd) => {
     wd.me.animation.push({ name: "walk", fromX: wd.me.x, fromY: wd.me.y });
     wd.addTrail("idle");
+    wd.addTrail("death", 1);
+
     oldx = wd.me.x;
     oldy = wd.me.y;
     wd.kill();
@@ -233,9 +235,7 @@ exports.bee = {
 // };
 
 exports.base = {
-  weight: 100,
-  rank: 0,
-  class: "norm",
+  class: "base",
   img: () => "mushroomking",
   akt: (akt) => {
     let akts = akt
@@ -252,7 +252,7 @@ exports.base = {
 exports.merchant = {
   weight: 100,
   rank: 30,
-  class: "norm",
+  class: "merchant",
   img: () => "merchant",
   akt: (akt) => {
     let handakts = akt.hand("trade");
@@ -295,10 +295,7 @@ exports.merchant = {
 // };
 
 exports.firebat = {
-  weight: 100,
-  rank: 80,
-  class: "norm",
-  life: 3,
+  class: "firebat",
   img: () => "firebat",
   akt: (akt) => {
     let arr = akt.move();
@@ -347,7 +344,7 @@ exports.firebat = {
 // }
 
 exports.teleporter = {
-  class: "norm",
+  class: "teleporter",
   img: () => "teleporter",
   akt: (akt) => {
     let arr = akt.move();
@@ -380,17 +377,11 @@ exports.teleporter = {
 exports.staziser = {
   weight: 100,
   rank: 80,
-  class: "norm",
+  class: "staziser",
   life: 3,
   img: () => "staziser",
   akt: (akt) => {
     return akt.move().concat(akt.hand("stazis"));
-  },
-  stazis: (wd) => {
-    wd.animatePunch();
-    if (wd.target.unit.status.includes("stazis")) wd.target.unit.status.remove("stazis");
-    else wd.addStatus("stazis");
-    wd.tire();
   },
 };
 
@@ -444,10 +435,7 @@ exports.staziser = {
 // }
 
 exports.aerostat = {
-  weight: 100,
-  rank: 100,
-  class: "norm",
-  life: 3,
+  class: "aerostat",
   img: () => "aerostat",
   akt: (akt) => {
     let akts = [];
@@ -480,13 +468,13 @@ exports.aerostat = {
         img: "drop",
       });
     }
-    if (akt.me.sticker && akt.me.data.drop == true) {
-      akts.push({
-        x: akt.me.x,
-        y: akt.me.y,
-        img: "undrop",
-      });
-    }
+    // if (akt.me.sticker && akt.me.data.drop == true) {
+    //   akts.push({
+    //     x: akt.me.x,
+    //     y: akt.me.y,
+    //     img: "undrop",
+    //   });
+    // }
     return akts;
   },
   // onDisappear: true,
@@ -596,7 +584,7 @@ exports.aerostat = {
 exports.zombie = {
   weight: 100,
   rank: 50,
-  class: "norm",
+  class: "slowdeath",
   life: 3,
   maxenergy: 1,
   img: () => "zombie",
@@ -604,8 +592,11 @@ exports.zombie = {
     return akt.move().concat(akt.hand("zombie"));
   },
   zombie: (wd) => {
-    if (wd.target.unit.sticker) {
-      wd.kill(wd.target.unit);
+    wd.animatePunch();
+    wd.target.unit.animation.push({ name: "shake" });
+    if (wd.target.unit.sticker?.tp == wd.me.tp) {
+      wd.addTrail("death");
+      wd.kill();
     } else
       wd.target.unit.sticker = {
         tp: wd.me.tp,
@@ -726,15 +717,12 @@ exports.mushroom = {
   img: () => "mushroom",
   akt: (akt) => {
     let akts = [];
-    let points = en.allPoints();
-    points = points.filter(
-      (pt) => en.isOccupied(akt.game, pt.x, pt.y) && (pt.x != akt.me.x || pt.y != akt.me.y)
-    );
+    let points = en.occupiedCells(akt.game).filter((pt) => pt.x != akt.me.x || pt.y != akt.me.y);
     points.forEach((pt) => {
       let tp = en.unitInPoint(akt.game, pt.x, pt.y)?.tp;
       if (tp != "mushroom" && tp != "base") akts.push({ x: pt.x, y: pt.y, img: "change" });
+      else akts.push({ x: pt.x, y: pt.y, img: "random" });
     });
-    akts.push({ x: akt.me.x, y: akt.me.y, img: "random" });
 
     return akts;
   },
@@ -745,7 +733,7 @@ exports.mushroom = {
   },
   random: (wd) => {
     wd.me.animation.push({ name: "polymorph", img: "mushroom" });
-    wd.polymorph(wd.me.x, wd.me.y);
+    wd.uniquePolymorph(wd.me.x, wd.me.y);
     wd.tire();
   },
   // onAppear: (wd) => {
@@ -754,9 +742,7 @@ exports.mushroom = {
 };
 
 exports.polymorpher = {
-  rank: 0,
-  weight: 50,
-  class: "norm",
+  class: "polymorpher",
   img: () => "chicken",
   akt: (akt) => {
     return akt.move().concat(akt.hand("polymorph"));
@@ -797,7 +783,7 @@ exports.polymorpher = {
 exports.pusher = {
   rank: 70,
   weight: 100,
-  class: "norm",
+  class: "pusher",
   life: 3,
   img: () => "pusher",
   akt: (akt) => {
@@ -863,7 +849,7 @@ exports.pusher = {
 
 exports.fountain = {
   rank: 70,
-  class: "norm",
+  class: "fountain",
   weight: 40,
   life: 3,
   img: () => "fountain",
@@ -888,7 +874,7 @@ exports.fountain = {
 exports.telepath = {
   weight: 100,
   rank: 40,
-  class: "norm",
+  class: "telepath",
   life: 3,
   img: () => "telepath",
   akt: (akt) => {
@@ -902,18 +888,15 @@ exports.telepath = {
 };
 
 exports.spliter = {
-  weight: 100,
-  rank: 145,
-  class: "norm",
-  life: 3,
+  class: "spliter",
   img: () => "spliter",
   akt: (akt) => {
     let akts = akt.move().concat(akt.hand("spliter"));
     return akts;
   },
   spliter: (wd) => {
-    wd.addStatus("spliter");
-    // console.log(wd.target);
+    if (!wd.target.unit?.status.includes("spliter2")) wd.addStatus("spliter");
+    wd.animatePunch();
     let u = wd.addUnit(
       wd.target.unit.tp,
       wd.target.x + (wd.target.x - wd.me.x),
@@ -921,7 +904,11 @@ exports.spliter = {
       wd.target.unit.team
     );
     // let u2 = wd.addUnit(wd.target.unit.tp, wd.target.x + (wd.target.x - wd.me.x) * 2, wd.target.y + (wd.target.y - wd.me.y) * 2, wd.target.unit.team)
-    if (u) u.status.push("spliter");
+    if (u) {
+      u.status.push("spliter");
+      u.animation.push({ name: "none" });
+      wd.addTrail("fly", 0, u, wd.target.x, wd.target.y);
+    }
     // if (u2)
     //   u2.status.push('spliter')
     wd.tire();
@@ -929,11 +916,28 @@ exports.spliter = {
 };
 
 exports.naga = {
-  weight: 100,
-  class: "norm",
+  class: "naga",
   img: () => "naga",
   akt: (akt) => {
     let akts = akt.move().concat(akt.hand("naga"));
+
+    // Отфильтруем акты, где все соседние клетки заняты юнитами
+    akts = akts.filter((action) => {
+      // Получаем координаты действия
+      const { x, y } = action;
+
+      // Получаем соседние клетки по Манхэттенскому расстоянию
+      const neighbors = en.near(x, y);
+
+      // Проверяем, заняты ли все 4 соседние клетки юнитами
+      const allNeighborsOccupied = neighbors.every((pt) => {
+        return en.unitInPoint(akt.game, pt.x, pt.y);
+      });
+
+      // Оставляем акт, если не все соседи заняты
+      return !allNeighborsOccupied;
+    });
+
     return akts;
   },
   naga: (wd) => {
@@ -980,10 +984,7 @@ exports.naga = {
 };
 
 exports.hatchery = {
-  weight: 0,
-  life: 3,
-  rank: 160,
-  class: "norm",
+  class: "hatchery",
   img: () => "hatchery",
   akt: (akt) => {
     let akts = akt.freemove();
@@ -1006,10 +1007,7 @@ exports.hatchery = {
   },
 };
 exports.bomb = {
-  weight: 100,
-  rank: 10,
-  life: 3,
-  class: "norm",
+  class: "bomb",
   img: () => "bomb",
   akt: (akt) => {
     let aktarr = akt.move();
@@ -1058,10 +1056,7 @@ exports.bomb = {
 };
 
 exports.plant = {
-  weight: 50,
-  life: 3,
-  rank: 60,
-  class: "norm",
+  class: "spawners",
   img: () => "plant",
   akt: (akt) => {
     let akts = [];
@@ -1097,10 +1092,7 @@ exports.plant = {
 };
 
 exports.worm = {
-  weight: 100,
-  life: 3,
-  rank: 100,
-  class: "norm",
+  class: "jackinthebox",
   img: () => "worm",
   akt: (akt) => {
     let akts = [];
@@ -1148,11 +1140,7 @@ exports.worm = {
 };
 
 exports.rocket = {
-  weight: 10,
-  life: 3,
-  rank: 100,
-  // neutral: true,
-  class: "norm",
+  class: "jackinthebox",
   img: (wd) => {
     let img = "rocket";
     for (i = wd.game.spoil.length; i--; i > 0) {
@@ -1217,9 +1205,7 @@ exports.rocket = {
 // };
 
 exports.kicker = {
-  weight: 100,
-  rank: 50,
-  class: "norm",
+  class: "kicker",
   img: () => "kicker",
   akt: (akt) => {
     // return [{ x: 5, y: 5, img: 'move' }]
@@ -1343,9 +1329,7 @@ exports.kicker = {
 // }
 
 exports.bear = {
-  rank: 20,
-  weight: 100,
-  class: "norm",
+  class: "bear",
   img: () => "bear",
   akt: (akt) => {
     let akts = akt.move();
@@ -1367,7 +1351,6 @@ exports.bear = {
   },
   bear: (wd) => {
     wd.target.unit.animation.push({ name: "jump", fromX: wd.target.x, fromY: wd.target.y });
-    // wd.target.unit.animation.push({ name: "none" });
     let x = wd.me.x - wd.target.x;
     let y = wd.me.y - wd.target.y;
     wd.animatePunch();
@@ -1388,16 +1371,20 @@ exports.bear = {
       });
       wd.kill(x + wd.me.x, y + wd.me.y);
     }
+    wd.addTrail(
+      "jump",
+      0,
+      { ...wd.target.unit, x: x + wd.me.x, y: y + wd.me.y },
+      wd.target.x,
+      wd.target.y
+    );
     wd.move(x + wd.me.x, y + wd.me.y);
-    // wd.addTrail("jump", { ...wd.target.unit, x: x + wd.me.x, y: y + wd.me.y });
     wd.tire();
   },
 };
 
 exports.frog = {
-  weight: 100,
-  class: "norm",
-  life: 3,
+  class: "frog",
   img: () => "frog",
   akt: (akt) => {
     let akts = akt.move();

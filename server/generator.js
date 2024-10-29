@@ -3,7 +3,8 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
-const SECOND_UNIT = "frog";
+// const SECOND_UNIT = "aerostat";
+const SECOND_UNIT = false;
 
 exports.new = (rank, ai) => {
   rank = 9999;
@@ -166,7 +167,7 @@ exports.new = (rank, ai) => {
   };
   let bluearr = [];
   let orangearr = [];
-  makeflag(4, 4, _.random(1) + 1);
+  makeflag(4, 4, 2);
   up = makeflag(1, 1, 1);
   // bluearr.push({ x: up.x, y: up.y });
   // bluearr.push({ x: up.x - 1, y: up.y });
@@ -256,9 +257,9 @@ exports.new = (rank, ai) => {
     for (let y = 0; y < 9; y++) {
       for (let x = 0; x < 9; x++) {
         if (data.field[x][y].slice(0, -1) != "team") {
-          if (x < 4) {
+          if (x < 3) {
             leftPoints.push({ x, y });
-          } else if (x > 4) {
+          } else if (x > 5) {
             rightPoints.push({ x, y });
           }
         }

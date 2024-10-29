@@ -2,6 +2,39 @@ const en = require("./engine");
 const meta = require("./meta");
 const _ = require("lodash");
 
+function getRandomUnit(unitsByClass, availableClasses, currentUnits, existingUnitType) {
+  let randomUnit;
+  let attempts = 0;
+  do {
+    // Выбираем случайный класс
+    let selectedClass = _.sample(availableClasses);
+
+    // Выбираем случайного юнита из выбранного класса
+    randomUnit = _.sample(unitsByClass[selectedClass]);
+
+    attempts++;
+  } while (
+    (randomUnit === existingUnitType || currentUnits.includes(randomUnit)) &&
+    attempts < 100
+  );
+
+  return randomUnit;
+}
+
+function getUnitsByClass(meta) {
+  let unitsByClass = {};
+  Object.keys(meta).forEach((key) => {
+    const unitClass = meta[key].class;
+    if (unitClass && unitClass !== "none" && unitClass !== "neutral" && unitClass !== "base") {
+      if (!unitsByClass[unitClass]) {
+        unitsByClass[unitClass] = [];
+      }
+      unitsByClass[unitClass].push(key);
+    }
+  });
+  return unitsByClass;
+}
+
 module.exports = (game, me, target) => {
   return {
     game,
@@ -70,7 +103,7 @@ module.exports = (game, me, target) => {
     tire: () => {
       me.isReady = false;
       me.isActive = false;
-      // console.log(me,'tire wrapper');
+      me.status.remove("telepath");
     },
     teleport: (xfrom, yfrom, xto, yto) => {
       let u = en.unitInPoint(game, xfrom, yfrom);
@@ -136,18 +169,35 @@ module.exports = (game, me, target) => {
         unit = target.unit;
       }
       if (unit) {
-        let tp;
-        do {
-          tp = _.sample(Object.keys(meta));
-        } while (
-          tp == unit.tp ||
-          meta[tp].class == "neutral" ||
-          meta[tp].class == "none" ||
-          tp == "base"
-        );
-        unit.tp = tp;
+        let unitsByClass = getUnitsByClass(meta);
+        let availableClasses = Object.keys(unitsByClass);
+        let randomUnit = getRandomUnit(unitsByClass, availableClasses, [], unit.tp);
+
+        unit.tp = randomUnit;
+        unit.energy = unit.maxenergy || 3;
       }
     },
+
+    uniquePolymorph: (x, y) => {
+      let unit;
+      if (x != undefined && y != undefined) {
+        unit = en.unitInPoint(game, x, y);
+      } else if (x != undefined && y == undefined) {
+        unit = x;
+      } else {
+        unit = target.unit;
+      }
+      if (unit) {
+        let unitsByClass = getUnitsByClass(meta);
+        let availableClasses = Object.keys(unitsByClass);
+        const currentUnits = game.unit.map((u) => u.tp);
+        let randomUnit = getRandomUnit(unitsByClass, availableClasses, currentUnits, unit.tp);
+
+        unit.tp = randomUnit;
+        unit.energy = unit.maxenergy || 3;
+      }
+    },
+
     terraform: (x, y, terrain) => {
       console.log(game.field[x][y]);
       if (game.field[x][y].slice(0, -1) != "team") game.field[x][y] = terrain;

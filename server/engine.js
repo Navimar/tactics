@@ -40,6 +40,10 @@ en.freeCells = (game) => {
   return en.allPoints().filter((point) => !en.isOccupied(game, point.x, point.y));
 };
 
+en.occupiedCells = (game) => {
+  return en.allPoints().filter((point) => en.isOccupied(game, point.x, point.y));
+};
+
 en.isFlag = (game, x, y) => {
   return game.field[x][y].slice(0, -1) == "team";
 };

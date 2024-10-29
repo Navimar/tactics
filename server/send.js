@@ -129,14 +129,16 @@ exports.data = (game) => {
         sendunit = {
           x: unit.x,
           y: unit.y,
+          m: unit.m,
+          status: unit.status.slice(),
           isActive: unit.isActive,
           isReady: unit.isReady,
           img: meta[unit.tp].img(wrapper(game, unit, unit)),
           sticker: unit.sticker
             ? {
-                img: meta[unit.sticker.tp].img(wrapper(game, u, u)),
+                img: meta[unit.sticker.tp].img(wrapper(game, unit, unit)),
                 color: (() => {
-                  if (player == 1) return u.sticker.team;
+                  if (player == 1) return unit.sticker.team;
                   if (player == 2)
                     return (() => {
                       if (unit.sticker.team == 1) {

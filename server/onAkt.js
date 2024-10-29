@@ -32,6 +32,7 @@ exports.telepath = (game, u) => {
   });
   // });
 };
+
 exports.teleporter = (game, u) => {
   if (u.status.includes("teleporter")) {
     let akts = [];
@@ -87,16 +88,49 @@ exports.worm = (game, u) => {
 };
 
 exports.stazis = (game, u) => {
-  if (u.status.includes("stazis")) u.akt = [];
+  if (u.status.includes("stazis")) {
+    u.akt = [];
+    return;
+  }
+  // Фильтруем список текущих действий юнита
   u.akt = u.akt.filter((a) => {
+    const unitAtPoint = en.unitInPoint(game, a.x, a.y);
+    // Удаляем действия, если:
+    // 1. В точке действия уже есть другой юнит
+    // 2. Этот юнит находится в состоянии "стазис"
+    // 3. Действие не связано со "стазисом" (то есть img не равно "stazis")
     if (
-      en.unitInPoint(game, a.x, a.y) &&
-      en.unitInPoint(game, a.x, a.y).status.includes("stazis") &&
-      a.img != "stazis"
-    )
-      return false;
-    else return true;
+      unitAtPoint &&
+      unitAtPoint.status.includes("stazis")
+      // && a.img != "stazis"
+    ) {
+      return false; // Удаляем действие, так как нельзя воздействовать на юнита в стазисе
+    } else {
+      return true; // Оставляем действие, если вышеуказанные условия не выполнены
+    }
   });
+
+  // Создаем список действий, связанных со стазисом
+  let stazisAkts = [];
+  let points = en.near(u.x, u.y); // Получаем соседние точки относительно юнита
+
+  // Фильтруем точки, чтобы оставить только те, где есть юниты в состоянии "стазис"
+  points = points.filter((pt) => {
+    let unitAtPoint = en.unitInPoint(game, pt.x, pt.y);
+    return unitAtPoint && unitAtPoint.status.includes("stazis");
+  });
+
+  // Добавляем новые действия, связанные со стазисом, к списку действий юнита
+  points.forEach((pt) => {
+    stazisAkts.push({
+      x: pt.x,
+      y: pt.y,
+      img: "stazis", // Указываем изображение стазиса для действия
+    });
+  });
+
+  // Объединяем текущие действия юнита с новыми действиями, связанными со стазисом
+  u.akt = u.akt.concat(stazisAkts);
 };
 
 // exports.flower = (game, u) => {

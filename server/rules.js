@@ -275,7 +275,7 @@ exports.airdropBirth = (game) => {
 exports.baseRebirth = (game) => {
   let ulist = game.unit.filter((unit) => unit.team == game.turn);
   if (ulist.some((unit) => unit.tp === "base")) return;
-  let points = en.freeCells(game);
+  let points = en.freeCells(game).filter((p) => !game.field[p.x][p.y].startsWith("team"));
   let point = _.sample(points);
   let u = en.addUnit(game, "base", point.x, point.y, game.turn);
   u.animation.push({ name: "add" });
@@ -327,6 +327,7 @@ exports.frog = (game) => {
     if (u.tp == "frog") u.data.lastjump = false;
   });
 };
+
 exports.drillgun = (game) => {
   game.unit.forEach((u) => {
     // u.status.remove('frog')

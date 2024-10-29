@@ -44,27 +44,7 @@ let renderanimated = (diff) => {
       y = -0.4;
     }
 
-    // if (fps <= 30)
     drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
-    // if (quality < 100)
-    //   drawTxt(
-    //     "quality " + Math.ceil(quality),
-    //     x,
-    //     (y += 0.5),
-    //     2,
-    //     "#000000",
-
-    //     undefined,
-    //     undefined,
-    //     true
-    //   );
-    // drawTxt('local.lastclick ' + local.lastclick, 0, y += 0.5, "#000000", undefined, undefined, true);
-
-    // drawTxt('dh ' + dh, 8, y += 0.5, "#000000", undefined, undefined, true);
-
-    // if (fps <= 30) {
-    //   quality = 50;
-    // }
   }
 };
 
@@ -359,7 +339,6 @@ let renderakt = () => {
           drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
           return;
         } else {
-          let sizeAdd = (local.cadr * 15) / 700;
           drawAkt(a.img, a.x, a.y, 0, 0, "disabled");
           return;
         }
@@ -371,6 +350,7 @@ let renderakt = () => {
     });
   }
 };
+
 let rendertrail = (x, y) => {
   let p = data.trail.filter((p) => p.x == x && p.y == y);
   p.forEach((trail) => {

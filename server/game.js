@@ -82,62 +82,64 @@ let creategame = (p1, p2, id, ai) => {
   return game;
 };
 exports.order = (game, orderUnit, akt) => {
+  if (!game) return;
   game.unit.forEach((u) => {
     u.animation = [];
   });
   game.spoil.forEach((s) => {
     s.animation = [];
   });
-
+  game.trail = [];
   //проверка корректный ли юнит и акт добавить в будущем, чтобы клиент не мог уронить сервер или сжулиьничать
-  if (game && !game.finished) {
-    fisher(game);
-    game.trail = [];
-    let unit = en.unitInPoint(game, orderUnit.x, orderUnit.y);
-    if (unit && unit.isReady) {
-      if (game.chooseteam) addbonus(game, unit);
+  if (game.finished) return;
 
-      game.unit.forEach((u) => {
-        u.isActive = false;
-        if (u.energy < (meta[u.tp].maxenergy || 3) && u != unit && u.isReady) {
-          wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
-          //onTire
-          rules.frog(game);
-          rules.aerostat(game);
-        }
-      });
-      unit.isActive = true;
-      if (unit.x - akt.x > 0) {
-        unit.m = true;
-      } else if (unit.x - akt.x < 0) {
-        unit.m = false;
+  fisher(game);
+
+  let unit = en.unitInPoint(game, orderUnit.x, orderUnit.y);
+  if (unit && unit.isReady) {
+    unit.isEngaged = true;
+    if (game.chooseteam) addbonus(game, unit);
+
+    game.unit.forEach((u) => {
+      u.isActive = false;
+      if (u.isEngaged && u != unit && u.isReady) {
+        wrapper(game, u, { x: u.x, y: u.y, unit: u }).tire();
+        //onTire
+        rules.frog(game);
+        rules.aerostat(game);
       }
-      if (_.isFunction(meta[unit.tp][akt.img])) {
-        meta[unit.tp][akt.img](
-          wrapper(game, unit, {
-            x: akt.x,
-            y: akt.y,
-            unit: en.unitInPoint(game, akt.x, akt.y),
-          }),
-          akt.data
-        );
-      } else if (_.isFunction(action[akt.img]))
-        action[akt.img](
-          wrapper(game, unit, {
-            x: akt.x,
-            y: akt.y,
-            unit: en.unitInPoint(game, akt.x, akt.y),
-          }),
-          akt.data
-        );
-      else console.log("unkonwn akt", akt.img);
+    });
+    unit.isActive = true;
+    if (unit.x - akt.x > 0) {
+      unit.m = true;
+    } else if (unit.x - akt.x < 0) {
+      unit.m = false;
     }
-
-    //onOrder
-    onOrder(game, unit, akt);
-    updateAkts(game);
-    send.data(game);
+    if (_.isFunction(meta[unit.tp][akt.img])) {
+      meta[unit.tp][akt.img](
+        wrapper(game, unit, {
+          x: akt.x,
+          y: akt.y,
+          unit: en.unitInPoint(game, akt.x, akt.y),
+        }),
+        akt.data
+      );
+    } else if (_.isFunction(action[akt.img]))
+      action[akt.img](
+        wrapper(game, unit, {
+          x: akt.x,
+          y: akt.y,
+          unit: en.unitInPoint(game, akt.x, akt.y),
+        }),
+        akt.data
+      );
+    else console.log("unkonwn akt", akt.img);
   }
+
+  //onOrder
+  onOrder(game, unit, akt);
+  updateAkts(game);
+  send.data(game);
 };
 
 let updateAkts = (game) => {
@@ -146,23 +148,26 @@ let updateAkts = (game) => {
     u.akt = [];
     if (u.isReady) {
       u.akt = meta[u.tp].akt(akter(game, u));
-      u.akt.forEach((uakt) => {
-        uakt.id = id++;
-      });
+      onAkt.teamPortal(game, u);
+      onAkt.teleporter(game, u);
+      onAkt.telepath(game, u);
+      onAkt.worm(game, u);
+      onAkt.slime(game, u);
+      onAkt.stazis(game, u);
     }
-    onAkt.teamPortal(game, u);
-    onAkt.telepath(game, u);
-    onAkt.worm(game, u);
-    onAkt.slime(game, u);
-    onAkt.stazis(game, u);
-    onAkt.teleporter(game, u);
+
     // onAkt.flower(game, u);
     if (u.akt.length == 0 && u.isActive) {
       u.isReady = false;
       u.isActive = false;
     }
+
+    u.akt.forEach((uakt) => {
+      uakt.id = id++;
+    });
   });
 };
+
 exports.endgame = (game, winner, words) => {
   game.finished = true;
   game.winner = winner;
@@ -249,6 +254,7 @@ exports.endturn = (game, p) => {
     game.unit.forEach((u) => {
       u.energy = meta[u.tp].maxenergy || 3;
       u.isReady = true;
+      u.isEngaged = false;
       u.animation = [];
     });
     game.spoil.forEach((s) => {

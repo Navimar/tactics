@@ -12,21 +12,52 @@ exports.start = () => {
   count_units();
 
   function count_units() {
-    let i = 0;
-    let arr = [];
+    let totalUnits = 0;
+    let totalUnitsWithoutUndefinedAndNone = 0;
+    let unitsByClass = {};
+    let undefinedClass = [];
+
+    // Группируем юниты по классам
     Object.keys(meta).forEach(function (key) {
-      arr.push({
-        name: key,
-        rank: meta[key].rank,
+      const unitClass = meta[key].class;
+      if (unitClass === undefined) {
+        undefinedClass.push({ name: key });
+      } else {
+        if (!unitsByClass[unitClass]) {
+          unitsByClass[unitClass] = [];
+        }
+        unitsByClass[unitClass].push({ name: key });
+      }
+    });
+
+    // Выводим информацию по каждому классу
+    Object.keys(unitsByClass).forEach((unitClass) => {
+      const units = unitsByClass[unitClass];
+      console.log(`\nClass: ${unitClass} (Total: ${units.length})`);
+      units.forEach((unit) => {
+        totalUnits++;
+        if (unitClass !== "none" && unitClass !== "neutral") {
+          totalUnitsWithoutUndefinedAndNone++;
+        }
+        console.log(`* ${unit.name}`);
       });
     });
-    arr = arr.sort((a, b) => {
-      return a.rank - b.rank;
-    });
-    arr.forEach((e) => {
-      i++;
-      console.log(i, e.name);
-    });
+
+    // Выводим юниты с неопределённым классом
+    if (undefinedClass.length > 0) {
+      console.log(`\nClass: undefined (Total: ${undefinedClass.length})`);
+      undefinedClass.forEach((unit) => {
+        totalUnits++;
+        console.log(`* ${unit.name}`);
+      });
+    }
+
+    // Общее количество юнитов
+    console.log(
+      `Total Units without undefined, 'none', and 'neutral': ${totalUnitsWithoutUndefinedAndNone}`
+    );
+    console.log(`
+Total Units: ${totalUnits}`);
   }
 
   function register_players() {
