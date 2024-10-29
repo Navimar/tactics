@@ -30,7 +30,11 @@ exports.find = (p, bot) => {
       // console.log(queue[0]);
       player.list().forEach((e) => {
         if (p.id == e.id) {
-          send.bot(p.id, "Вы ищете игру", bot);
+          send.bot(
+            p.id,
+            "Вы начали искать игру. К сожалению игроков немного и найти игру может быть сложно. Напишите в @IncredibleTacticsChat, чтобы договориться об игре",
+            bot
+          );
         } else if (e.subscribe) {
           send.bot(
             e.id,
