@@ -1,19 +1,16 @@
 const en = require("./engine");
 const _ = require("lodash");
 
-// exports.warrior = {
-//   weight: 100,
-//   rank: 0,
-//   class: "basic",
-//   life: 3,
-//   img: () => "warrior",
-//   akt: (akt) => {
-//     return akt.move().concat(akt.hand("wound"));
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-// };
+exports.warrior = {
+  weight: 100,
+  rank: 0,
+  class: "none",
+  life: 3,
+  img: () => "warrior",
+  akt: (akt) => {
+    return akt.move().concat(akt.hand("wound"));
+  },
+};
 
 // exports.archer = {
 //   weight: 100,
@@ -359,6 +356,9 @@ exports.teleporter = {
     return arr;
   },
   teleporter: (wd) => {
+    wd.target.unit.animation.push({ name: "fly", fromX: wd.target.x, fromY: wd.target.y });
+    wd.me.animation.push({ name: "fly", fromX: wd.me.x, fromY: wd.me.y });
+
     wd.addStatus("teleporter");
     wd.tire();
     let tx = wd.target.x;
@@ -382,6 +382,11 @@ exports.staziser = {
   img: () => "staziser",
   akt: (akt) => {
     return akt.move().concat(akt.hand("stazis"));
+  },
+  stazis: (wd) => {
+    wd.animatePunch();
+    wd.addStatus("stazis");
+    wd.tire();
   },
 };
 
@@ -606,44 +611,42 @@ exports.zombie = {
   },
 };
 
-// exports.digger = {
-//   rank: 80,
-//   weight: 100,
-//   class: "norm",
-//   img: "digger",
-//   akt: (akt) => {
-//     let akts = akt.move();
-//     akts.forEach((e) => (e.img = "move"));
-//     akts = akts.concat(akt.hand("digger"));
-//     // akts.push({
-//     //   x: akt.me.x,
-//     //   y: akt.me.y,
-//     //   img: 'diger',
-//     // });
-//     // akts = akts.filter(a => {
-//     //   if (a.img == 'digger' && akt.game.field[a.x][a.y].slice(0, -1) == 'team')
-//     //     return false
-//     //   else
-//     //     return true
-//     // });
-//     return akts;
-//   },
-//   move: (wd) => {
-//     wd.walk();
-//   },
-//   digger: (wd) => {
-//     if (wd.game.field[wd.target.x][wd.target.y] == "grass")
-//       wd.game.field[wd.target.x][wd.target.y] = "ground";
-//     else if (wd.game.field[wd.target.x][wd.target.y] == "ground")
-//       wd.game.field[wd.target.x][wd.target.y] = "grass";
-//     else if (wd.game.field[wd.target.x][wd.target.y] == "water")
-//       wd.game.field[wd.target.x][wd.target.y] = "grass";
-//     if (wd.game.field[wd.target.x][wd.target.y].slice(0, -1) == "team")
-//       wd.kill(wd.target.unit);
+exports.digger = {
+  rank: 80,
+  weight: 100,
+  class: "digger",
+  img: () => "digger",
+  akt: (akt) => {
+    let akts = akt.move();
+    akts.forEach((e) => (e.img = "move"));
+    akts = akts.concat(akt.hand("digger"));
+    // akts.push({
+    //   x: akt.me.x,
+    //   y: akt.me.y,
+    //   img: 'diger',
+    // });
+    akts = akts.filter((a) => {
+      if (a.img == "digger" && akt.game.field[a.x][a.y].slice(0, -1) == "team") return false;
+      else return true;
+    });
+    return akts;
+  },
+  move: (wd) => {
+    wd.walk();
+  },
+  digger: (wd) => {
+    wd.animatePunch();
+    if (wd.game.field[wd.target.x][wd.target.y] == "grass")
+      wd.game.field[wd.target.x][wd.target.y] = "ground";
+    else if (wd.game.field[wd.target.x][wd.target.y] == "ground")
+      wd.game.field[wd.target.x][wd.target.y] = "grass";
+    else if (wd.game.field[wd.target.x][wd.target.y] == "water")
+      wd.game.field[wd.target.x][wd.target.y] = "grass";
+    if (wd.game.field[wd.target.x][wd.target.y].slice(0, -1) == "team") wd.kill(wd.target.unit);
 
-//     wd.tire();
-//   },
-// };
+    wd.tire();
+  },
+};
 
 // exports.glider = {
 //   weight: 0,
@@ -712,7 +715,6 @@ exports.bush = {
 };
 
 exports.mushroom = {
-  weight: 100,
   class: "neutral",
   img: () => "mushroom",
   akt: (akt) => {
@@ -746,9 +748,6 @@ exports.polymorpher = {
   img: () => "chicken",
   akt: (akt) => {
     return akt.move().concat(akt.hand("polymorph"));
-  },
-  move: (wd) => {
-    wd.walk();
   },
 };
 
@@ -882,6 +881,7 @@ exports.telepath = {
     return akts;
   },
   telepath: (wd) => {
+    wd.animatePunch();
     wd.addStatus("telepath");
     wd.tire();
   },
@@ -935,7 +935,7 @@ exports.naga = {
       });
 
       // Оставляем акт, если не все соседи заняты
-      return !allNeighborsOccupied;
+      return !allNeighborsOccupied || action.img != "naga";
     });
 
     return akts;
@@ -1038,9 +1038,7 @@ exports.bomb = {
     wd.spoil("fire", wd.me.x + 1, wd.me.y + 1, false, 3);
 
     wd.spoil("fire", wd.me.x, wd.me.y, false, 3);
-    // this.bomb.bomb(wd);
-  },
-  bomb: (wd) => {
+
     for (let xx = -1; xx <= 1; xx++) {
       for (let yy = -1; yy <= 1; yy++) {
         if (
@@ -1050,7 +1048,8 @@ exports.bomb = {
           wd.game.field[wd.target.x + xx][wd.target.y + yy] = "ground";
       }
     }
-
+  },
+  bomb: (wd) => {
     wd.kill();
   },
 };
@@ -1208,8 +1207,12 @@ exports.kicker = {
   class: "kicker",
   img: () => "kicker",
   akt: (akt) => {
-    // return [{ x: 5, y: 5, img: 'move' }]
-    return akt.move().concat(akt.hand("kicker"));
+    const isEdge = (position) => {
+      const { x, y } = position;
+      return x === 0 || y === 0 || x === 8 || y === 8; // 8 - максимальное значение координат
+    };
+
+    return akt.move().concat(akt.hand("kicker").filter((k) => isEdge(akt.me) || !isEdge(k))); // Фильтруем акт k, проверяя координаты
   },
   kicker: (wd) => {
     wd.animatePunch();

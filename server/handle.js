@@ -53,9 +53,7 @@ exports.start = () => {
     }
 
     // Общее количество юнитов
-    console.log(
-      `Total Units without undefined, 'none', and 'neutral': ${totalUnitsWithoutUndefinedAndNone}`
-    );
+    console.log(`Total Units without 'none', and 'neutral': ${totalUnitsWithoutUndefinedAndNone}`);
     console.log(`
 Total Units: ${totalUnits}`);
   }
@@ -132,6 +130,7 @@ exports.socket = (socket, e, msg) => {
             )
               msg.unit = "rocket";
           game.order(gm, msg.unit, msg.akt);
+          send.data(gm);
         }
       }
       if (e == "bonus") {
@@ -198,13 +197,15 @@ exports.bot = (ctx, bot) => {
     p.game.push(game.new(p, p));
     send.bot(id, "Игра успешно создана!", bot);
     send.gamelist(id, p, bot);
-  }
-  // else if (text == '/single') {
-  //   p.game.push(game.new(p, p, 'ai'))
-  //   send.bot(id, 'Игра успешно создана!', bot);
-  //   send.gamelist(id, p, bot);
-  // }
-  else if (text == "/cancel") {
+  } else if (text == "/vsai") {
+    p.game.push(game.new(p, p, "ai"));
+    send.bot(id, "Игра против компьютера успешно создана!", bot);
+    send.gamelist(id, p, bot);
+  } else if (text == "/single") {
+    p.game.push(game.new(p, p, "mission"));
+    send.bot(id, "Игра успешно создана!", bot);
+    send.gamelist(id, p, bot);
+  } else if (text == "/cancel") {
     queue.cancel(p);
     send.bot(id, "Поиск отменен", bot);
   } else if (text == "/subscribe") {

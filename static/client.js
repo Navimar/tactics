@@ -5,8 +5,11 @@ let local = {
   description: {},
   seconds: 0,
   lastclick: 0,
+  newAnimationTurn: 0,
+  animationTurn: 0,
   akt: [],
   focus: false,
+  position: { p1: 0, p2: 0 },
   fisher: [999, 999],
   sandclock: { x: 0, y: 0 },
   spoilmask: _.times(9, () => _.times(9, () => _.random(1, 1000))),
@@ -102,7 +105,7 @@ let renderhtml = (login) => {
   // `
   let html = `
    <span>Чтобы зарегестрироваться и играть с другими игроками добавьте <a href="http://t.me/unitcraftbot">телеграм бота</a><br>
-   А также заходите в <a href="http://t.me/unitcraft">наш чат в телеграме</a></span>
+   А также заходите в <a href="http://t.me/incredibletactics">наш чат в телеграме</a></span>
   `;
   if (login == "success") html = `Ваш ID ` + findGetParameter("id");
 };
@@ -162,7 +165,10 @@ let onStep = (diff) => {
   local.animationProgress += diff;
   local.cadrProgress += diff;
   if (local.cadrProgress >= 1000) local.cadrProgress -= 1000;
-  local.animationTurn = Math.floor(local.animationProgress / 1000);
+  local.newAnimationTurn = Math.floor(local.animationProgress / 1000);
+  if (local.newAnimationTurn != local.animationTurn) {
+    local.animationTurn = local.newAnimationTurn;
+  }
   renderanimated(diff);
 };
 
@@ -179,8 +185,6 @@ let onUpdate = (val) => {
   local.animationProgress = 0;
   local.cadrProgress = 0;
   blocked = false;
-  // updateAudio.play();
-  // console.log(val);
   local.lastclick = local.seconds;
   local.oldfield = data.field;
   data = val;
@@ -189,7 +193,8 @@ let onUpdate = (val) => {
   local.sandclock = false;
   local.fisher[0] = data.fisher[0];
   local.fisher[1] = data.fisher[1];
-  if (local.turn == false && data.turn == true) {
+  if (local.turn == false && data.turn == true && !data.sandbox) {
+    playSound("your_turn");
     tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 240);
     local.turn = data.turn;
   }
@@ -208,7 +213,9 @@ let onUpdate = (val) => {
   if (local.frame != data.frame) {
     local.frame = data.frame;
   }
+  local.position = scorePosition();
   render();
+  mixer(0);
   if (!data.history && allakts() == 0 && data.turn) {
     endturn();
   }

@@ -12,7 +12,6 @@ const onAkt = require("./onAkt");
 const rules = require("./rules");
 const _ = require("lodash");
 const bot = require("./bot");
-const ai = require("./ai");
 
 let games = [];
 let lastid = 0;
@@ -35,9 +34,7 @@ let creategame = (p1, p2, id, ai) => {
   if (p1 == p2) {
     sandbox = true;
   }
-  if (ai) {
-    ai = true;
-    bonus = [null, 0, 0];
+  if (ai == "mission") {
     leftturns = 999;
     turn = 1;
     chooseteam = false;
@@ -77,10 +74,13 @@ let creategame = (p1, p2, id, ai) => {
       }
     },
   };
-  updateAkts(game);
   rules.spill(game);
+  if (ai == "mission") rules.generalPolymoprh(game);
+
+  updateAkts(game);
   return game;
 };
+
 exports.order = (game, orderUnit, akt) => {
   if (!game) return;
   game.unit.forEach((u) => {
@@ -133,13 +133,12 @@ exports.order = (game, orderUnit, akt) => {
         }),
         akt.data
       );
-    else console.log("unkonwn akt", akt.img);
+    else console.log("unkonwn akt", unit.tp, akt.img);
   }
 
   //onOrder
   onOrder(game, unit, akt);
   updateAkts(game);
-  send.data(game);
 };
 
 let updateAkts = (game) => {
@@ -236,11 +235,9 @@ exports.endturn = (game, p) => {
     for (let x = 0; x < 9; x++) {
       for (let y = 0; y < 9; y++) {
         if (game.field[x][y] == "team1") {
-          // if (game.turn - 1 == 0) game.trail.push({ img: "gold", x, y });
           flag[0]++;
         }
         if (game.field[x][y] == "team2") {
-          // if (game.turn - 1 == 1) game.trail.push({ img: "gold", x, y });
           flag[1]++;
         }
       }
@@ -294,22 +291,20 @@ exports.endturn = (game, p) => {
     rules.rockettarget(game);
     rules.splitOnEndturn(game);
     rules.worm(game);
-    rules.airdropBirth(game);
-    rules.airdrop(game);
+    if (game.ai != "mission") rules.airdropBirth(game);
+    if (game.ai != "mission") rules.airdrop(game);
+    if (game.ai == "mission") rules.eggAirdrop(game);
     onOrder(game);
-    rules.flagwin(game);
+    if (game.ai != "mission") rules.flagwin(game);
 
     // rules.basePolymoprh(game);
-    rules.baseRebirth(game);
-    if (game.ai && game.turn == 1) worldshift(game);
+    if (game.ai != "mission") rules.baseRebirth(game);
+    // if (game.ai && game.turn == 1) worldshift(game);
     updateAkts(game);
 
     send.data(game);
 
     game.keyframe = game.frame.length - 1;
-    if (game.ai && game.turn == 2) {
-      ai.go(game, 2);
-    }
 
     if (!game.sandbox)
       // send.gamelist(game.players[game.turn - 1].id, game.players[game.turn - 1], bot);

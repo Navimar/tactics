@@ -174,7 +174,7 @@ module.exports = (game, me, target) => {
         let randomUnit = getRandomUnit(unitsByClass, availableClasses, [], unit.tp);
 
         unit.tp = randomUnit;
-        unit.energy = unit.maxenergy || 3;
+        unit.energy = meta[unit.tp].maxenergy || 3;
       }
     },
 
@@ -194,7 +194,7 @@ module.exports = (game, me, target) => {
         let randomUnit = getRandomUnit(unitsByClass, availableClasses, currentUnits, unit.tp);
 
         unit.tp = randomUnit;
-        unit.energy = unit.maxenergy || 3;
+        unit.energy = meta[unit.tp].maxenergy || 3;
       }
     },
 

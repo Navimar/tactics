@@ -53,9 +53,8 @@ exports.move = (wd, data) => {
   wd.walk(data.energyCost);
 };
 
-exports.stazis = (wd) => {
+exports.unstazis = (wd) => {
   wd.animatePunch();
-  if (wd.target.unit.status.includes("stazis")) wd.target.unit.status.remove("stazis");
-  else wd.addStatus("stazis");
+  wd.target.unit.status.remove("stazis");
   wd.tire();
 };

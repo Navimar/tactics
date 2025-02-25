@@ -50,7 +50,7 @@ module.exports = (game, unit, akt) => {
     rules.hoplite(game);
     // rules.split(game, unit)
     rules.lover(game);
-    rules.staziser(game);
+    // rules.staziser(game);
     rules.spill(game);
     rules.landmineexplosion(game);
     rules.slime(game);
@@ -59,7 +59,8 @@ module.exports = (game, unit, akt) => {
     rules.fireInWater(game);
     rules.unitInFire(game);
     rules.wormportal(game);
-    rules.genocide(game);
+    if (game.ai != "mission") rules.genocide(game);
+    if (game.ai == "mission") rules.missionDefeat(game);
     rules.maxEnergyLimit(game);
     // if (!game.ai) rules.flagwin(game);
   } while (game.deadPool.length > 0);

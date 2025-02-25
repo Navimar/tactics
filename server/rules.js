@@ -202,19 +202,24 @@ exports.fireBurn = (game) => {
 };
 
 exports.egg = (game) => {
+  if (game.turn != 2) return;
   for (i = game.spoil.length; i--; i > 0) {
     if (game.spoil[i].name == "egg" && !en.unitInPoint(game, game.spoil[i].x, game.spoil[i].y)) {
       // let tp
       // do {
       // 	tp = _.sample(Object.keys(meta));
       // } while (tp == game.spoil[i].data.tp)
-      en.addUnit(
+      let u = en.addUnit(
         game,
-        game.spoil[i].data.tp,
+        _.sample(["warrior", "bee", "firebat", "telepath", "pusher", "fountain", "naga", "plant"]),
         game.spoil[i].x,
         game.spoil[i].y,
-        game.spoil[i].data.team
+        game.spoil[i].data?.team || 2
       );
+      if (u) {
+        u.animation.push({ name: "add" });
+        u.isReady = false;
+      }
       // en.addUnit(game, tp, game.spoil[i].x, game.spoil[i].y, game.spoil[i].data.team);
       game.spoil.splice(i, 1);
     }
@@ -292,6 +297,13 @@ exports.baseRebirth = (game) => {
 //     }
 //   }
 // };
+
+exports.generalPolymoprh = (game) => {
+  let ulist = game.unit.filter((unit) => unit.team == 1);
+  ulist.forEach((unit) => {
+    wrapper(game, unit, unit).polymorph(unit);
+  });
+};
 
 exports.eggcrack = (game) => {
   for (i = game.spoil.length; i--; i > 0) {
@@ -595,4 +607,109 @@ exports.genocide = (game) => {
   if (team1isAlive && !team2isAlive) gm.endgame(game, 1);
   if (team2isAlive && !team1isAlive) gm.endgame(game, 2);
   if (!team1isAlive && !team2isAlive) game.leftturns = 0;
+};
+
+exports.missionDefeat = (game) => {
+  //закончилисиь юниты
+  let team1isAlive = game.unit.some((unit) => unit.team === 1);
+  if (!team1isAlive) gm.endgame(game, 2);
+};
+
+exports.eggAirdrop = (game) => {
+  if (game.turn != 2) return;
+  if (!game.turnCounter) game.turnCounter = 0;
+
+  game.turnCounter += 1;
+
+  // Check if there are no units with team == 2, if no units of team == 2 have any actions, or if 10 turns have passed
+  const noTeamTwoUnits = game.unit.every((unit) => unit.team !== 2);
+  const allUnitInStatzis = game.unit
+    .filter((unit) => unit.team === 2)
+    .every((unit) => unit.status.includes("stazis"));
+  const triggerLevelUp = noTeamTwoUnits || allUnitInStatzis || game.turnCounter >= 4 + game.lvl;
+
+  if (!triggerLevelUp) return;
+
+  // Increase level by 1
+  if (!game.lvl) game.lvl = 1;
+  else game.lvl += 1;
+
+  // Reset turn counter
+  game.turnCounter = 0;
+
+  // Retrieve all points on the grid
+  const allPoints = en.allPoints();
+
+  // Change all points with team2 to team1
+  allPoints.forEach((p) => {
+    if (game.field[p.x][p.y] === "team2") {
+      game.field[p.x][p.y] = "team1";
+    }
+  });
+
+  let points = allPoints.filter((p) => game.field[p.x][p.y].slice(0, -1) !== "team");
+
+  // Function to find the minimum Manhattan distance from a point to a set of points
+  const minDistanceToPoints = (point, points) => {
+    let minDist = Infinity;
+    points.forEach((pt) => {
+      const dist = en.distance(point.x, point.y, pt.x, pt.y);
+      if (dist < minDist) {
+        minDist = dist;
+      }
+    });
+    return minDist;
+  };
+
+  // Combine the list of units and spoils into a single array
+  let combinedPoints = game.unit.concat(game.spoil.filter((s) => s.name === "egg"));
+
+  for (let i = 0; i < game.lvl; i++) {
+    // Find the point with the maximum minimum distance to all combined points
+    let maxDistance = 0;
+    let bestPoints = [];
+    points.forEach((point) => {
+      const dist = minDistanceToPoints(point, combinedPoints);
+      if (dist > maxDistance) {
+        maxDistance = dist;
+        bestPoints = [point];
+      } else if (dist === maxDistance) {
+        bestPoints.push(point);
+      }
+    });
+
+    // Randomly select one of the best points and add a spoil
+    if (bestPoints.length > 0) {
+      const selectedPoint = _.sample(bestPoints);
+      en.addSpoil(game, "egg", selectedPoint.x, selectedPoint.y, false, 3);
+
+      // Update the points to exclude the selected point
+      points = points.filter((p) => p.x !== selectedPoint.x || p.y !== selectedPoint.y);
+      combinedPoints.push(selectedPoint);
+    }
+  }
+
+  // Spawn "mushroom" unit with team 1 in the center every 5 levels
+  if (game.lvl % 3 === 0) {
+    const centerPoint = {
+      x: Math.floor(game.field.length / 2),
+      y: Math.floor(game.field[0].length / 2),
+    };
+    let spawnPoint = centerPoint;
+    let attempts = 0;
+
+    while (attempts < 10) {
+      if (!game.unit.some((unit) => unit.x === spawnPoint.x && unit.y === spawnPoint.y)) {
+        let u = en.addUnit(game, "mushroom", spawnPoint.x, spawnPoint.y, 1);
+        wrapper(game, u, u).polymorph(u);
+        u.animation.push({ name: "add" });
+        break;
+      } else {
+        // Try a random neighboring point
+        const neighbors = en.near(spawnPoint.x, spawnPoint.y);
+        spawnPoint = _.sample(neighbors);
+        attempts++;
+      }
+    }
+  }
 };

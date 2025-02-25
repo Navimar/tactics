@@ -30,7 +30,8 @@ exports.gamelist = (id, p, bot) => {
   let key = player.setKey(p);
   let text = "";
   p.game.forEach((e) => {
-    if (e.ai) text += "Миссия: ";
+    if (e.ai == "mission") text += "Выживание: ";
+    else if (e.ai == "ai") text += "Против компьютера: ";
     else if (e.sandbox) text += "Песочница: ";
     else {
       if ((e.bonus[1] == null && e.players[0].id) || (e.bonus[2] == null && e.players[1].id)) {
@@ -61,6 +62,7 @@ exports.successfulLogin = (socket) => {
 exports.data = (game) => {
   let getData = (game, player) => {
     let send = {
+      sandbox: game.sandbox,
       frame: (() => {
         if (!game.sandbox && player == 2) return game.frame.length - 1;
         else return game.frame.length;
@@ -240,6 +242,7 @@ exports.data = (game) => {
     }
   }
 };
+
 exports.frame = (game, p, f) => {
   let n = player.number(game, p);
   let p0socket = game.players[n - 1].socket.get(game.id);
@@ -261,7 +264,3 @@ exports.logicerror = (game, error) => {
   game.players[0].socket.get(game.id).emit("logic", error);
   game.players[1].socket.get(game.id).emit("logic", error);
 };
-
-// let send = (socket, event, msg, ctx) => {
-//     ctx.reply
-// }

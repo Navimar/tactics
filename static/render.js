@@ -44,7 +44,31 @@ let renderanimated = (diff) => {
       y = -0.4;
     }
 
-    drawTxt("fps " + fps, x, y, 2, "#000000", undefined, undefined, true);
+    // drawTxt("fps " + fps, x, y - 0.2, 2, "#000000", undefined, undefined, true);
+    let total = local.position[0] + local.position[1];
+    let percentage1 = total > 0 ? ((local.position[0] / total) * 100).toFixed(1) : 0;
+    let percentage2 = total > 0 ? ((local.position[1] / total) * 100).toFixed(1) : 0;
+
+    drawTxt(
+      `p1 ${percentage1}% (${local.position[0]})`,
+      x,
+      y,
+      2,
+      "#000000",
+      undefined,
+      undefined,
+      true
+    );
+    drawTxt(
+      `p2 ${percentage2}% (${local.position[1]})`,
+      x,
+      y + 0.4,
+      2,
+      "#000000",
+      undefined,
+      undefined,
+      true
+    );
   }
 };
 

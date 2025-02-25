@@ -3,7 +3,7 @@ const en = require("./engine");
 const _ = require("lodash");
 
 const START_UNIT = "base";
-// const SECOND_UNIT = "aerostat";
+// const SECOND_UNIT = "staziser";
 const SECOND_UNIT = false;
 
 exports.new = (rank, ai) => {
@@ -52,7 +52,6 @@ exports.new = (rank, ai) => {
   let defgrass = 1;
   let defsky = 0;
   let defmountain = 0;
-  let n = 999;
   let grasspower = 10000;
   let groundpower = 10000;
 
@@ -105,16 +104,6 @@ exports.new = (rank, ai) => {
       if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "grass") grass += grasspower;
       if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "grass") grass += grasspower;
 
-      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "sky") sky += n;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "sky") sky += n;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "sky") sky += n;
-      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "sky") sky += n;
-
-      if (data.field[p.x + 1] && data.field[p.x + 1][p.y] == "mountain") mountain += n;
-      if (data.field[p.x][p.y + 1] && data.field[p.x][p.y + 1] == "mountain") mountain += n;
-      if (data.field[p.x][p.y - 1] && data.field[p.x][p.y - 1] == "mountain") mountain += n;
-      if (data.field[p.x - 1] && data.field[p.x - 1][p.y] == "mountain") mountain += n;
-
       if (ground > grass) grass = 0;
       if (ground < grass) ground = 0;
 
@@ -126,64 +115,16 @@ exports.new = (rank, ai) => {
         data.field[p.x][p.y] = "mountain";
     }
   });
-
-  // let makeflag = (px, py, team) => {
-  //   let dir = _.random(1) * -2 + 1
-  //   if (py < 4)
-  //     dir = +1
-  //   if (py > 4)
-  //     dir = -1
-
-  //   let i = 0
-  //   while (
-  //     data.field[px][py].slice(0, -1) == 'team'
-  //     || data.field[px][py + 1].slice(0, -1) == 'team'
-  //     || data.field[px][py - 1].slice(0, -1) == 'team'
-  //     || data.field[px - 1][py].slice(0, -1) == 'team'
-  //     || data.field[px + 1][py].slice(0, -1) == 'team'
-  //     || (
-  //       data.field[px][py + 1] == data.field[px][py]
-  //       && data.field[px][py - 1] == data.field[px][py]
-  //       && data.field[px - 1][py] == data.field[px][py]
-  //       && data.field[px + 1][py] == data.field[px][py]
-  //       && i++ < 25
-  //     )
-  //   ) {
-  //     py += 1 * dir
-  //     if (py >= 7 || py <= 1) {
-  //       dir *= -1
-  //     }
-  //   }
-  //   data.field[px][py] = 'team' + team;
-
-  //   if (py <= 5)
-  //     dir = -1
-  //   else dir = 1
-  //   return { x: px, y: py, dir }
-  // }
   let makeflag = (px, py, team) => {
     data.field[px][py] = "team" + team;
     return { x: px, y: py, dir: 0 };
   };
-  let bluearr = [];
-  let orangearr = [];
+
   makeflag(4, 4, 2);
   up = makeflag(1, 1, 1);
-  // bluearr.push({ x: up.x, y: up.y });
-  // bluearr.push({ x: up.x - 1, y: up.y });
-  // bluearr.push({ x: up.x, y: up.y + -1 });
   up = makeflag(1, 7, 1);
-  // bluearr.push({ x: up.x, y: up.y });
-  // bluearr.push({ x: up.x - 1, y: up.y });
-  // bluearr.push({ x: up.x, y: up.y + 1 });
   up = makeflag(7, 1, 2);
-  // orangearr.push({ x: up.x, y: up.y - 1 });
-  // orangearr.push({ x: up.x + 1, y: up.y });
-  // orangearr.push({ x: up.x, y: up.y });
   up = makeflag(7, 7, 2);
-  // orangearr.push({ x: up.x, y: up.y + 1 });
-  // orangearr.push({ x: up.x + 1, y: up.y });
-  // orangearr.push({ x: up.x, y: up.y });
   const pointsnearteam = [
     [4 + dir, 4],
     [4 - dir, 4],
@@ -237,76 +178,65 @@ exports.new = (rank, ai) => {
     }
   });
 
-  if (!ai) {
-    if (START_UNIT) {
-      bluearr.push({ x: 1, y: 1 });
-      orangearr.push({ x: 7, y: 7 });
-      bluearr[0].tp = START_UNIT;
-      orangearr[0].tp = START_UNIT;
-    }
-    if (SECOND_UNIT) {
-      orangearr.push({ x: 7, y: 1, tp: SECOND_UNIT });
-      bluearr.push({ x: 1, y: 7, tp: SECOND_UNIT });
-    }
+  points = [];
+  let leftPoints = [];
+  let rightPoints = [];
 
-    points = [];
-    let leftPoints = [];
-    let rightPoints = [];
-
-    // Разделяем точки на левую и правую половину
-    for (let y = 0; y < 9; y++) {
-      for (let x = 0; x < 9; x++) {
-        if (data.field[x][y].slice(0, -1) != "team") {
-          if (x < 3) {
-            leftPoints.push({ x, y });
-          } else if (x > 5) {
-            rightPoints.push({ x, y });
-          }
+  // Разделяем точки на левую и правую половину
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      if (data.field[x][y].slice(0, -1) != "team") {
+        if (x < 3) {
+          leftPoints.push({ x, y });
+        } else if (x > 5) {
+          rightPoints.push({ x, y });
         }
       }
     }
+  }
+  // Выбираем равное количество точек из каждой половины
+  let halfPointsCount = 3; // половина от общего количества точек, которое вы хотите добавить
+  points = _.sampleSize(leftPoints, halfPointsCount).concat(
+    _.sampleSize(rightPoints, halfPointsCount)
+  );
+  // Добавляем грибы в выбранные точки
+  points.forEach((point) => {
+    data.unit.push(makeUnit("mushroom", point.x, point.y, 3));
+  });
 
-    // Выбираем равное количество точек из каждой половины
-    let halfPointsCount = 3; // половина от общего количества точек, которое вы хотите добавить
-    points = _.sampleSize(leftPoints, halfPointsCount).concat(
-      _.sampleSize(rightPoints, halfPointsCount)
-    );
+  console.log(ai);
+  if (ai == "mission") {
+    data.unit.push(makeUnit("mushroom", 3, 4, 1));
+    data.unit.push(makeUnit("mushroom", 4, 4, 1));
+    data.unit.push(makeUnit("mushroom", 5, 4, 1));
 
-    // Добавляем центральную точку
-    // points.push({ x: 4, y: 4 });
-
-    // Добавляем грибы в выбранные точки
-    points.forEach((point) => {
-      data.unit.push(makeUnit("mushroom", point.x, point.y, 3));
-    });
-
-    //куст в центре
-    data.unit.push(makeUnit("bush", 4, 4, 3));
-  } else {
-    barraks = _.shuffle(barraks);
-    bluearr = _.sampleSize(bluearr, 9);
-    orangearr = _.sampleSize(orangearr, 9);
-    let e = "firebat";
-    bluearr[0].tp = "hoplite";
-    bluearr[1].tp = "hoplite";
-    bluearr[2].tp = "hoplite";
-    bluearr[3].tp = barraks[3];
-    bluearr[4].tp = barraks[4];
-    bluearr[5].tp = barraks[5];
-    orangearr[1].tp = "firebat";
-    orangearr[2].tp = "firebat";
-    orangearr[3].tp = "firebat";
-    orangearr[0].tp = "firebat";
-    orangearr[4].tp = "firebat";
-    orangearr[5].tp = "firebat";
+    data.field[4][4] = "team1";
+    data.field[7][1] = "team1";
+    data.field[7][7] = "team1";
+    return data;
   }
 
+  let bluearr = [];
+  let orangearr = [];
+  //куст в центре
+  data.unit.push(makeUnit("bush", 4, 4, 3));
+
+  if (START_UNIT) {
+    bluearr.push({ x: 1, y: 1 });
+    orangearr.push({ x: 7, y: 7 });
+    bluearr[0].tp = START_UNIT;
+    orangearr[0].tp = START_UNIT;
+  }
+  if (SECOND_UNIT) {
+    orangearr.push({ x: 7, y: 1, tp: SECOND_UNIT });
+    bluearr.push({ x: 1, y: 7, tp: SECOND_UNIT });
+  }
   bluearr.forEach((e) => {
     data.unit.push(makeUnit(e.tp || rndUnit(), e.x, e.y, 1));
   });
   orangearr.forEach((e) => {
     data.unit.push(makeUnit(e.tp || rndUnit(), e.x, e.y, 2));
   });
-
   return data;
+  // }
 };
