@@ -1,11 +1,10 @@
-const rules = require("./rules");
-const meta = require("./meta");
+import rules from "./rules.js";
+import meta from "./meta.js";
+import wrapper from "./wrapper.js";
 
-const wrapper = require("./wrapper");
+import _ from "lodash";
 
-const _ = require("lodash");
-
-module.exports = (game, unit, akt) => {
+export default (game, unit, akt) => {
   //возимся с мертвыми и выполняем правила
   do {
     for (let i = game.deadPool.length; i--; i > 0) {

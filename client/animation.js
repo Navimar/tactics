@@ -1,4 +1,8 @@
-const animateWalk = (u, fromX, fromY) => {
+import { local } from "./data.js";
+import { drawUnit } from "./render.js";
+
+const animate = {};
+animate.walk = (u, fromX, fromY) => {
   let totalDuration = 1000;
   if (local.cadrProgress > totalDuration) return false;
 
@@ -13,7 +17,7 @@ const animateWalk = (u, fromX, fromY) => {
   return true;
 };
 
-const animateFlight = (u, fromX, fromY) => {
+animate.flight = (u, fromX, fromY) => {
   let totalDuration = 1000;
   if (local.cadrProgress > totalDuration) return false;
 
@@ -26,7 +30,7 @@ const animateFlight = (u, fromX, fromY) => {
   return true;
 };
 
-const animateJump = (u, fromX, fromY) => {
+animate.jump = (u, fromX, fromY) => {
   let totalDuration = 1000;
   if (local.cadrProgress > totalDuration) return false;
 
@@ -40,7 +44,7 @@ const animateJump = (u, fromX, fromY) => {
   return true;
 };
 
-const animateTeleport = (u, fromX, fromY) => {
+animate.teleport = (u, fromX, fromY) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -59,7 +63,7 @@ const animateTeleport = (u, fromX, fromY) => {
   return true;
 };
 
-const animateWorm = (u, fromX, fromY) => {
+animate.worm = (u, fromX, fromY) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -78,7 +82,7 @@ const animateWorm = (u, fromX, fromY) => {
   return true;
 };
 
-const animateShake = (u) => {
+animate.shake = (u) => {
   let totalDuration = 1000;
 
   if (local.cadrProgress > totalDuration) return false;
@@ -101,14 +105,14 @@ const animateShake = (u) => {
   return true;
 };
 
-const animateBreath = (u) => {
+animate.breath = (u) => {
   let sizeAdd = 0;
   sizeAdd = (local.cadr / 700) * 15;
   drawUnit({ ...u, sizeAdd });
 };
 
-const animatePunch = (u, targetX, targetY) => {
-  totalDuration = 500;
+animate.punch = (u, targetX, targetY) => {
+  let totalDuration = 500;
   if (local.cadrProgress < totalDuration) {
     // Изменяем расчёт так, чтобы движение происходило вперёд и обратно в течение полного цикла прогресса
     let cycleProgress = Math.PI * (local.cadrProgress / totalDuration); // Период от 0 до PI
@@ -121,7 +125,7 @@ const animatePunch = (u, targetX, targetY) => {
   return true;
 };
 
-const animateTrailDeath = (unit, x, y) => {
+animate.trailDeath = (unit, x, y) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -134,7 +138,7 @@ const animateTrailDeath = (unit, x, y) => {
   return true;
 };
 
-const animateAdd = (unit) => {
+animate.add = (unit) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -145,7 +149,7 @@ const animateAdd = (unit) => {
   return true;
 };
 
-const animatePolymorph = (u, img) => {
+animate.polymorph = (u, img) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -162,7 +166,7 @@ const animatePolymorph = (u, img) => {
   return true;
 };
 
-const animateLookAround = (u) => {
+animate.lookAround = (u) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -174,7 +178,7 @@ const animateLookAround = (u) => {
   return true;
 };
 
-const animateLaunch = (u, x, y) => {
+animate.launch = (u, x, y) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -184,7 +188,7 @@ const animateLaunch = (u, x, y) => {
   return true;
 };
 
-const animateFall = (u, x, y) => {
+animate.fall = (u, x, y) => {
   let totalDuration = 1000; // Общая длительность анимации в миллисекундах
   if (local.cadrProgress > totalDuration) return false;
 
@@ -194,3 +198,5 @@ const animateFall = (u, x, y) => {
   drawUnit({ ...u, x, y, m: "upsidedown" }); // Добавляем 'upsidedown' для переворота юнита
   return true;
 };
+
+export default animate;

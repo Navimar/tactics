@@ -1,7 +1,7 @@
-const fs = require("fs");
-const sha = require("sha256");
-const dotenv = require("dotenv");
-const path = require("path");
+import fs from "fs";
+import sha from "sha256";
+import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -221,4 +221,4 @@ function GenerateToken(stringLength) {
   }
   return rndString;
 }
-module.exports = player;
+export default player;

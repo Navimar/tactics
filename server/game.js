@@ -1,25 +1,27 @@
-const meta = require("./meta");
-const action = require("./action");
-const time = require("./time");
-const wrapper = require("./wrapper");
-const akter = require("./akter");
-const send = require("./send");
-const en = require("./engine");
-const player = require("./player");
-const generator = require("./generator");
-const onOrder = require("./onOrder");
-const onAkt = require("./onAkt");
-const rules = require("./rules");
-const _ = require("lodash");
-const bot = require("./bot");
+import meta from "./meta.js";
+import action from "./action.js";
+import time from "./time.js";
+import wrapper from "./wrapper.js";
+import akter from "./akter.js";
+import send from "./send.js";
+import en from "./engine.js";
+import player from "./player.js";
+import generator from "./generator.js";
+import onOrder from "./onOrder.js";
+import onAkt from "./onAkt.js";
+import rules from "./rules.js";
+import _ from "lodash";
+import bot from "./bot.js";
 
 let games = [];
 let lastid = 0;
-exports.games = () => {
+
+const g = {};
+g.games = () => {
   return games;
 };
 
-exports.new = (p1, p2, ai) => {
+g.new = (p1, p2, ai) => {
   let game = creategame(p1, p2, lastid++, ai);
   games.push(game);
   return game;
@@ -81,7 +83,7 @@ let creategame = (p1, p2, id, ai) => {
   return game;
 };
 
-exports.order = (game, orderUnit, akt) => {
+g.order = (game, orderUnit, akt) => {
   if (!game) return;
   game.unit.forEach((u) => {
     u.animation = [];
@@ -167,7 +169,7 @@ let updateAkts = (game) => {
   });
 };
 
-exports.endgame = (game, winner, words) => {
+g.endgame = (game, winner, words) => {
   game.finished = true;
   game.winner = winner;
   send.data(game);
@@ -211,25 +213,26 @@ exports.endgame = (game, winner, words) => {
   player.clear(game.players[0], game.id);
   player.clear(game.players[1], game.id);
 };
-exports.surrender = (game, p) => {
+
+g.surrender = (game, p) => {
   if (game && !game.finished) {
     if (p == 1) {
-      exports.endgame(game, 2);
+      g.endgame(game, 2);
     } else {
-      exports.endgame(game, 1);
+      g.endgame(game, 1);
     }
     updateAkts(game);
     send.data(game);
   }
 };
 
-exports.rematch = (gm) => {
+g.rematch = (gm) => {
   ng = creategame(gm.players[0], gm.players[1], gm.id);
   for (i in games) if (games[i] == gm) games[i] = ng;
   send.data(ng);
 };
 
-exports.endturn = (game, p) => {
+g.endturn = (game, p) => {
   function cnFlag() {
     let flag = [0, 0];
     for (let x = 0; x < 9; x++) {
@@ -316,7 +319,7 @@ exports.endturn = (game, p) => {
   }
 };
 
-exports.setbonus = (game, p, bonus) => {
+g.setbonus = (game, p, bonus) => {
   game.bonus[3 - p] = bonus;
   if (game.sandbox) {
     game.bonus[1] = bonus;
@@ -338,6 +341,7 @@ exports.setbonus = (game, p, bonus) => {
     send.data(game);
   }
 };
+
 function addbonus(game, unit) {
   if (unit.team !== game.turn) {
     game.unit.forEach((u) => {
@@ -373,7 +377,7 @@ function addbonus(game, unit) {
   game.chooseteam = false;
 }
 
-exports.timeout = (game) => {
+g.timeout = (game) => {
   console.log(game.id, "check time", time.clock(), game.lastturn);
   if (time.clock() - game.lastturn > 86400 * 3) {
     let winner = game.turn == 1 ? 2 : 1;
@@ -406,10 +410,12 @@ function worldshift(game) {
   }
 }
 
-exports.byId = (id) => {
+g.byId = (id) => {
   let g = games.find((e) => {
     return e.id == id;
   });
   if (g == undefined) g = false;
   return g;
 };
+
+export default g;

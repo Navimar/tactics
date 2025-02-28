@@ -1,6 +1,6 @@
-const en = require("./engine");
-const meta = require("./meta");
-const _ = require("lodash");
+import en from "./engine.js";
+import _ from "lodash";
+import meta from "./meta.js";
 
 function getRandomUnit(unitsByClass, availableClasses, currentUnits, existingUnitType) {
   let randomUnit;
@@ -35,7 +35,7 @@ function getUnitsByClass(meta) {
   return unitsByClass;
 }
 
-module.exports = (game, me, target) => {
+export default (game, me, target) => {
   return {
     game,
     me,

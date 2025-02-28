@@ -1,11 +1,12 @@
-const meta = require("./meta");
-const en = require("./engine");
-const _ = require("lodash");
+import meta from "./meta.js";
+import en from "./engine.js";
+import _ from "lodash";
 
 const START_UNIT = "base";
 // const SECOND_UNIT = "staziser";
 const SECOND_UNIT = false;
 
+const exports = {};
 exports.new = (rank, ai) => {
   rank = 9999;
   let barraks = [];
@@ -121,10 +122,10 @@ exports.new = (rank, ai) => {
   };
 
   makeflag(4, 4, 2);
-  up = makeflag(1, 1, 1);
-  up = makeflag(1, 7, 1);
-  up = makeflag(7, 1, 2);
-  up = makeflag(7, 7, 2);
+  makeflag(1, 1, 1);
+  makeflag(1, 7, 1);
+  makeflag(7, 1, 2);
+  makeflag(7, 7, 2);
   const pointsnearteam = [
     [4 + dir, 4],
     [4 - dir, 4],
@@ -204,7 +205,6 @@ exports.new = (rank, ai) => {
     data.unit.push(makeUnit("mushroom", point.x, point.y, 3));
   });
 
-  console.log(ai);
   if (ai == "mission") {
     data.unit.push(makeUnit("mushroom", 3, 4, 1));
     data.unit.push(makeUnit("mushroom", 4, 4, 1));
@@ -240,3 +240,4 @@ exports.new = (rank, ai) => {
   return data;
   // }
 };
+export default exports;

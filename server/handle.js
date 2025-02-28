@@ -1,12 +1,13 @@
-const player = require("./player");
-const game = require("./game");
-const meta = require("./meta");
-const queue = require("./queue");
-const send = require("./send.js");
+import player from "./player.js";
+import game from "./game.js";
+import meta from "./meta.js";
+import queue from "./queue.js";
+import send from "./send.js";
 
-const sha = require("sha256");
-const fs = require("fs");
+import sha from "sha256";
+import fs from "fs";
 
+const exports = {};
 exports.start = () => {
   register_players();
   count_units();
@@ -247,3 +248,5 @@ exports.bot = (ctx, bot) => {
     }
   }
 };
+
+export default exports;

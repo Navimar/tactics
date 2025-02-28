@@ -1,7 +1,8 @@
-const en = require("./engine");
-const meta = require("./meta");
-const akter = require("./akter");
-const { unitInPoint } = require("./engine");
+import en from "./engine.js";
+import meta from "./meta.js";
+import akter from "./akter.js";
+
+const exports = {};
 
 exports.slime = (game, u) => {
   if (u.status.includes("slime")) {
@@ -73,7 +74,7 @@ exports.teamPortal = (game, u) => {
 };
 
 exports.worm = (game, u) => {
-  for (i = game.spoil.length; i--; i > 0) {
+  for (let i = game.spoil.length; i--; i > 0) {
     if (game.spoil[i].name == "wormportal" && game.spoil[i].x == u.x && game.spoil[i].y == u.y) {
       let oldx = u.x;
       let oldy = u.y;
@@ -142,3 +143,5 @@ exports.stazis = (game, u) => {
 //   })
 //   u.akt = u.akt.concat(akter(game, u).hand('capture', 'neutral'))
 // }
+
+export default exports;

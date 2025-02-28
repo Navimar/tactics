@@ -1,7 +1,7 @@
-const _ = require("lodash");
-const en = require("./engine");
+import _ from "lodash";
+import en from "./engine.js";
 
-module.exports = (game, me) => {
+export default (game, me) => {
   return {
     me,
     game,

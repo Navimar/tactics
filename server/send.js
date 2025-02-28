@@ -1,13 +1,13 @@
-const _ = require("lodash");
-const meta = require("./meta");
-const akter = require("./akter");
-const wrapper = require("./wrapper");
+import _ from "lodash";
+import meta from "./meta.js";
 
-const dotenv = require("dotenv");
-
+import wrapper from "./wrapper.js";
+import dotenv from "dotenv";
 dotenv.config();
-const player = require("./player");
 
+import player from "./player.js";
+
+const exports = {};
 exports.web = (p, game) => {
   msg = game.data;
   event = "update";
@@ -180,6 +180,7 @@ exports.data = (game) => {
         m: u.m,
         x: u.x,
         y: u.y,
+        team: u.team,
         animation: u.animation,
         sticker: u.sticker
           ? {
@@ -264,3 +265,5 @@ exports.logicerror = (game, error) => {
   game.players[0].socket.get(game.id).emit("logic", error);
   game.players[1].socket.get(game.id).emit("logic", error);
 };
+
+export default exports;

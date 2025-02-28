@@ -1,6 +1,6 @@
-const input = require("./input");
+import input from "./input.js";
 
-exports.main = (io) => {
+export default (io) => {
   Array.prototype.remove = function () {
     var what,
       a = arguments,

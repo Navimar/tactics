@@ -1,34 +1,34 @@
-var express = require("express");
-var app = express();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
-var run = require("./server/run.js");
-const dotenv = require("dotenv");
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import run from "./server/run.js";
 
 dotenv.config();
 
-app.use(express.static(__dirname + "/static"));
-app.use(express.static(__dirname + "/script"));
-app.use(express.static(__dirname + "/server"));
-app.use(express.static(__dirname + "/img"));
-app.use(express.static(__dirname + "/img.nosync"));
-app.use(express.static(__dirname + "/sound"));
-app.use(express.static(__dirname + "/config"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.get("*", function (req, res) {
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+
+app.use(express.static(path.join(__dirname, "dist")));
+app.use(express.static(path.join(__dirname, "img")));
+app.use(express.static(path.join(__dirname, "img.nosync")));
+app.use(express.static(path.join(__dirname, "sound")));
+
+app.get("*", (req, res) => {
   res.status(404).send("nothing there");
 });
 
-// app.get('/log', function (req, res) {
-//     const text = fs.readFileSync(process.env.OPENSHIFT_LOG_DIR + 'nodejs.log', 'utf8');
-//     res.status(200).send(text);
-// });
+const port = process.env.PORT || 3000;
+const ip = process.env.IP || "127.0.0.1";
 
-const port = process.env.PORT;
-const ip = process.env.IP;
+run(io);
 
-run.main(io, ip, port);
-
-http.listen(port, ip, function () {
-  console.log("listening on " + ip + ":" + port);
+httpServer.listen(port, ip, () => {
+  console.log(`Listening on ${ip}:${port}`);
 });

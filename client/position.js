@@ -1,10 +1,10 @@
-const en = require("../server/engine");
+import en from "../server/engine.js";
 
 function logDebug(message) {
   console.log(message); // Оставляем закомментированным
 }
 
-function scorePosition() {
+export default function (game) {
   let score = {
     t1: 0,
     t2: 0,
@@ -16,6 +16,7 @@ function scorePosition() {
       score[`t${unit.team}`] -= 30;
     }
   });
+  console.log(en.allUnitsOfType(game, "base"));
 
   // 1) Даём 40 баллов, если нет базы
   if (!en.allUnitsOfType(game, "base").some((u) => u.team === 1)) score.t1 += 40; // 40 очков за отсутствие базы
@@ -80,6 +81,6 @@ function scorePosition() {
 
   // Записываем итоговые очки
   logDebug(`Final Score: Team 1 = ${score.t1}, Team 2 = ${score.t2}`);
-  return [234, 123];
+
   return [Math.round(score.t1), Math.round(score.t2)];
 }

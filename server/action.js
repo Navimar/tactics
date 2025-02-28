@@ -1,6 +1,8 @@
-const en = require("./engine");
-const _ = require("lodash");
-const meta = require("./meta");
+import en from "./engine.js";
+import _ from "lodash";
+import meta from "./meta.js";
+
+const exports = {};
 
 exports.teleport = (wd) => {
   wd.me.animation.push({ name: "teleport", fromX: wd.me.x, fromY: wd.me.y });
@@ -58,3 +60,5 @@ exports.unstazis = (wd) => {
   wd.target.unit.status.remove("stazis");
   wd.tire();
 };
+
+export default exports;

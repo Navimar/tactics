@@ -1,6 +1,7 @@
-const en = require("./engine");
-const _ = require("lodash");
+import en from "./engine.js";
+import _ from "lodash";
 
+const exports = {};
 exports.warrior = {
   weight: 100,
   rank: 0,
@@ -153,8 +154,8 @@ exports.bee = {
     wd.addTrail("idle");
     wd.addTrail("death", 1);
 
-    oldx = wd.me.x;
-    oldy = wd.me.y;
+    let oldx = wd.me.x;
+    let oldy = wd.me.y;
     wd.kill();
     wd.go();
     if (en.fieldInPoint(wd.game, oldx, oldy).slice(0, -1) != "team")
@@ -165,8 +166,8 @@ exports.bee = {
   move: (wd) => {
     wd.me.animation.push({ name: "walk", fromX: wd.me.x, fromY: wd.me.y });
 
-    oldx = wd.me.x;
-    oldy = wd.me.y;
+    let oldx = wd.me.x;
+    let oldy = wd.me.y;
     wd.go();
 
     if (en.fieldInPoint(wd.game, oldx, oldy).slice(0, -1) != "team")
@@ -1486,3 +1487,5 @@ exports.frog = {
 //     wd.me.data.summoned = true;
 //   },
 // };
+
+export default exports;

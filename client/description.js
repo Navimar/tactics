@@ -1,4 +1,6 @@
-let description_field = {
+const description = {};
+
+description.field = {
   grass: {
     name: "Трава",
     description: "По ней приятно гулять",
@@ -22,14 +24,14 @@ let description_field = {
     description: "Юниты могут в ней плавать. Тушит огонь.",
   },
 };
-let description_spoil = {
+description.spoil = {
   fire: "Большой огонь. Поджигает юнитов. Постепенно тухнет.",
   fire1: "Средний огонь. Поджигает юнитов. Скоро потухнет.",
   fire2: "Маленький огонь. Поджигает юнитов. Потухнет в конце хода.",
   airdrop: "Здесь вырастет гриб на следующий ход, если никто ему не помешает.",
   worm: "Сюда делает подкоп Червь. Соперник не видит этой отметки.",
 };
-let description_status = {
+description.status = {
   fire: "Этот юнит сгорит в конце хода соперника.",
   fire2: "Этот юнит сгорит в конце хода.",
   stazis: "Юнит в стазисе. Не может ничего делать. Можно освободить другим юнитом.",
@@ -43,8 +45,8 @@ let description_status = {
   frog2: "Прыг-скок перепрыгнул двух юнитов. Его прыжки смертельны на этом ходу.",
   telepath: "Этот юнит под внушением телепата и выполнит любой приказ.",
 };
-let description_notfound = "Описание не готово";
-let description_unit = {
+description.notfound = "Описание не готово";
+description.unit = {
   polymorpher: {
     name: "Полиморфер",
     description: "Превращает юнита в другого",
@@ -167,4 +169,6 @@ let description_unit = {
       "Прыгает через юнитов. После двух прыжков в течении одного хода начинает убивать каждого кого перепрыгнет на этом ходу.",
   },
 };
-description_sticker = "В этом юните внутри находится ";
+description.sticker = "В этом юните внутри находится ";
+
+export default description;

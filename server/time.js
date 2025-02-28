@@ -1,8 +1,10 @@
 let clock = 0;
 
+const exports = {};
 exports.tick = () => {
-    clock++
-}
+  clock++;
+};
 exports.clock = () => {
-    return clock
-}
+  return clock;
+};
+export default exports;

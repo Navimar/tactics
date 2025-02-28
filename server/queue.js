@@ -1,9 +1,11 @@
-const game = require("./game");
-const send = require("./send");
-const player = require("./player");
-const dotenv = require("dotenv");
+import game from "./game.js";
+import send from "./send.js";
+import player from "./player.js";
+import dotenv from "dotenv";
 
 dotenv.config();
+
+const exports = {};
 
 let queue = [];
 exports.find = (p, bot) => {
@@ -55,3 +57,5 @@ exports.cancel = (p, bot) => {
     queue = [];
   }
 };
+
+export default exports;

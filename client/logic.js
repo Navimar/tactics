@@ -1,93 +1,23 @@
+import _ from "lodash";
+
+import { render, renderanimated } from "./render.js";
+import { findGetParameter, tip } from "./util.js";
+import { data, local, system } from "./data.js";
+import { socket } from "./input.js";
+import scorePosition from "./position.js";
+import mixer from "./mixer.js";
+
+import description from "./description.js";
+
 let mobile = false;
-
-let local = {
-  time: 0,
-  description: {},
-  seconds: 0,
-  lastclick: 0,
-  newAnimationTurn: 0,
-  animationTurn: 0,
-  akt: [],
-  focus: false,
-  position: { p1: 0, p2: 0 },
-  fisher: [999, 999],
-  sandclock: { x: 0, y: 0 },
-  spoilmask: _.times(9, () => _.times(9, () => _.random(1, 1000))),
-  tip: {
-    text: "Подключение к серверу...",
-    x: 3,
-    y: 3,
-    color: "#F00",
-    font: 300,
-    dur: 30,
-  },
-  turn: 1,
-  gameid: findGetParameter("game"),
-  frame: 0,
-  unitencn: 9,
-  unitcn: 9,
-  cost: 5,
-  rise: false,
-  cadr: 0,
-};
-let data = {
-  fisher: ["???", "!!!"],
-  leftturns: "нет подключения к серверу",
-  trail: [],
-  spoil: [],
-  gold: [11, 11],
-  unit: [],
-};
-
-let fieldmask = (() => {
-  let arr = [];
-  for (let y = 0; y < 9; y++) {
-    arr[y] = [];
-    for (let x = 0; x < 9; x++) {
-      arr[y][x] = [Math.random(), Math.random()];
-    }
-  }
-  return arr;
-})();
-
-let tip = (text, x, y, color, dur, size) => {
-  if (!size) {
-    size = 100;
-  }
-  if (!dur) dur = 5;
-  local.tip = { text, x, y, color, size, dur };
-};
+let blocked = false;
 
 let leftclickcn = 0;
 let nextunit = 0;
-let orientation = "h";
 let fisherStart = false;
 let connected = false;
-window.onload = function () {
-  render();
-  inputMouse();
-  inputServer();
-  onStep(0);
-  step(new Date().getTime());
-  login();
-  renderhtml();
-};
 
-var resizeId;
-window.addEventListener(
-  "resize",
-  function (event) {
-    clearTimeout(resizeId);
-    resizeId = setTimeout(doneResizing, 500);
-  },
-  true
-);
-
-function doneResizing() {
-  render();
-}
-
-function step(lastTime) {
+export function step(lastTime) {
   let time = new Date().getTime();
   let timeDiff = time - lastTime;
   lastTime = time;
@@ -97,33 +27,31 @@ function step(lastTime) {
   });
 }
 
-let renderhtml = (login) => {
+export let renderhtml = (login) => {
   //<span>Введите ваш ID</span> <br>
   // document.getElementById('menu').innerHTML =`
   // <input placeholder="Введите ваш ID" contenteditable="true" id='userid'></input><button>Войти</button> или <>добавьте бота телеграм!<br>
   // <button>Получить ID</button>
   // `
   let html = `
-   <span>Чтобы зарегестрироваться и играть с другими игроками добавьте <a href="http://t.me/unitcraftbot">телеграм бота</a><br>
+   <span>Чтобы зарегестрироваться и играть с другими игроками добавьте <a href="http://t.me/incredibletacticsbot">телеграм бота</a><br>
    А также заходите в <a href="http://t.me/incredibletactics">наш чат в телеграме</a></span>
   `;
   if (login == "success") html = `Ваш ID ` + findGetParameter("id");
 };
 
-let onStep = (diff) => {
-  // console.log('step');
+export let onStep = (diff) => {
   local.time += diff;
-  // console.log(local.tip.dur);
   if (Math.floor(local.time / 1000) > local.seconds) {
     local.seconds = Math.floor(local.time / 1000);
-    local.tip.dur--;
+    if (local.tip) local.tip.dur--;
     if (data.turn) {
       local.fisher[0]--;
     } else {
       local.fisher[1]--;
     }
     if (!data.bonus && local.fisher[0] != "" && local.fisher[0] == 30) {
-      tip(
+      local.tip = tip(
         "Вы не успеваете закончить ход. Ход будет передан сопернику через 30 секунд!",
         3,
         3,
@@ -140,13 +68,13 @@ let onStep = (diff) => {
       local.seconds >= local.lastclick + 45
     ) {
       local.lastclick = local.seconds;
-      tip("Не забывайте передать ход сопернику", 3, 3, "#F00", 5, 200);
+      local.tip = tip("Не забывайте передать ход сопернику", 3, 3, "#F00", 5, 200);
       render();
     }
     // if (!data.bonus && local.fisher[0] != '' && local.fisher[0] <= 0) endturn();
     // renderpanel();
   }
-  if (tapDown && local.time - tapTime > interval) {
+  if (system.tapDown && local.time - tapTime > interval) {
     onMouseDownRight();
     tapDown = false;
   }
@@ -172,7 +100,7 @@ let onStep = (diff) => {
   renderanimated(diff);
 };
 
-let onLogin = (val) => {
+export const onLogin = (val) => {
   if (val !== "success") {
     alert(val);
   } else {
@@ -181,13 +109,13 @@ let onLogin = (val) => {
   }
   render();
 };
-let onUpdate = (val) => {
+export const onUpdate = (val) => {
   local.animationProgress = 0;
   local.cadrProgress = 0;
   blocked = false;
   local.lastclick = local.seconds;
   local.oldfield = data.field;
-  data = val;
+  Object.assign(data, val);
   local.tip = false;
   local.unit = false;
   local.sandclock = false;
@@ -195,7 +123,7 @@ let onUpdate = (val) => {
   local.fisher[1] = data.fisher[1];
   if (local.turn == false && data.turn == true && !data.sandbox) {
     playSound("your_turn");
-    tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 240);
+    local.tip = tip("ВАШ ХОД!!!", 3, 4, "#1ebe29", 10, 240);
     local.turn = data.turn;
   }
   local.unitcn = 0;
@@ -213,7 +141,7 @@ let onUpdate = (val) => {
   if (local.frame != data.frame) {
     local.frame = data.frame;
   }
-  local.position = scorePosition();
+  local.position = scorePosition(data);
   render();
   mixer(0);
   if (!data.history && allakts() == 0 && data.turn) {
@@ -229,10 +157,10 @@ let getAkt = (x, y) => {
 };
 
 let clickOnAkt = () => {
-  let gu = getUnit(mouseCell.x, mouseCell.y);
+  let gu = getUnit(system.mouseCell.x, system.mouseCell.y);
 
   if (local.unit && local.unit.akt && data.turn && local.unit.canMove) {
-    local.order = getAkt(mouseCell.x, mouseCell.y);
+    local.order = getAkt(system.mouseCell.x, system.mouseCell.y);
     if (local.order) {
       send();
       local.sandclock = { x: local.order.x, y: local.order.y };
@@ -241,7 +169,7 @@ let clickOnAkt = () => {
     }
   }
   if (local.build && data.turn) {
-    let u = getUnit(mouseCell.x, mouseCell.y);
+    let u = getUnit(system.mouseCell.x, system.mouseCell.y);
     if (u) {
       if (!blocked) {
         socket.emit("order", {
@@ -254,57 +182,68 @@ let clickOnAkt = () => {
       blocked = true;
       local.sandclock = { x: local.build.x, y: local.build.y };
     } else {
-      tip("Нажмите на юнита, чтобы построить такого же", mouseCell.x, mouseCell.y, "#005500");
+      tip(
+        "Нажмите на юнита, чтобы построить такого же",
+        system.mouseCell.x,
+        system.mouseCell.y,
+        "#005500"
+      );
     }
     return;
   }
   if (!data.turn) {
-    tip("Сейчас ход соперника", mouseCell.x, mouseCell.y, "#005500");
+    tip("Сейчас ход соперника", system.mouseCell.x, system.mouseCell.y, "#005500");
   } else if (!gu && local.unit && local.unit.color == 2) {
     tip(
       "Вы пытаетесь ходить юнитом соперника! Ходите юнитами с белой обводкой.",
-      mouseCell.x,
-      mouseCell.y,
+      system.mouseCell.x,
+      system.mouseCell.y,
       "#333"
     );
   } else if (!gu && local.unit && local.unit.color == 3 && !local.unit.canMove) {
     // local.unit = false;
     tip(
       "Вы пытаетесь ходить нейтральным юнитом. Ваши юниты имеют белую обводку.",
-      mouseCell.x,
-      mouseCell.y,
+      system.mouseCell.x,
+      system.mouseCell.y,
       "#050"
     );
   } else if (!gu && local.unit && !local.unit.isReady) {
     tip(
       "Ваш юнит устал и никуда не пойдет на этом ходу. Действуйте юнитами с белой обводкой",
-      mouseCell.x,
-      mouseCell.y,
+      system.mouseCell.x,
+      system.mouseCell.y,
       "#050"
     );
   } else if (!gu && local.unit && local.unit.color == 1) {
     tip(
       "Вам нужно нажать на любой белый квадратик чтобы ходить юнитом!",
-      mouseCell.x,
-      mouseCell.y,
+      system.mouseCell.x,
+      system.mouseCell.y,
       "#333"
     );
   }
   return false;
 };
 
-let onMouseDown = () => {
+export const onMouseDown = () => {
   local.lastclick = local.seconds;
   let handleclick = () => {
     if (!socket.connected) {
-      tip("Подключение к серверу...", 3, 3, "#0F0", 5, 200);
+      local.tip = tip("Подключение к серверу...", 3, 3, "#0F0", 5, 200);
       login();
       return;
     }
     if (data.history) {
       if (
-        (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
-        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
+        (system.mouseCell.y >= 9 &&
+          system.mouseCell.y < 11 &&
+          system.mouseCell.x >= 6 &&
+          system.mouseCell.x <= 7) ||
+        (system.mouseCell.x >= 9 &&
+          system.mouseCell.x < 11 &&
+          system.mouseCell.y >= 6 &&
+          system.mouseCell.y <= 7)
       ) {
         // if (data.finished) {
         // rematch();
@@ -316,30 +255,33 @@ let onMouseDown = () => {
       return;
     }
     if (data.bonus == "choose") {
-      if ((mouseCell.y > -3 && mouseCell.y < 0) || (mouseCell.x > -3 && mouseCell.x < 0)) {
+      if (
+        (system.mouseCell.y > -3 && system.mouseCell.y < 0) ||
+        (system.mouseCell.x > -3 && system.mouseCell.x < 0)
+      ) {
         let b;
-        if (mouseCell.x < 0) b = (mouseCell.x + 2) * 9 + mouseCell.y;
-        if (mouseCell.y < 0) b = (mouseCell.y + 2) * 9 + mouseCell.x;
+        if (system.mouseCell.x < 0) b = (system.mouseCell.x + 2) * 9 + system.mouseCell.y;
+        if (system.mouseCell.y < 0) b = (system.mouseCell.y + 2) * 9 + system.mouseCell.x;
         sendbonus(b);
       } else {
         tip(
           "Нажмите на одну из красных кнопок с числом! Это определит, кто будет ходить первым.",
-          mouseCell.x,
-          mouseCell.y,
+          system.mouseCell.x,
+          system.mouseCell.y,
           "#222"
         );
       }
       return;
     }
     if (data.bonus == "wait") {
-      tip("Соперник еще выбирает бонус. Подождите", mouseCell.x, mouseCell.y, "#222");
+      tip("Соперник еще выбирает бонус. Подождите", system.mouseCell.x, system.mouseCell.y, "#222");
       return;
     }
     local.tip = false;
     local.description.spoil = false;
     if (
-      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 8) ||
-      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 8)
+      (system.mouseCell.y >= 9 && system.mouseCell.y < 11 && system.mouseCell.x >= 8) ||
+      (system.mouseCell.x >= 9 && system.mouseCell.x < 11 && system.mouseCell.y >= 8)
     ) {
       if (!data.finished) {
         surrender();
@@ -347,8 +289,14 @@ let onMouseDown = () => {
       return;
     }
     if (
-      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 4 && mouseCell.x <= 5) ||
-      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 4 && mouseCell.y <= 5)
+      (system.mouseCell.y >= 9 &&
+        system.mouseCell.y < 11 &&
+        system.mouseCell.x >= 4 &&
+        system.mouseCell.x <= 5) ||
+      (system.mouseCell.x >= 9 &&
+        system.mouseCell.x < 11 &&
+        system.mouseCell.y >= 4 &&
+        system.mouseCell.y <= 5)
     ) {
       if (local.unit) tip(local.unit.description, 3, 3, "#000", 5, 120);
       else if (local.build)
@@ -372,24 +320,36 @@ let onMouseDown = () => {
       return;
     }
     if (
-      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 6 && mouseCell.x <= 7) ||
-      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 6 && mouseCell.y <= 7)
+      (system.mouseCell.y >= 9 &&
+        system.mouseCell.y < 11 &&
+        system.mouseCell.x >= 6 &&
+        system.mouseCell.x <= 7) ||
+      (system.mouseCell.x >= 9 &&
+        system.mouseCell.x < 11 &&
+        system.mouseCell.y >= 6 &&
+        system.mouseCell.y <= 7)
     ) {
       if (local.frame > 0) showframe(data.keyframe);
       return;
     }
     if (data.bonus != "ready" || data.win == "win" || data.win == "defeat") return;
     if (
-      ((mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x <= 1) ||
-        (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y <= 1)) &&
+      ((system.mouseCell.y >= 9 && system.mouseCell.y < 11 && system.mouseCell.x <= 1) ||
+        (system.mouseCell.x >= 9 && system.mouseCell.x < 11 && system.mouseCell.y <= 1)) &&
       data.turn
     ) {
       endturn();
       return;
     }
     if (
-      (mouseCell.y >= 9 && mouseCell.y < 11 && mouseCell.x >= 2 && mouseCell.x < 4) ||
-      (mouseCell.x >= 9 && mouseCell.x < 11 && mouseCell.y >= 2 && mouseCell.y < 4)
+      (system.mouseCell.y >= 9 &&
+        system.mouseCell.y < 11 &&
+        system.mouseCell.x >= 2 &&
+        mouseCell.x < 4) ||
+      (system.mouseCell.x >= 9 &&
+        system.mouseCell.x < 11 &&
+        system.mouseCell.y >= 2 &&
+        system.mouseCell.y < 4)
     ) {
       let arr = [];
       data.unit.forEach((u) => {
@@ -408,16 +368,16 @@ let onMouseDown = () => {
       return;
     }
 
-    if (local.unit?.x != mouseCell.x || mouseCell.y != local.unit?.y) {
-      let gu = getUnit(mouseCell.x, mouseCell.y);
-      if (local.unit && getAkt(mouseCell.x, mouseCell.y)) {
+    if (local.unit?.x != system.mouseCell.x || system.mouseCell.y != local.unit?.y) {
+      let gu = getUnit(system.mouseCell.x, system.mouseCell.y);
+      if (local.unit && getAkt(system.mouseCell.x, system.mouseCell.y)) {
         leftclickcn++;
         if (leftclickcn == 2) {
           let txt =
             "Если вместо выделения вы хотите отдать приказ — нажмите ПРАВОЙ кнопкной мыши!!!";
           if (mobile)
             txt = "Если вместо выделения вы хотите отдать приказ — сделайте ДОЛГОЕ нажатие!!!";
-          tip(txt, mouseCell.x, mouseCell.y, "#550000");
+          local.tip = tip(txt, system.mouseCell.x, system.mouseCell.y, "#550000");
           leftclickcn = 0;
         }
       }
@@ -434,23 +394,30 @@ let onMouseDown = () => {
         return;
       }
       if (data.chooseteam) {
-        tip("Выделите синиго или рыжего юнита. И ходите им!", mouseCell.x, mouseCell.y, "#333");
+        tip(
+          "Выделите синиго или рыжего юнита. И ходите им!",
+          system.mouseCell.x,
+          system.mouseCell.y,
+          "#333"
+        );
         return;
       }
       if (!local.unit) {
-        local.description.name = description_field[data.field[mouseCell.x][mouseCell.y]]?.name;
+        local.description.name =
+          description.field[data.field[system.mouseCell.x][system.mouseCell.y]]?.name;
         local.description.description =
-          description_field[data.field[mouseCell.x][mouseCell.y]]?.description;
-        if (!local.description.name) local.description.name = data.field[mouseCell.x][mouseCell.y];
+          description.field[data.field[system.mouseCell.x][system.mouseCell.y]]?.description;
+        if (!local.description.name)
+          local.description.name = data.field[system.mouseCell.x][system.mouseCell.y];
         if (!local.description.description) local.description.description = description_notfound;
         local.description.color = "#000066";
-        let s = data.spoil.filter((s) => s.x == mouseCell.x && s.y == mouseCell.y);
+        let s = data.spoil.filter((s) => s.x == system.mouseCell.x && s.y == system.mouseCell.y);
 
         local.description.spoil = s[0]?.name;
         tip(
           "Выделите юнита с белой обводкой и ходите им!",
-          mouseCell.x,
-          mouseCell.y,
+          system.mouseCell.x,
+          system.mouseCell.y,
           "#000",
           5,
           100
@@ -467,12 +434,12 @@ let onMouseDown = () => {
   render();
 };
 
-let onMouseDownRight = () => {
+export const onMouseDownRight = () => {
   local.lastclick = local.seconds;
   if (!data.history) {
     local.tip = false;
     nextunit = 0;
-    if (blocked) tip("Секундочку...", mouseCell.x, mouseCell.y, "#005500");
+    if (blocked) tip("Секундочку...", system.mouseCell.x, system.mouseCell.y, "#005500");
     clickOnAkt();
 
     // console.log(data.turn)
@@ -520,7 +487,7 @@ let endturn = () => {
   blocked = true;
 };
 
-let login = () => {
+export let login = () => {
   socket.emit("login", {
     id: findGetParameter("id"),
     pass: findGetParameter("key"),

@@ -1,8 +1,8 @@
-const game = require("./game");
-const meta = require("./meta");
-const _ = require("lodash");
-const en = require("./engine");
-const send = require("./send");
+import _ from "lodash";
+
+import game from "./game.js";
+import en from "./engine.js";
+import send from "./send.js";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -1,3 +1,6 @@
+import { data, local } from "./data.js";
+import playSound from "./audio.js";
+
 const unitAudio = (x, y, turn) => {
   let unit = data.unit.find((unit) => unit.x === x && unit.y === y);
   if (!unit) return;
@@ -47,7 +50,7 @@ const unitAudio = (x, y, turn) => {
   }
 };
 
-function mixer(turn) {
+export default function (turn) {
   for (let y = 0; y < 9; y++) {
     for (let x = 0; x < 9; x++) {
       unitAudio(x, y, turn);

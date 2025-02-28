@@ -1,11 +1,15 @@
+import { canvasText } from "./canvas.js";
+import { getDeviceType } from "./util.js";
+import { data, local, system } from "./data.js";
+import { onMouseDown, onMouseDownRight } from "./logic.js";
+
 let mousePos;
 let mouseDown;
-let mouseCell = { x: 0, y: 0 };
-let tapDown;
+
 let tapTime;
 const interval = 200;
 
-function getMousePos(canvas, evt) {
+export function getMousePos(canvas, evt) {
   let rect = canvas.getBoundingClientRect();
 
   return {
@@ -23,12 +27,7 @@ function getTouchPos(canvas, evt) {
 
 let taptime;
 let right = false;
-function inputMouse() {
-  // window.addEventListener('focus', () => {
-  //   // console.log('hi!');
-  //   login();
-  // });
-
+export function inputMouse() {
   document.oncontextmenu = function (e) {
     return false;
   };
@@ -39,7 +38,6 @@ function inputMouse() {
   window.addEventListener("orientationchange", function () {
     // After orientationchange, add a one-time resize event
     var afterOrientationChange = function () {
-      // alert(window.orientation);
       render();
       window.removeEventListener("resize", afterOrientationChange);
     };
@@ -64,8 +62,7 @@ function inputMouse() {
       setMouseCell();
 
       tapTime = local.time;
-      tapDown = true;
-      // drawImgMask('tap', mouseCell.x, mouseCell.y);
+      system.tapDown = true;
       e.preventDefault();
     },
     false
@@ -76,7 +73,7 @@ function inputMouse() {
       mousePos = getTouchPos(canvasText, e);
       setMouseCell();
 
-      tapDown = false;
+      system.tapDown = false;
       if (local.time - tapTime < interval) {
         onMouseDown();
       }
@@ -89,8 +86,6 @@ function inputMouse() {
   canvasText.addEventListener(
     "mousedown",
     (e) => {
-      // alert(window.orientation);
-
       switch (e.which) {
         case 1:
           //Left Mouse button pressed.
@@ -136,17 +131,19 @@ function inputMouse() {
 
 let setMouseCell = () => {
   if (getDeviceType() == "desktop")
-    mouseCell = {
+    system.mouseCell = {
       x: Math.floor(
-        ((mousePos.x - shiftX / window.devicePixelRatio) / dh) * window.devicePixelRatio
+        ((mousePos.x - system.shiftX / window.devicePixelRatio) / system.dh) *
+          window.devicePixelRatio
       ),
       y: Math.floor(
-        ((mousePos.y - shiftY / window.devicePixelRatio) / dh) * window.devicePixelRatio
+        ((mousePos.y - system.shiftY / window.devicePixelRatio) / system.dh) *
+          window.devicePixelRatio
       ),
     };
   else
-    mouseCell = {
-      x: Math.floor((mousePos.x - shiftX) / dh),
-      y: Math.floor((mousePos.y - shiftY) / dh),
+    system.mouseCell = {
+      x: Math.floor((mousePos.x - system.shiftX) / dh),
+      y: Math.floor((mousePos.y - system.shiftY) / dh),
     };
 };

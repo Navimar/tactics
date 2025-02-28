@@ -1,8 +1,7 @@
-// // const _ = require('underscore');
-const bot = require("./bot");
-const time = require("./time");
+import bot from "./bot.js";
+import time from "./time.js";
 
-const handle = require("./handle");
+import handle from "./handle.js";
 
 const input = {};
 const speed = 1;
@@ -93,4 +92,4 @@ input.bot = () => {
   });
 };
 
-module.exports = input;
+export default input;

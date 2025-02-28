@@ -1,4 +1,12 @@
-function findGetParameter(name, url) {
+export function tip(text, x, y, color, dur, size) {
+  if (!size) {
+    size = 100;
+  }
+  if (!dur) dur = 5;
+  return { text, x, y, color, size, dur };
+}
+
+export function findGetParameter(name, url) {
   if (!url) {
     url = window.location.href;
   }
@@ -16,17 +24,7 @@ function findGetParameter(name, url) {
   }
 }
 
-const isAdjacent = (x1, y1, x2, y2) => {
-  // Проверяем, являются ли все аргументы целыми числами
-  if (![x1, y1, x2, y2].every(Number.isInteger)) {
-    return false;
-  }
-
-  // Проверяем ортогональную смежность
-  return (x1 === x2 && Math.abs(y1 - y2) === 1) || (y1 === y2 && Math.abs(x1 - x2) === 1);
-};
-
-function getDeviceType() {
+export function getDeviceType() {
   const userAgent = navigator.userAgent.toLowerCase();
   const width = window.innerWidth;
 

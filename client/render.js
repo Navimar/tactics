@@ -1,122 +1,21 @@
+import draw from "./draw.js";
+import { data, system, local } from "./data.js";
+import { tip } from "./util.js";
+import { socket } from "./input.js";
+import animate from "./animation.js";
+import description from "./description.js";
 let fps = 60;
 
-let renderanimated = (diff) => {
-  resize(true);
-
+let fieldmask = (() => {
+  let arr = [];
   for (let y = 0; y < 9; y++) {
+    arr[y] = [];
     for (let x = 0; x < 9; x++) {
-      if (local.animationTurn != local.renderedturn && local.animationTurn < 4) {
-        local.renderedturn = local.animationTurn;
-        render();
-      }
-
-      let u = data.spoil.filter((u) => u.x == x && u.y == y);
-      u.forEach((spoil) => {
-        let spoil_animation;
-        if (spoil.animation) spoil_animation = spoil.animation[local.animationTurn];
-
-        if (spoil_animation) {
-          switch (spoil_animation.name) {
-            case "none":
-              break;
-          }
-          return;
-        }
-        if (spoil.name.startsWith("fire")) drawSpoil(spoil.name, spoil.x, spoil.y, true);
-      });
-
-      rendertrail(x, y);
-      renderunit(x, y);
+      arr[y][x] = [Math.random(), Math.random()];
     }
   }
-  renderakt();
-  if (data.bonus == "choose") renderpanel();
-  if (!socket.connected) tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
-
-  if (!diff) diff = 0;
-  if (diff > 100) diff = 100;
-  if (diff) {
-    fps = Math.ceil(1000 / diff);
-    let x = -2.85;
-    let y = 8;
-    if (orientation == "h") {
-      x = 6.85;
-      y = -0.4;
-    }
-
-    // drawTxt("fps " + fps, x, y - 0.2, 2, "#000000", undefined, undefined, true);
-    let total = local.position[0] + local.position[1];
-    let percentage1 = total > 0 ? ((local.position[0] / total) * 100).toFixed(1) : 0;
-    let percentage2 = total > 0 ? ((local.position[1] / total) * 100).toFixed(1) : 0;
-
-    drawTxt(
-      `p1 ${percentage1}% (${local.position[0]})`,
-      x,
-      y,
-      2,
-      "#000000",
-      undefined,
-      undefined,
-      true
-    );
-    drawTxt(
-      `p2 ${percentage2}% (${local.position[1]})`,
-      x,
-      y + 0.4,
-      2,
-      "#000000",
-      undefined,
-      undefined,
-      true
-    );
-  }
-};
-
-let render = () => {
-  resize();
-
-  if (data.history) drawBackground("history");
-  else {
-    if (data.turn == 1) {
-      drawBackground("edgeTurn");
-    } else {
-      drawBackground("edgeWait");
-    }
-  }
-
-  if (data.bonus != "choose") renderpanel();
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      renderfield(x, y);
-      if (
-        local.animationTurn < 2 &&
-        local.oldfield &&
-        local.oldfield[x][y] == "grass" &&
-        data.field[x][y] == "ground"
-      )
-        drawImgMask("grass", x, y, fieldmask[x][y], false);
-    }
-    for (let x = 0; x < 9; x++) {
-      renderspoil(x, y);
-    }
-    // for (let x = 0; x < 9; x++) {
-    //   renderunit(x, y, diff);
-    // }
-    if (data.chooseteam || !data.bonus == "ready") {
-      for (let x = 0; x < 9; x++) {
-        if (data.field[x][y] == "team1") drawImgMask("bluestart", x, y);
-        if (data.field[x][y] == "team2") drawImgMask("orangestart", x, y);
-      }
-    }
-  }
-
-  if (local.sandclock) {
-    drawImg("sandclock", local.sandclock.x, local.sandclock.y);
-  }
-
-  renderdescription();
-  rendertip();
-};
+  return arr;
+})();
 
 let renderpanel = () => {
   let c = [
@@ -126,7 +25,7 @@ let renderpanel = () => {
     [9, 6],
     [9, 4],
   ];
-  if (orientation == "h") {
+  if (system.orientation == "h") {
     c.forEach((e) => e.reverse());
   }
 
@@ -135,7 +34,7 @@ let renderpanel = () => {
     let i = 0;
     for (let fx = -2; fx < 0; fx++) {
       for (let fy = 0; fy < 9; fy++) {
-        if (orientation == "h") {
+        if (system.orientation == "h") {
           drawProp("bonus", fy, fx, 1 + sizeadd, 1 - sizeadd);
           drawTxt(("0" + i).slice(-2), fy + 0.25, fx + 0.15, "#000", 170);
         } else {
@@ -146,31 +45,31 @@ let renderpanel = () => {
       }
     }
   } else {
-    drawPanel("abyss", c[4][0], c[4][1], 2, 2);
+    draw.drawPanel("abyss", c[4][0], c[4][1], 2, 2);
 
     if (data.finished) {
       // drawSize('frame', c[3][0], c[3][1], 2, 2)
     } else {
       // drawSize('help', c[3][0], c[3][1], 2, 2)
-      if (orientation == "w") {
-        drawPanel("surrender", c[2][0], c[2][1], 2, 1);
-      } else drawPanel("surrenderh", c[2][0], c[2][1], 1, 2);
+      if (system.orientation == "w") {
+        draw.drawPanel("surrender", c[2][0], c[2][1], 2, 1);
+      } else draw.drawPanel("surrenderh", c[2][0], c[2][1], 1, 2);
     }
 
-    if (local.frame > 0) drawPanel("frame", c[3][0], c[3][1], 2, 2);
+    if (local.frame > 0) draw.drawPanel("frame", c[3][0], c[3][1], 2, 2);
 
     if (data.win == "win") {
-      drawPanel("win", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("win", c[0][0], c[0][1], 2, 2);
     } else if (data.win == "defeat") {
-      drawPanel("defeat", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("defeat", c[0][0], c[0][1], 2, 2);
     } else if (data.bonus == "choose") {
-      drawPanel("choose", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("choose", c[0][0], c[0][1], 2, 2);
     } else if (data.bonus == "wait") {
-      drawPanel("wait", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("wait", c[0][0], c[0][1], 2, 2);
     } else if (data.turn) {
-      drawPanel("turn", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("turn", c[0][0], c[0][1], 2, 2);
     } else {
-      drawPanel("turnEnemy", c[0][0], c[0][1], 2, 2);
+      draw.drawPanel("turnEnemy", c[0][0], c[0][1], 2, 2);
     }
 
     // drawTxt(local.fisher[0] + '', c[0][0] + 0.15, c[0][1] + 0.4 + 0.15, '#090')
@@ -196,27 +95,27 @@ let renderpanel = () => {
         arr.push(u);
       }
     });
-    drawPanel("next", c[1][0], c[1][1], 2, 2);
+    draw.drawPanel("next", c[1][0], c[1][1], 2, 2);
     if (data.win != "win" && data.win != "defeat")
-      drawTxt(data.leftturns + "⌛", c[0][0] + 0.5, c[0][1] + 0.35, 1.5, "#222", 150);
+      draw.drawTxt(data.leftturns + "⌛", c[0][0] + 0.5, c[0][1] + 0.35, 1.5, "#222", 150);
   }
-  if (orientation == "h") drawPanel("scrollh", 0, -3, 9, 3);
-  else drawPanel("scroll", -3, 0, 3, 9);
+  if (system.orientation == "h") draw.drawPanel("scrollh", 0, -3, 9, 3);
+  else draw.drawPanel("scroll", -3, 0, 3, 9);
 };
 
-const drawUnit = (unit) => {
+export const drawUnit = (unit) => {
   if (!local.once) {
     local.once = true;
   }
   unit.sizeAdd = unit.sizeAdd || 0;
-  cellX = Math.round(unit.x);
-  cellY = Math.round(unit.y);
+  let cellX = Math.round(unit.x);
+  let cellY = Math.round(unit.y);
   if (!(cellX >= 0 && cellX < 9 && cellY < 9 && cellY >= 0)) return true;
 
   const groundSize = ["grass", "team1", "team2"].includes(data.field[cellX][cellY]) ? 56 : 0;
 
   if (unit.cropPercent)
-    drawPropUnitCropped(
+    draw.drawPropUnitCropped(
       unit.img,
       unit.x,
       unit.y,
@@ -230,7 +129,7 @@ const drawUnit = (unit) => {
       unit.cropPercent
     );
   else
-    drawPropUnit(
+    draw.drawPropUnit(
       unit.img,
       unit.x,
       unit.y,
@@ -242,13 +141,14 @@ const drawUnit = (unit) => {
       groundSize + unit.sizeAdd,
       !unit.static
     );
-  if (unit.focused) drawImg("focus", unit.x, unit.y, true);
+  if (unit.focused) draw.drawImg("focus", unit.x, unit.y, true);
   if (data.field[cellX][cellY] === "water")
-    drawImgMask("drawn", unit.x, unit.y, fieldmask[cellX][cellY], true);
+    draw.drawImgMask("drawn", unit.x, unit.y, fieldmask[cellX][cellY], true);
 
-  if (unit.sticker) drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
+  if (unit.sticker)
+    draw.drawSticker(unit.sticker.img, unit.x, unit.y, unit.sticker.color, !unit.static);
 
-  unit.status?.forEach((stt) => drawStatus(stt, unit.x, unit.y, true));
+  unit.status?.forEach((stt) => draw.drawStatus(stt, unit.x, unit.y, true));
 };
 
 const renderunit = (x, y) => {
@@ -263,34 +163,34 @@ const renderunit = (x, y) => {
       case "none":
         break;
       case "walk":
-        animateWalk(unit, animation.fromX, animation.fromY);
+        animate.walk(unit, animation.fromX, animation.fromY);
         break;
       case "fly":
-        animateFlight(unit, animation.fromX, animation.fromY);
+        animate.flight(unit, animation.fromX, animation.fromY);
         break;
       case "jump":
-        animateJump(unit, animation.fromX, animation.fromY);
+        animate.jump(unit, animation.fromX, animation.fromY);
         break;
       case "teleport":
-        animateTeleport(unit, animation.fromX, animation.fromY);
+        animate.teleport(unit, animation.fromX, animation.fromY);
         break;
       case "worm":
-        animateWorm(unit, animation.fromX, animation.fromY);
+        animate.worm(unit, animation.fromX, animation.fromY);
         break;
       case "add":
-        animateAdd(unit);
+        animate.add(unit);
         break;
       case "punch":
-        animatePunch(unit, animation.targetX, animation.targetY);
+        animate.punch(unit, animation.targetX, animation.targetY);
         break;
       case "idle":
         drawUnit({ ...unit, x: animation.fromX, y: animation.fromY });
         break;
       case "shake":
-        animateShake(unit);
+        animate.shake(unit);
         break;
       case "polymorph":
-        animatePolymorph(unit, animation.img);
+        animate.polymorph(unit, animation.img);
         break;
       default:
         drawUnit({ ...unit, static: true });
@@ -299,7 +199,7 @@ const renderunit = (x, y) => {
     return;
   }
   if (unit.isReady && data.turn && unit.canMove && (!local.unit?.canMove || !local.unit?.isReady)) {
-    animateBreath(unit);
+    animate.breath(unit);
     return;
   }
   drawUnit({ ...unit, static: true });
@@ -308,16 +208,16 @@ const renderunit = (x, y) => {
 let renderfield = (x, y) => {
   if (!data.field) return;
   let v = 0;
-  drawImgMask(data.field[x][y], x, y + v, fieldmask[x][y]);
+  draw.drawImgMask(data.field[x][y], x, y + v, fieldmask[x][y]);
   if (data.field[x][y - 1] && data.field[x][y - 1] != data.field[x][y])
-    drawImgFieldConnection(
+    draw.drawImgFieldConnection(
       "ns" + data.field[x][y - 1] + data.field[x][y],
       x,
       y - 0.5,
       fieldmask[x][y]
     );
   if (data.field[x - 1] && data.field[x - 1][y] != data.field[x][y])
-    drawImgFieldConnection(
+    draw.drawImgFieldConnection(
       "we" + data.field[x - 1][y] + data.field[x][y],
       x - 0.5,
       y,
@@ -329,7 +229,7 @@ let renderfield = (x, y) => {
 
 let renderoldfield = (x, y) => {
   let v = 0;
-  drawImgMask(local.oldfield[x][y], x, y + v, fieldmask[x][y]);
+  draw.drawImgMask(local.oldfield[x][y], x, y + v, fieldmask[x][y]);
   if (local.oldfield[x][y - 1] && local.oldfield[x][y - 1] != local.oldfield[x][y])
     drawImgFieldConnection(
       "ns" + local.oldfield[x][y - 1] + local.oldfield[x][y],
@@ -349,7 +249,7 @@ let renderoldfield = (x, y) => {
 let renderspoil = (x, y) => {
   let u = data.spoil.filter((u) => u.x == x && u.y == y);
   u.forEach((s) => {
-    if (!s.name.startsWith("fire")) drawSpoil(s.name, s.x, s.y);
+    if (!s.name.startsWith("fire")) draw.drawSpoil(s.name, s.x, s.y);
   });
 };
 
@@ -360,15 +260,15 @@ let renderakt = () => {
       if (local.unit.canMove) {
         if (data.turn == 1) {
           let sizeAdd = (local.cadr * 15) / 700;
-          drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
+          draw.drawAkt(a.img, a.x, a.y, -sizeAdd, sizeAdd, false);
           return;
         } else {
-          drawAkt(a.img, a.x, a.y, 0, 0, "disabled");
+          draw.drawAkt(a.img, a.x, a.y, 0, 0, "disabled");
           return;
         }
       }
       if (!local.unit.canMove) {
-        drawAkt(a.img, a.x, a.y, 0, 0, "enemy");
+        draw.drawAkt(a.img, a.x, a.y, 0, 0, "enemy");
         return;
       }
     });
@@ -382,22 +282,22 @@ let rendertrail = (x, y) => {
     if (local.animationTurn == trail.turn) {
       switch (trail.name) {
         case "death":
-          animateTrailDeath(trail.unit, trail.x, trail.y);
+          animate.trailDeath(trail.unit, trail.x, trail.y);
           break;
         case "fly":
-          animateFlight(trail.unit, trail.x, trail.y);
+          animate.flight(trail.unit, trail.x, trail.y);
           break;
         case "jump":
-          animateJump(trail.unit, trail.x, trail.y);
+          animate.jump(trail.unit, trail.x, trail.y);
           break;
         case "idle":
           drawUnit({ ...trail.unit, x: trail.x, y: trail.y });
           break;
         case "launch":
-          animateLaunch(trail.unit, trail.x, trail.y);
+          animate.launch(trail.unit, trail.x, trail.y);
           break;
         case "fall":
-          animateFall(trail.unit, trail.x, trail.y);
+          animate.fall(trail.unit, trail.x, trail.y);
           break;
         default:
           // Обработка случая, если имя trail не соответствует ни одному из вариантов
@@ -408,7 +308,7 @@ let rendertrail = (x, y) => {
 };
 let rendertip = () => {
   if (local.tip && local.tip.dur > 0)
-    drawTxt(
+    draw.drawTxt(
       local.tip.text,
       local.tip.x,
       local.tip.y,
@@ -422,8 +322,8 @@ let rendertip = () => {
 
 function renderdescription() {
   if (local.unit) {
-    local.description.name = description_unit[local.unit.tp]?.name;
-    local.description.description = description_unit[local.unit.tp]?.description;
+    local.description.name = description.unit[local.unit.tp]?.name;
+    local.description.description = description.unit[local.unit.tp]?.description;
     if (!local.description.name) local.description.name = local.unit.tp;
     if (!local.description.description) local.description.description = description_notfound;
     if (local.unit?.color == 1) local.description.color = "#006600";
@@ -433,13 +333,31 @@ function renderdescription() {
 
   if (local.description.name) {
     let lasty;
-    if (orientation == "h") {
-      drawTxt(local.description.name, 0.2, -2.8, 8.55, local.description.color, 130, false, false);
-      lasty = drawTxt(local.description.description, 0.2, -2.3, 8.55, "#000000", 100, false, false);
+    if (system.orientation == "h") {
+      draw.drawTxt(
+        local.description.name,
+        0.2,
+        -2.8,
+        8.55,
+        local.description.color,
+        130,
+        false,
+        false
+      );
+      lasty = draw.drawTxt(
+        local.description.description,
+        0.2,
+        -2.3,
+        8.55,
+        "#000000",
+        100,
+        false,
+        false
+      );
       if (local.unit?.status && local.unit?.status[0]) {
-        drawStatus(local.unit.status[0], 0.2, lasty + 0.5, false);
-        drawTxt(
-          description_status[local.unit.status[0]],
+        draw.drawStatus(local.unit.status[0], 0.2, lasty + 0.5, false);
+        draw.drawTxt(
+          description.status[local.unit.status[0]],
           1.5,
           lasty + 0.5,
           6,
@@ -450,7 +368,7 @@ function renderdescription() {
         );
       } else {
         if (local.unit.sticker) {
-          drawPropUnit(
+          draw.drawPropUnit(
             local.unit.sticker.img,
             0.2,
             lasty + 0.5,
@@ -463,7 +381,7 @@ function renderdescription() {
             false
           );
           drawTxt(
-            description_sticker + description_unit[local.unit.sticker.img]?.name,
+            description.sticker + description.unit[local.unit.sticker.img]?.name,
             1.5,
             lasty + 0.5,
             6,
@@ -475,9 +393,9 @@ function renderdescription() {
         }
       }
       if (local.description.spoil) {
-        drawSpoil(local.description.spoil, 0.2, lasty + 0.5, false);
-        drawTxt(
-          description_spoil[local.description.spoil] || local.description.spoil,
+        draw.drawSpoil(local.description.spoil, 0.2, lasty + 0.5, false);
+        draw.drawTxt(
+          description.spoil[local.description.spoil] || local.description.spoil,
           1.5,
           lasty + 0.5,
           6,
@@ -488,12 +406,30 @@ function renderdescription() {
         );
       }
     } else {
-      drawTxt(local.description.name, -2.92, 0.2, 2.9, local.description.color, 130, false, false);
-      lasty = drawTxt(local.description.description, -2.92, 0.7, 2.9, "#000000", 100, false, false);
+      draw.drawTxt(
+        local.description.name,
+        -2.92,
+        0.2,
+        2.9,
+        local.description.color,
+        130,
+        false,
+        false
+      );
+      lasty = draw.drawTxt(
+        local.description.description,
+        -2.92,
+        0.7,
+        2.9,
+        "#000000",
+        100,
+        false,
+        false
+      );
       if (local.unit?.status && local.unit?.status[0]) {
-        drawStatus(local.unit.status[0], -2.7, lasty + 0.5, false);
-        drawTxt(
-          description_status[local.unit.status[0]] || local.unit.status[0],
+        draw.drawStatus(local.unit.status[0], -2.7, lasty + 0.5, false);
+        draw.drawTxt(
+          description.status[local.unit.status[0]] || local.unit.status[0],
           -2.92,
           lasty + 1.7,
           2.9,
@@ -504,7 +440,7 @@ function renderdescription() {
         );
       } else {
         if (local.unit.sticker) {
-          drawPropUnit(
+          draw.drawPropUnit(
             local.unit.sticker.img,
             -2.7,
             lasty + 0.5,
@@ -516,8 +452,8 @@ function renderdescription() {
             52,
             false
           );
-          drawTxt(
-            description_sticker + description_unit[local.unit.sticker.img]?.name,
+          draw.drawTxt(
+            description.sticker + description.unit[local.unit.sticker.img]?.name,
             -2.92,
             lasty + 1.7,
             2.9,
@@ -531,7 +467,7 @@ function renderdescription() {
       if (local.description.spoil) {
         drawSpoil(local.description.spoil, -2.7, lasty + 0.5, false);
         drawTxt(
-          description_spoil[local.description.spoil] || local.description.spoil,
+          description.spoil[local.description.spoil] || local.description.spoil,
           -2.92,
           lasty + 1.7,
           2.9,
@@ -544,3 +480,122 @@ function renderdescription() {
     }
   }
 }
+
+export const render = () => {
+  draw.resize();
+
+  if (data.history) draw.drawBackground("history");
+  else {
+    if (data.turn == 1) {
+      draw.drawBackground("edgeTurn");
+    } else {
+      draw.drawBackground("edgeWait");
+    }
+  }
+
+  if (data.bonus != "choose") renderpanel();
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      renderfield(x, y);
+      if (
+        local.animationTurn < 2 &&
+        local.oldfield &&
+        local.oldfield[x][y] == "grass" &&
+        data.field[x][y] == "ground"
+      )
+        draw.drawImgMask("grass", x, y, fieldmask[x][y], false);
+    }
+    for (let x = 0; x < 9; x++) {
+      renderspoil(x, y);
+    }
+    // for (let x = 0; x < 9; x++) {
+    //   renderunit(x, y, diff);
+    // }
+    if (data.chooseteam || !data.bonus == "ready") {
+      for (let x = 0; x < 9; x++) {
+        if (data.field[x][y] == "team1") draw.drawImgMask("bluestart", x, y);
+        if (data.field[x][y] == "team2") draw.drawImgMask("orangestart", x, y);
+      }
+    }
+  }
+
+  if (local.sandclock) {
+    draw.drawImg("sandclock", local.sandclock.x, local.sandclock.y);
+  }
+
+  renderdescription();
+  rendertip();
+};
+
+export const renderanimated = (diff) => {
+  draw.resize(true);
+
+  for (let y = 0; y < 9; y++) {
+    for (let x = 0; x < 9; x++) {
+      if (local.animationTurn != local.renderedturn && local.animationTurn < 4) {
+        local.renderedturn = local.animationTurn;
+        render();
+      }
+
+      let u = data.spoil.filter((u) => u.x == x && u.y == y);
+      u.forEach((spoil) => {
+        let spoil_animation;
+        if (spoil.animation) spoil_animation = spoil.animation[local.animationTurn];
+
+        if (spoil_animation) {
+          switch (spoil_animation.name) {
+            case "none":
+              break;
+          }
+          return;
+        }
+        if (spoil.name.startsWith("fire")) draw.drawSpoil(spoil.name, spoil.x, spoil.y, true);
+      });
+
+      rendertrail(x, y);
+      renderunit(x, y);
+    }
+  }
+  renderakt();
+  if (data.bonus == "choose") renderpanel();
+  if (!socket.connected)
+    local.tip = tip("Разорвано соединение с сервером...", 3, 3, "#F00", 5, 200);
+
+  if (!diff) diff = 0;
+  if (diff > 100) diff = 100;
+  if (diff) {
+    fps = Math.ceil(1000 / diff);
+    let x = -2.85;
+    let y = 8;
+    if (system.orientation == "h") {
+      x = 6.85;
+      y = -0.4;
+    }
+
+    // drawTxt("fps " + fps, x, y - 0.2, 2, "#000000", undefined, undefined, true);
+    let total = local.position[0] + local.position[1];
+    let percentage1 = total > 0 ? ((local.position[0] / total) * 100).toFixed(1) : 0;
+    let percentage2 = total > 0 ? ((local.position[1] / total) * 100).toFixed(1) : 0;
+
+    draw.drawTxt(
+      `p1 ${percentage1}% (${local.position[0]})`,
+      x,
+      y,
+      2,
+      "#000000",
+      undefined,
+      undefined,
+      true
+    );
+    draw.drawTxt(
+      `p2 ${percentage2}% (${local.position[1]})`,
+      x,
+      y + 0.4,
+      2,
+      "#000000",
+      undefined,
+      undefined,
+      true
+    );
+  }
+};

@@ -1,4 +1,4 @@
-const meta = require("./meta");
+import meta from "./meta.js";
 
 let en = {};
 
@@ -222,4 +222,4 @@ en.path = (game, x1, y1, x2, y2) => {
   return [];
 };
 
-module.exports = en;
+export default en;

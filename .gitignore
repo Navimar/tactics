@@ -9,3 +9,4 @@ img.nosync/
 .env
 .env.prod
 assets/*
+dist/*

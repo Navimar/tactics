@@ -1,3 +1,5 @@
+import { Howl } from "howler";
+
 // Объект для хранения загруженных звуков
 const sounds = {};
 
@@ -11,7 +13,7 @@ function loadSound(filename) {
 }
 
 // Основная функция для воспроизведения звука с случайной громкостью и скоростью
-function playSound(filename) {
+export default function playSound(filename) {
   // Проверяем, загружен ли уже звук
   if (!sounds[filename]) {
     // Если звук не загружен, загружаем его
